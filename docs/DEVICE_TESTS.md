@@ -55,7 +55,7 @@ Android의 Foreground Service에는 유효한 알림이 필요하다. 앱의 ‘
 JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-- BUILD SUCCESSFUL, 단위 테스트 **39개 통과**, 실패·오류 0. (2026-11-07 갱신 주기·재탐색 설정 7개, 재연결 이벤트 정책 6개 추가분 포함.) 위 10:00~10:07 시험은 커밋 `0ccfeeb`의 갱신 주기 빌드로 수행했다(설정 안내 문구 한 줄만 다름). 재연결 이벤트 정책(커밋 `0d8af20`)은 13:33에, 리뷰 수정(커밋 `61a5bc9`의 코드)은 13:53에 설치해 일부만 확인했다(아래 표, `test-results/outage-policy-validation.txt`). 현재 설치본은 `61a5bc9`의 코드다.
+- BUILD SUCCESSFUL, 단위 테스트 **47개 통과**, 실패·오류 0. (2026-11-07 갱신 주기·재탐색 설정 7개, 재연결 이벤트 정책 6개 추가분 포함.) 위 10:00~10:07 시험은 커밋 `0ccfeeb`의 갱신 주기 빌드로 수행했다(설정 안내 문구 한 줄만 다름). 재연결 이벤트 정책(커밋 `0d8af20`)은 13:33에, 리뷰 수정(커밋 `61a5bc9`의 코드)은 13:53에 설치해 일부만 확인했다(아래 표, `test-results/outage-policy-validation.txt`). 현재 설치본은 `61a5bc9`의 코드다.
 - 암호화 고정 벡터, 유효 거리/신선도, 디바운스·히스테리시스·중복 방지, 10m 상한, Webhook 정책, 자동 재개 정책을 검사했다.
 - Lint 오류 0, 경고 1: 사용자 원본 아이콘에 별도 monochrome layer가 없다. 컬러 원본은 그대로 유지했다.
 - APK debug 서명 검증 결과와 SHA-256은 `test-results/apk-signature.txt`, `artifacts/SHA256SUMS.txt`에 보관한다.
@@ -81,6 +81,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 |Tasker 수신·프로필 실행|공식 SDK 플러그인 구현, 시험 휴대폰에 Tasker 미설치로 외부 수신 미검증|
 |HTTPS Webhook 서버 도착|암호화 자격 증명·영속 큐·재시도 구현, 수신 URL 미제공으로 외부 전달 미검증|
 |삼성 Modes and Routines 직접 거리 조건|공식 등록 SDK 미확보. 앱 자체의 직접 루틴 제어를 주장하지 않음. 조사 결과는 [AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md)|
+|SmartThings 가상 스위치 연결|**확인(2026-11-07):** 가상 스위치 생성(CLI `virtualdevices:create`), SmartThings 앱 목록 표시, 자동화 ‘만약 → 기기 상태’에서 선택 가능, CLI 이벤트로 시험 자동화가 1~2초 만에 실행, 앱의 삼성 로그인 토큰으로 읽기 200·쓰기 200과 켜기/끄기 시험이 SmartThings 상태를 실제로 변경. **미확인:** 실제 이탈·복귀 이벤트 연동, 차량 잠금 자동화와 지연, 토큰 장기 유효성, 오프라인 재전송|
 |SmartThings 자동화 트리거|문서 조사만 수행, 계정 실험 없음|
 |앱 알림 → 삼성 루틴 ‘알림을 받으면’ 조건|조건 화면·알림 리스너·문구는 기기 앱에서 확인했으나 **루틴을 만들어 실행해 보지 않음.** 알림 접근이 꺼져 있었음|
 |UWB 갱신 주기 빠름 120ms / 절전 600ms의 배터리 효과|콜백 간격은 확인했다(위). **폰·태그의 배터리 소모 변화는 측정하지 않았다.** 비충전·장시간·다른 기기/태그는 미검증|

@@ -29,6 +29,8 @@
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
 |`automation/MonitorEvents.kt`|최근 100개 이벤트, 별도 채널 알림, WorkManager HTTPS Webhook|
+|`automation/SmartThingsSync.kt`|SmartThings OAuth 토큰 저장·갱신, 가상 스위치 이벤트 전송 Worker, 일일 갱신 Worker|
+|`domain/SmartThingsSwitch.kt`|가상 스위치 요청·토큰 응답 처리(순수 함수), 이벤트→ON/OFF 매핑|
 |`automation/TaskerEvents.kt`|공식 Tasker 이벤트 플러그인의 설정·필터·변수·명시적 전달|
 
 ## 세션 흐름
@@ -69,6 +71,7 @@
 |---|---|
 |`files/account.vault`|삼성 토큰·태그 정보·소유자 키·선택 ID. `uwbpulse.account.v1` Keystore 키로 암호화|
 |`files/webhook.vault`|Webhook URL/Bearer. 별도 `uwbpulse.webhook.v1` 키|
+|`files/smartthings.vault`|SmartThings 클라이언트 ID·비밀, 액세스/갱신 토큰, 가상 스위치 기기 ID. 별도 `uwbpulse.smartthings.v1` 키|
 |DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases, tracking_rate, rescan_max_millis, last_meters / last_seen_epoch(마지막 상태 한 건)|
 |DataStore `probe`|초기 진단 화면의 선택 BLE 주소. 서비스의 소유 태그 식별 기준으로 사용하지 않음|
 |`files/monitor-events.json`|최근 100개 비식별 이벤트. 시각과 거리는 포함|

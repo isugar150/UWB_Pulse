@@ -103,6 +103,10 @@ Foreground Service에는 유효한 알림이 필요하므로 서비스 알림 �
 
 WorkManager의 네트워크 조건과 영속 큐를 사용합니다. 연결·읽기 타임아웃 각각 5초, 최대 3회 전송, 429·5xx·네트워크 오류에 지수 백오프를 적용합니다. 다른 호스트로 리디렉션하지 않습니다. `Idempotency-Key`/이벤트 ID로 수신 측 중복 방지를 지원합니다. 서버의 멱등 처리는 별도로 필요합니다. Webhook을 끄면 대기 작업도 전송을 건너뜁니다. 실제 도착 시점은 OS 작업 스케줄·네트워크 상태에 영향을 받습니다.
 
+### SmartThings 가상 스위치 (선택, 실험)
+
+이탈 시 SmartThings 가상 스위치를 켜고 복귀 시 끕니다. SmartThings 자동화의 ‘만약’에서 그 스위치를 조건으로 써서 차량 문 잠금 등을 실행합니다. 폰 잠금·빅스비·하드웨어와 무관합니다. 설정 절차는 [SmartThings 연결 안내](docs/SMARTTHINGS_SETUP.md)에 있습니다. 서버 없이 앱이 SmartThings 서버를 직접 호출하며, 앱에 저장된 삼성 계정 로그인만 씁니다. **가상 스위치 생성, 자동화 ‘만약’ 노출, 앱의 켜기·끄기 쓰기(HTTP 200, SmartThings 상태 변경)는 2026-11-07 실기기에서 확인했습니다.** 실제 이탈·복귀 이벤트 연동과 차량 잠금 자동화, 로그인 토큰의 장기 유효성은 아직 확인하지 않았고, 이 토큰 사용은 비공식 동작입니다.
+
 ## 빌드 / 설치
 
 JDK 25, Android SDK Platform 37 / Build Tools 36.0.0. `gradle/gradle-daemon-jvm.properties`가 daemon JVM 25를 지정합니다. Android Studio에서 SDK 경로를 지정하거나 개인 `local.properties`에 `sdk.dir`를 설정합니다.

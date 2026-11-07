@@ -81,6 +81,7 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 |중지 직후 재시작 지연|중지 후 곧바로 시작하면 `GATT_..._147`/`OWNER_TAG_NOT_FOUND`로 첫 수신까지 21~73초. 원인 조사 필요(이전 빌드와 비교 안 함)|
 |일시적 재연결 이벤트 억제 검증|단위 테스트와 기기 시험으로 확인: 짧은 일시 실패는 이벤트 0건, 이동 시험에서 2분 25초 뒤 `TAG_DISCONNECTED` 1회·`UWB_MONITORING_ERROR` 0건·복귀 시 자동 재연결(`test-results/outage-policy-validation.txt`). 남은 확인: 한 번도 연결된 적 없는 태그가 실행 내내 범위 밖인 경우|
 |`TAG_AUTHENTICATION_FAILED` 재시도 검증|12:49:20 사용자 사용 중 한 번의 인증 실패로 서비스가 멈췄다. 이제 연속 3번까지 재시도하고 4번째에 멈춘다(프로토콜·인증 불변 조건은 그대로). 기기에서 실제로 재시도 후 복구하는지 미확인. 원인(`GATT_BUSY_RETRY` 직후 실패)은 미조사|
+|SmartThings 가상 스위치|[SMARTTHINGS_SETUP.md](SMARTTHINGS_SETUP.md). 가상 스위치 생성·‘만약’ 노출·앱 쓰기(삼성 로그인, HTTP 200)는 확인됨. 남은 것: 실제 이탈/복귀 이벤트로 스위치가 바뀌는지, 스위치 ON → 차량 잠금 자동화(사용자가 만듦)와 전체 지연, 삼성 로그인 토큰 장기 유효성, 막힐 때 OAuth 전환 시험. 로그인 토큰 사용은 비공식|
 |SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md) 참고. **가장 먼저**: 삼성 루틴의 ‘알림을 받으면’ 조건으로 앱 이벤트 알림이 루틴을 실행하는지 사용자 폰에서 시험(알림 접근 허용 필요, 루틴 생성은 사용자 동의 후). 그다음 가상 스위치 수동 REST 호출 시험|
 |배터리·장기 안정성|비충전·기본 최적화·깊은 절전·수 시간 시험. 15분 충전 중 결과와 구분|
 |호환 기기 확대|AndroidX backend 및 다른 OS/펌웨어. 지원 feature와 실제 background callback을 별도 검증|
