@@ -15,7 +15,7 @@
 
 ## 설정 순서
 
-1. **가상 스위치 만들기(PC, 한 번).** SmartThings CLI(`brew install smartthingscommunity/smartthings/smartthings`)로 로그인한 뒤 아래 내용의 파일을 만들고 `<위치 ID>`, `<방 ID>`는 `smartthings locations`, `smartthings rooms`로 확인해 채웁니다.
+1. **가상 스위치 만들기(PC, 한 번).** SmartThings CLI(`brew install smartthingscommunity/smartthings/smartthings`)로 로그인한 뒤 아래 내용의 파일을 만들고 `<위치 ID>`, `<방 ID>`는 `smartthings locations`, `smartthings locations:rooms --location <위치 ID>`(CLI 3.x에는 `rooms` 명령이 없음)로 확인해 채웁니다.
 
 ```json
 {"name":"UWB_Pulse","roomId":"<방 ID>","owner":{"ownerType":"LOCATION","ownerId":"<위치 ID>"},"deviceProfile":{"components":[{"id":"main","capabilities":[{"id":"switch","version":1}],"categories":[{"name":"Switch"}]}]}}
@@ -34,7 +34,9 @@ smartthings virtualdevices:create -j -i virtual-switch.json
 
 ## 동작과 한계
 
-- 이탈 이벤트(`TAG_DISTANCE_EXCEEDED`)에 스위치 OFF, 복귀 이벤트(`TAG_RETURNED`)에 ON을 보냅니다. 시작/연동 활성화 후 첫 실제 거리로 한 번 상태를 맞추며, 최초 거리가 임계값 밖이면 이탈 지속 시간을 기다립니다. 연결 소실·오류만으로는 바꾸지 않습니다. 업데이트 전 반대 방향으로 만들어진 대기 작업은 폐기합니다.
+- **이탈 신호는 기본으로 ‘켰다 끄기’(1.5초 간격)입니다.** 이미 꺼져 있는 스위치에 끄기만 보내면 SmartThings에서 상태가 바뀌지 않아 ‘꺼지면’ 자동화가 다시 실행되지 않기 때문입니다. ‘켜지면’을 조건으로 쓰는 자동화가 있으면 이탈마다 한 번 실행되니 만들지 마세요. 설정의 ‘이탈 때 켰다 끄기’로 끌 수 있고 ‘켰다 끄기 시험’ 버튼으로 확인합니다(기기 미검증).
+
+- 이탈 이벤트(`TAG_DISTANCE_EXCEEDED`)에 스위치 OFF, 복귀 이벤트(`TAG_RETURNED`)에 ON을 보냅니다. 시작/연동 활성화 후 첫 실제 거리로 한 번 상태를 맞추며, 최초 거리가 임계값 밖이면 이탈 지속 시간을 기다립니다. 짧은 연결 소실·오류만으로는 바꾸지 않습니다. 단 가까웠던 태그와 30초 넘게 연결이 끊기면(차 문이 닫혀 전파가 막히는 경우) 한 번 끄고, 복귀 거리 안의 실제 거리로 다시 켭니다(설정에서 해제 가능, 기기 미검증). 업데이트 전 반대 방향으로 만들어진 대기 작업은 폐기합니다.
 - 인터넷이 필요합니다. 이벤트는 **발생 후 30초까지만 유효**하며, 30초부터 오프라인 대기·재시도 신호를 폐기합니다. 최대 5회 제한 안에서도 만료 시간이 우선합니다. 더 새로운 상태가 이전 요청을 교체하며 실제 HTTP 전송도 직렬화합니다. 만료·교체는 `ST_SWITCH_DROPPED`에 남습니다. 이미 서버에 보낸 동작을 되돌리는 기능은 아닙니다.
 - **삼성 로그인 토큰을 SmartThings 공개 API에 쓰는 것은 비공식 동작입니다.** 이번 시험에서는 통했지만 삼성·SmartThings 정책 변경으로 막힐 수 있고 토큰 유효 기간은 확인하지 못했습니다. 막히면 OAuth 앱 방식(앱 설정의 OAuth 항목, SmartThings CLI `apps:create`)으로 전환할 수 있게 코드를 남겨 두었습니다.
 - 이 토큰은 SmartThings 계정의 기기를 제어할 수 있습니다. 앱은 Keystore 암호화 저장소에 보관하고 로그에 남기지 않으며, 로그에는 HTTP 상태만 기록합니다.

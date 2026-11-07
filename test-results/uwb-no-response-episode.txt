@@ -1,0 +1,20 @@
+2026-11-08 KST / Samsung SM-F971N / Android 17 API 37 / one SmartTag2 a few centimetres from the phone
+Episode: the tag authenticated over BLE and accepted the encrypted UWB configuration, but did not answer in UWB.
+No ids, addresses, keys or tokens. Interval = ranging interval requested.
+
+07:13:34 interval 600  UWB_STARTED, OOB acknowledged   -> phone UWB chip: every round RangingStatus=33, Distance=0 (17 rounds), "no ranging results for 10000 ms. Stopping session" -> UWB_STOPPED_0 at 07:13:45
+07:13:55 interval 600  same sequence                    -> UWB_STOPPED_0 at 07:14:06 -> TAG_UWB_UNAVAILABLE refusals=2 (notification), retry backoff 5 min
+07:19:33 interval 600  same sequence                    -> UWB_STOPPED_0 at 07:19:43
+07:26:32 interval 240  UWB_STARTED                      -> first report in 0.9 s, 85 reports in 25 s, status 0, 0.7-1.0 m
+A-B-A with the same tag, same position, adb commands only (DebugCommandReceiver):
+07:29:00 interval 600  35 rounds status 0, 1 round status 33 (the first round of a session), reports 0.72-0.85 m
+07:29:35 interval 240  78 rounds status 0, 3 rounds status 33 (first rounds), reports 0.9-0.96 m
+07:30:09 interval 600  32 rounds status 0, 1 round status 33, reports 0.97-1.08 m
+
+What this shows
+- The interval is not the cause: 600 ms fails at 07:13-07:19 and works at 07:29 and 07:30; 240 ms works at 07:26 and 07:29.
+- The tag's own advertisement (as parsed by the SmartThings app, journal-free system log) reported batteryLevel=3 and uWBFlag=1 continuously from 06:48 to 07:14, including just before and after the failures. A low battery is not what the advertisement says.
+- Our connection, owner authentication, MTU and configuration writes succeeded in every failing session; only the UWB ranging got no reply from the tag.
+- The failure lasted about 6-12 minutes (07:13:34 to somewhere before 07:26:32) and ended without any change on our side. The 11-07 17:03 episode (GATT write 133 / UWB_STOPPED_0) also ended by the next morning.
+- What else happened in the same period: the earbuds used as a stand-in for the car connected (07:10:46) and disconnected (07:13:24) with repeated LE-audio link flaps at 07:11:34, 07:12:23 and 07:13:13; the app was started and stopped several times. Neither is shown to be the cause.
+- The first round of every session reports status 33 once: that is the normal start-up round, not a failure.

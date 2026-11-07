@@ -1,0 +1,71 @@
+2026-11-08 KST / Samsung SM-F971N / Android 17 API 37
+Car-Bluetooth mode, first run on the device after installing the 2026-11-08 06:42 build. The car (a bonded car device) was NOT connected to the phone, so only the "car link absent" path ran.
+No ids, addresses, tokens or keys; the car device name is omitted from the excerpt.
+
+06:44:48 MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; carMode=true; interactive=true; batteryExempt=false
+06:44:48 CAR_LINK connected=false; via=seed
+06:44:51 CAR_PHASE car link lost; tracking window 1 started          (3.0 s confirmation after the seed)
+06:44:51 BLE_SCAN_MODE LOW_LATENCY
+06:44:52 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+06:44:55 GATT_CONNECTED discovering auth and UWB services
+06:44:55 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+06:44:55 UWB_RATE requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+06:44:56 GATT_LOW_POWER connection priority requested; accepted=true
+06:44:56 UWB_REPORT meters=1.0; confidence=2; total=1
+06:44:57 ST_SWITCH_RESULT state=on; httpStatus=200; attempt=1
+06:45:02 UWB_REPORT meters=0.98; confidence=2; total=10
+
+Not exercised on the device: a real car link (CAR_LINK via=acl/a2dp/hfp, idle phase, switch on), a departure that closes the window, the 30 s lost-link rule, and the timing of this car's Bluetooth disconnect relative to leaving. Those are covered by unit tests (CarModeTests, SwitchPresenceSyncTests, PresencePolicyTests) only.
+
+--- Second run, same day, with the first-version behaviour (before the fix) ---
+06:46:37 TAG_UWB_STOPPED encrypted stop acknowledged            (monitoring stopped)
+06:46:39 MONITOR_START ... carMode=true
+06:46:39 CAR_LINK connected=false; via=seed
+06:46:42 CAR_PHASE car link lost; tracking window 1 started      <- wrong: the car had never been linked in this run
+06:46:46 BLE_CANDIDATE ... ownerSignatureMatched=true
+06:46:56 MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147     (tag still held the previous session after a quick stop/start)
+06:47:12 PRESENCE_LINK_LOST silentMs=30040; switch=off           <- false OFF with the tag next to the phone
+06:47:12 CAR_PHASE departure decided; tag released until the car links again
+06:47:12 ST_SWITCH_RESULT state=off; httpStatus=200; attempt=1
+
+Cause: a start without the car link was treated like "the car link just dropped", so a tracking window opened; the lost-link rule counted 30 s from the window start although no tag measurement had ever been possible.
+Fix (build installed 06:48): a start without a car link only waits (CarModeMachine.Phase.WAITING); the tag is not scanned, connected or ranged until the car has linked once.
+
+--- Third run, fixed build ---
+06:48:52 MONITOR_START ... carMode=true
+06:48:52 CAR_LINK connected=false; via=seed
+06:48:55 CAR_PHASE started without the car link; tag left alone until the car links
+No BLE_SCAN_MODE, BLE_CANDIDATE, GATT_CONNECTED, UWB_STARTED or ST_SWITCH_RESULT followed.
+
+--- Fourth run, build with the pulse and the 8 s / 60 s car-window rules (installed 06:57) ---
+06:57:58 MONITOR_START ... carMode=true
+06:57:58 CAR_LINK connected=false; via=seed
+06:58:01 CAR_PHASE started without the car link; tag left alone until the car links
+Only the waiting path was run. The pulse (on, 1.5 s, off), the 8 s seen-then-lost rule, the 60 s never-measured rule and its notification were NOT exercised on the device (unit tests only). The "켰다 끄기 시험" button was deliberately not pressed: the switch is currently off and the state of the user's lock automation is unknown.
+
+--- Fifth run, build with the saved car phase (installed 07:07) ---
+07:07:37 MONITOR_START ... carMode=true
+07:07:37 CAR_RESTORE saved=none; ageMs=-1; carWasLinkedBeforeStart=false; startPhase=UNKNOWN      (user start: a user stop had cleared the phase)
+07:07:40 CAR_PHASE started without the car link; tag left alone until the car links
+(process killed with SIGKILL, restarted by START_STICKY)
+07:07:56 MONITOR_RESTORE manual=false
+07:07:56 CAR_RESTORE saved=WAITING; ageMs=15849; carWasLinkedBeforeStart=false; startPhase=UNKNOWN
+07:07:59 CAR_PHASE started without the car link; tag left alone until the car links
+Only the "nothing to revive" path ran. Reviving a missed departure (saved CAR_CONNECTED or TRACKING within 15 minutes, car link gone) needs a real car link and is covered by unit tests only.
+
+--- Sixth run: earbuds as a stand-in for the car (07:10 - 07:14) ---
+07:10:46 (system log) earbuds connect: A2DP/HFP connected
+07:10:13 - 07:12 CAR_LINK lines absent although the earbuds connected: the receiver was registered RECEIVER_NOT_EXPORTED and never received the Bluetooth stack's broadcasts (sender uid 1002). Fixed: RECEIVER_EXPORTED (all four actions are protected broadcasts).
+After the fix:
+07:12:50 CAR_LINK connected=true; via=seed
+07:12:50 CAR_PHASE car linked; tag left alone; switch=on
+07:12:50 ST_SWITCH_RESULT state=on; httpStatus=200; attempt=1
+07:13:13 CAR_LINK_OTHER action=acl_disconnected; transport=2      (other devices' LE links: ignored, as intended)
+07:13:24 CAR_LINK connected=false; via=acl                       (earbuds put in the case; the ACL loss ends every profile)
+07:13:27 CAR_PHASE car link lost; tracking window 1 started      (3 s confirmation)
+07:13:34 TAG_AUTHENTICATED ... ; 07:13:34 UWB_STARTED technology=0 ; 07:13:35 OOB_ENCRYPTED_ACKNOWLEDGED
+07:13:45 MONITOR_CONNECTION_ERROR UWB_STOPPED_0                  (no UWB report in 10 s; the tag was a few centimetres from the phone)
+07:13:55 second attempt: same sequence, no report
+07:14:06 TAG_UWB_UNAVAILABLE refusals=2; code=UWB_STOPPED_0 ... check the tag battery
+07:14:20 CAR_TRACKING_STOPPED / MONITOR_STOP                       (stopped by hand before the 60 s never-measured rule could send a pulse)
+This is a real "BLE and authentication work, UWB does not start" case on this tag, about 25 minutes after UWB ranged normally (06:44 - 06:48). Cause unknown; the tag battery is the suspected one but not measured. The refusal detection and its notification worked as designed. No pulse and no off signal were sent in this run.

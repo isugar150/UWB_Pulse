@@ -124,3 +124,32 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 최신 사용자 요청으로 가까움/복귀 ON·이탈 OFF로 변경했다. 위의 이탈 ON·복귀 OFF 관측은 이전 방향의 기록이다. 첫 실제 거리로 초기 상태를 한 번 맞추며, 임계값 밖에서 시작하면 이탈 지속 시간을 기다린다. Tasker/Webhook의 거리 이벤트는 바꾸지 않는다.
 
 단위 테스트 72개 통과(방향·초기 동기화 회귀 4개 추가), Lint 오류 0 / 기존 monochrome 경고 1. 같은 서명으로 덮어쓰기 후 16:45:14.949 실제 HIGH 거리 0.90m(activityVisible=false, interactive=false) 수신 → 16:45:15.781 `ST_SWITCH_RESULT state=on httpStatus=200` 확인. 임계 5m·복귀 4.5m·3초·모니터링 ON 유지. 이 수정 뒤 실제 이동으로 이탈 OFF를 다시 만들지는 않았으며 거리 엔진/매핑 단위 테스트로 검증했다. SmartThings 차량 잠금 루틴은 꺼짐 조건으로 사용자가 설정해야 한다.
+
+## 재연결 장애 (2026-11-07 17시대, 이후 자연 회복)
+
+17:03까지 정상 수신 후 UWB_STOPPED_0. 소유 광고/상호 인증 이후 ACTIVATE 쓰기가 GATT_WRITE_STATUS_133으로 반복 실패. 사용자 확인: 태그 절전 OFF. 연결 휴지 및 폰 Bluetooth/UWB 재시작 후에도 실패. 진단 빌드에서 fresh encrypted STOP ACK·ACTIVATE 실패, 휴대폰 로컬 UWB 시작 전 ACTIVATE 실패를 확인. 진단 변경은 제거하고 커밋 6593343 APK 재설치. 현재 기본 앱의 실제 거리 표시 비교를 위해 UWB Pulse 임시 중지. 원인/복구 미확정. 이 관측이 앞선 설치 직후 성공 기록보다 최신이다.
+
+**후속**: 다음 날 06:33에는 같은 태그가 정상 측정됐고 이 기록의 ‘임시 중지’ 상태는 더 이상 아니다. 11-08 07:13~07:25에 비슷한 증상이 다시 나타났다가 저절로 풀렸다([CAR_MODE.md](CAR_MODE.md) §5). 원인은 확정하지 못했다.
+
+## 2026-11-08 관측 (차량 블루투스 모드와 UWB 무응답)
+
+사용자 보고(운전 뒤 태그 배터리, 문을 닫으면 끊겨 잠금 안 됨)는 관측이며 당시 저널은 확보하지 못했다. 아래는 이후 기기에서 한 시험이다. 설계·규칙은 [CAR_MODE.md](CAR_MODE.md). 모두 USB 충전 중이고, 차량 모드 시험의 ‘차량’은 07:10 이후 이어폰을 임시로 골랐다(그 전에는 차량 없이 시작하는 경로만). 증거 발췌는 `test-results/car-mode-validation.txt`, `reinstall-validation.txt`, `uwb-no-response-episode.txt`.
+
+|시각|시험|결과|
+|---|---|---|
+|06:22|새 빌드 설치(앱·가상 스위치를 사용자가 지운 뒤)|기존 설치가 없어 서명 충돌 없음|
+|06:33|삼성 로그인(사용자)·태그 선택·기기 ID 입력·연동 켜기·시작|`ST_PROBE` 읽기·쓰기 200, `UWB_RATE requested=SAVER; intervalMs=600`, `GATT_LOW_POWER accepted=true`, 거리 0.37m, 스위치 켜짐 200, 콜백 약 1.67/s|
+|06:44~06:46|차량 모드 첫 빌드, 차량 없이 시작|‘끊김’으로 보고 추적 창이 열려 태그에 연결·측정(이후 잘못된 동작으로 판단)|
+|06:46~06:47|중지 직후 재시작|태그가 이전 세션을 쥐어 `GATT_CONNECTION_STATUS_147`, 30초 무측정 뒤 스위치 끄기 신호 HTTP 200(태그는 폰 옆) — 잘못된 동작. `WAITING`으로 수정|
+|06:48 이후|수정 빌드, 차량 없이 시작(여러 번)|`CAR_PHASE started without the car link`, 검색·연결·UWB·스위치 신호 없음|
+|07:07|프로세스 SIGKILL|`START_STICKY`로 복구, `CAR_RESTORE saved=WAITING`을 읽고 대기|
+|07:10~07:12|이어폰 연결·끊김|`CAR_LINK` 한 줄도 없음 — 수신기가 비공개로 등록돼 시스템 알림을 못 받던 버그. `RECEIVER_EXPORTED`로 수정|
+|07:12:50|수정 빌드, 이어폰 연결 상태로 시작|`CAR_LINK connected=true; via=seed` → `CAR_PHASE car linked` → 스위치 켜짐 200|
+|07:13:13~07:13:27|이어폰을 케이스에|다른 기기 LE 알림은 무시, `CAR_LINK connected=false; via=acl` → 3초 뒤 추적 창 → 태그 인증·UWB 시작|
+|07:13:34~07:19:43|UWB 무응답|3번 모두 라운드마다 응답 없음(`RangingStatus=33`) → `UWB_STOPPED_0`. 07:14:06 `TAG_UWB_UNAVAILABLE refusals=2`, 재시도 5분 간격. 이 사이 07:14:20에 모니터링을 직접 중지(60초 규칙의 잠금 신호 방지)|
+|07:26~07:30|갱신 주기 비교|240ms 성공, 이어서 600ms·240ms·600ms(A-B-A) 모두 성공 → 주기는 원인이 아님. 태그 광고의 배터리 단계는 06:48~07:14 내내 3|
+|07:31|adb 명령으로 설정 복원|이어폰 대신 사용자의 차량 기기를 다시 선택하고 차량 모드·SmartThings 연동·절전 600ms를 복원, 차량 연결 대기|
+
+이 날의 단위 테스트는 115개(기존 72 + 43), Lint 오류 0 / 경고 1.
+
+**미확인**: 실제 차량, 재연결 시 추적 창 취소, 놓친 이탈 되살림 실기기, 켰다 끄기의 실제 SmartThings 반응, 8초·60초·30초 규칙 실주행, 비충전·장시간·배터리 절감, 화면 꺼짐 중 타이머 지연. 전체 목록은 [CAR_MODE.md](CAR_MODE.md) §9.3.

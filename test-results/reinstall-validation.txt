@@ -1,0 +1,19 @@
+2026-11-08 KST / Samsung SM-F971N / Android 17 API 37
+Fresh install of the 2026-11-08 06:22 debug build (default SAVER, link-loss switch rule, LOW_POWER connection priority) after the user removed the app and the SmartThings virtual switch.
+Samsung login completed by the user (verification code). Tag selected, new virtual switch ID entered through the app (ID not recorded here). No distance or door test was run.
+Excerpt of the on-device journal (no ids, addresses, tokens or keys):
+
+2026-11-08T06:33:00 ST_PROBE readStatus=200; writeStatus=200
+2026-11-08T06:33:42 MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; interactive=true; batteryExempt=false
+2026-11-08T06:33:47 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-08T06:33:47 UWB_RATE requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T06:33:47 UWB_STARTED technology=0
+2026-11-08T06:33:47 OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T06:33:48 GATT_LOW_POWER connection priority requested; accepted=true
+2026-11-08T06:33:48 UWB_REPORT meters=0.37; confidence=2; total=1
+2026-11-08T06:33:48 ST_SWITCH_RESULT state=on; httpStatus=200; attempt=1
+2026-11-08T06:33:53 UWB_REPORT meters=1.01; confidence=2; total=10
+2026-11-08T06:33:59 UWB_REPORT meters=0.98; confidence=2; total=19
+2026-11-08T06:34:04 UWB_REPORT meters=0.93; confidence=2; total=28
+
+Callback rate: 9 callbacks per ~5.4 s = 1.67/s, matching the 600 ms interval. First valid report ~6 s after start. Tag battery effect not measured.

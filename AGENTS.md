@@ -11,7 +11,7 @@
 
 ## 수정 시 유지할 동작
 
-- 실제 UWB 콜백만 거리로 사용한다. RSSI 변환·임의 값·연결 중단으로 이탈을 만들지 않는다.
+- 실제 UWB 콜백만 거리로 사용한다. RSSI 변환·임의 값·연결 중단으로 이탈(거리 이벤트)을 만들지 않는다. 예외는 SmartThings 스위치뿐이다: 가까웠던 태그와 30초 넘게 연결이 끊기면 스위치만 끄며(설정으로 해제 가능) 거리 엔진·Tasker·Webhook 이벤트는 건드리지 않는다. 근거는 `docs/ARCHITECTURE.md`.
 - 현재 성공 경로는 삼성 계정 → 소유자 키 → 광고 서명 매핑 → 상호 인증 → 암호화 OOB → 플랫폼 UWB다. 초기 진단용 실패 경계로 되돌리지 않는다.
 - 태그는 기존 계정 등록을 유지한다. 태그 초기화, 앱 데이터 삭제, 수정 SmartThings 설치는 일반 개발 절차에 포함하지 않는다.
 - 모니터링 ON/OFF·선택 태그·backend·거리 정책을 보존한다. 사용자가 중지한 세션을 자동 재개하지 않는다.
@@ -28,9 +28,9 @@ JDK 25, Android SDK Platform 37, Build Tools 36.0.0을 사용한다. daemon JVM 
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 72개, 기기 계측 테스트는 3개, Lint 오류 0 / monochrome 아이콘 경고 1이다. 새 테스트를 추가하면 문서의 개수도 갱신한다. 계측 테스트는 `./gradlew :app:connectedDebugAndroidTest`로 실행하며 별도 합성 데이터 vault만 사용한다. 실행 전 추적을 정상 중지하고, 끝나면 원래 ON/OFF 상태로 복원한다.
+macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 115개, 기기 계측 테스트는 3개, Lint 오류 0 / monochrome 아이콘 경고 1이다. 새 테스트를 추가하면 문서의 개수도 갱신한다. 계측 테스트는 `./gradlew :app:connectedDebugAndroidTest`로 실행하며 별도 합성 데이터 vault만 사용한다. 실행 전 추적을 정상 중지하고, 끝나면 원래 ON/OFF 상태로 복원한다.
 
-실제 무선 검증은 별도다. `docs/HANDOFF.md`의 재현 절차를 따른다. 재부팅 검증 중에는 부팅 후 자동 재개 증거를 얻기 전에 앱 Activity를 열지 않는다. 실기기 시험을 하지 않았다면 그 사실을 명확히 기록한다.
+기기 설정은 화면을 넘겨 누르지 말고 `adb shell am broadcast -n dev.uwbpulse.monitor/.debug.DebugCommandReceiver --es tracking_rate NORMAL --ez car_mode true --es monitor start|stop` 형식의 개발용 명령으로 바꾼다(전체 키는 `docs/HANDOFF.md`). 실제 무선 검증은 별도다. `docs/HANDOFF.md`의 재현 절차를 따른다. 재부팅 검증 중에는 부팅 후 자동 재개 증거를 얻기 전에 앱 Activity를 열지 않는다. 실기기 시험을 하지 않았다면 그 사실을 명확히 기록한다.
 
 ## 저장소와 배포
 

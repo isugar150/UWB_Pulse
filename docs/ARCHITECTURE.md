@@ -24,11 +24,16 @@
 |`data/ProbeStore.kt`|현재 UI StateFlow, 화면 가시성, 최근 300줄 저널(추가 쓰기, 600줄에서 정리)·보고서 내보내기|
 |`domain/ProbeModels.kt`|측정·상태 모델, 유효/신선한 수신 및 화면별 카운터|
 |`domain/DistanceEventEngine.kt`|Android에 의존하지 않는 이탈·복귀 상태 머신|
-|`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
-|`domain/FailurePolicy.kt`|연결 실패 분류(재시도 가능·링크 손실)와 `OutageGate`: 일시적 재연결 실패를 외부 이벤트에서 제외|
+|`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms, 기본 600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
+|`domain/FailurePolicy.kt`|연결 실패 분류(재시도 가능·링크 손실)와 `OutageGate`: 일시적 재연결 실패를 외부 이벤트에서 제외. 연결 상태 콜백의 status 8(감독 타임아웃)은 영구 오류가 아니라 링크 손실|
 |`domain/ResumePolicy.kt`|BOOT / 업데이트 / 프로세스 재시작의 저장 ON 복원 조건|
 |`domain/ConnectionTimeout.kt`|개별 연결 시간 초과만 오류로 변환하고 호출자 취소는 그대로 전달|
-|`domain/SwitchPresenceSync.kt`|시작/연동 활성화 후 첫 실제 거리로 스위치 상태를 한 번 동기화. 이탈 debounce와 복귀 latch 유지|
+|`domain/SwitchPresenceSync.kt`|시작/연동 활성화 후 첫 실제 거리로 스위치 상태를 한 번 동기화. 이탈 debounce와 복귀 latch 유지. 연결 소실이 `PresencePolicy` 기준을 넘으면 스위치만 한 번 끄고, 복귀 거리 안의 실제 거리로 다시 켠다(거리 엔진은 건드리지 않음)|
+|`domain/CarMode.kt`|차량 블루투스 모드의 순수 로직: `CarLink`(ACL·A2DP·HFP를 하나의 연결 여부로 합침. ACL 끊김은 프로파일도 모두 끊김으로 처리), `CarModeMachine`(CAR_CONNECTED → TRACKING → AWAY, 차량 없이 시작하면 WAITING, 차량 재연결이 항상 우선)|
+|`debug/DebugCommandReceiver.kt`|adb 전용 개발 명령: 추적 주기, 차량 기기·모드, SmartThings 연동·펄스·연결 소실 끄기, 모니터링 시작·중지. `android.permission.DUMP`로 보호(shell만 보냄), 자격 증명은 다루지 않음|
+|`data/CarBluetooth.kt`|등록된 기기 목록, 차량 연결 여부 초기 조회(프로파일 프록시), ACL·프로파일 상태 수신기(반드시 `RECEIVER_EXPORTED`: 블루투스 스택은 uid 1002로 보내 비공개 수신기는 받지 못한다). LE ACL은 무시하고 주소·이름은 로그에 남기지 않음|
+|`domain/DepartureJudge.kt`|차량 모드 창의 이탈 판정(마지막 실제 거리 또는 창 시작부터의 무음 시간 + `PresencePolicy` 한계). 시간선 단위 테스트용 순수 클래스|
+|`domain/PresencePolicy.kt`|‘멀어짐으로 본다’의 기준: 마지막 실제 거리 후 30초, 링크 손실 outage, Bluetooth ON. 순수 함수|
 |`domain/SwitchDelivery.kt`|SmartThings 요청 30초 만료·최신 요청·전송 직렬화와 취소 확인|
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
@@ -53,11 +58,47 @@
 
 새 무선 세션은 수신 freshness 시각을 초기화하고 자체 첫 측정 20초를 갖는다(누적 진단 카운터는 유지). 이전 세션의 오래된 수신 때문에 새 세션이 1초 만에 종료되지 않는다. nonce/proof 응답 시간 초과는 링크 손실로 재시도하며 proof 검증 실패의 연속 3회 제한과 구분한다. 플랫폼 기능 조회의 5초 초과는 `UWB_CAPABILITIES_TIMEOUT` 재시도로 분류한다. 사용자/OS 취소는 재시도로 바꾸지 않는다.
 
-초기 3번의 검색과 화면에 보이는 검색은 LOW_LATENCY를 유지한다. 숨겨진 상태에서 3번 이상 실패한 재검색은 BALANCED로 낮춘다. 15초 검색 창·사용자의 재탐색 최대 간격·기본 UWB 240ms는 유지한다. FGS 알림은 내용이 달라질 때만 다시 게시한다. 이 변경의 실제 소비 전력과 BALANCED 장기 재진입 지연은 별도 측정 대상이다.
+초기 3번의 검색과 화면에 보이는 검색은 LOW_LATENCY를 유지한다. 숨겨진 상태에서 3번 이상 실패한 재검색은 BALANCED로 낮춘다. 15초 검색 창·사용자의 재탐색 최대 간격은 유지한다. 기본 UWB 갱신은 2026-11-08에 240ms에서 600ms로 낮췄다(저장된 선택은 유지). 첫 실제 거리 뒤에는 BLE 연결 우선순위를 LOW_POWER로 요청해 태그의 연결 이벤트를 줄인다(`GATT_LOW_POWER` 저널; 태그 소비 전력 효과는 미측정). FGS 알림은 내용이 달라질 때만 다시 게시한다. 이 변경의 실제 소비 전력과 BALANCED 장기 재진입 지연은 별도 측정 대상이다.
 
 계정 로그인·갱신·로그아웃은 IO 스레드의 공통 잠금으로 직렬화하고, 광고 검증/인증용 키는 독립 불변 스냅샷에서 읽는다. 토큰 갱신 네트워크 지연이 메인 스레드의 키 조회를 막지 않는다.
 
 이벤트 dispatcher는 단일 Channel 소비자로 발행 순서를 유지한다. SmartThings는 최신 `SwitchRequest`(발생 시각·대상·시험 여부 포함)를 기존 암호화 vault에 보관하고 WorkManager에는 요청 ID만 넣는다. 전송 직렬화 잠금은 취소된 작업의 동기 HTTP가 실제 반환할 때까지 유지한다. 30초 이상/미래 시각/교체·비활성화·대상 변경 요청은 폐기하며, 401 갱신 후와 연결 설정 후 body 전송 직전에 재검사한다. 만료는 `ST_SWITCH_DROPPED`에 남긴다. 기기에 도착하기 전에 이미 서버에 전송된 동작의 취소나 서버 내부 처리 순서는 보장하지 않는다.
+
+## 차량 블루투스 모드 (2026-11-08, 기기 미검증)
+
+설계·규칙·값·검증 현황·위험을 한곳에 정리한 문서는 [CAR_MODE.md](CAR_MODE.md)다. 아래는 구조 관점의 요약이다.
+
+설정 `car_mode`와 선택한 기기(`car_address`, `car_name`)가 모두 있을 때만 켜지며, 아니면 지금까지의 연속 추적이다. `ProbeService.monitor`는 서비스 수준(저장 ON, FGS, 종료)만 맡고 실제 추적은 `track`(한 번의 추적 창)이 한다. 연속 모드는 창 하나가 서비스 수명과 같다.
+
+1. 차량이 폰에 연결돼 있으면(`CAR_PHASE car linked`) 태그 검색·GATT·UWB를 모두 하지 않는다. 스위치를 한 번 켜고 `awayTagAliases`의 이탈 latch를 지운다.
+2. 차량이 **연결돼 있다가** 끊기고 3초 뒤에도 끊겨 있으면 추적 창을 하나 연다. 서비스를 시작할 때 이미 차량이 연결돼 있지 않았다면(`CAR_PHASE started without the car link`) 이탈이 아니므로 태그를 건드리지 않고 첫 차량 연결을 기다린다(스위치도 바꾸지 않는다). 창은 기존 `track`과 같다(검색·인증·UWB·거리 엔진). 연결 소실 규칙의 기준 시각은 마지막 실제 거리가 아니라 이 순간이다(`lastValidAt = anchor`).
+3. 이탈은 이렇게 확정한다. ① 실제 이탈 이벤트(임계거리 초과 + 지속 시간). ② 창 안에서 태그가 가깝게 측정된 뒤 `PresencePolicy.SEEN_THEN_LOST_MILLIS`(8초) 동안 측정이 끊김. ③ 창이 열린 뒤 한 번도 측정하지 못한 채 `NEVER_MEASURED_MILLIS`(60초)가 지남 — 이때는 실패 종류(광고 없음, 147, 133)를 따지지 않고 잠그며 폰에 ‘태그 미측정 잠금 안내’ 알림을 띄운다. ②·③은 사용자가 Bluetooth를 끈 경우만 제외한다. 확정되면 창을 닫고 태그를 놓는다(`CAR_PHASE departure decided`). 이후 차량이 다시 연결될 때까지 태그에 접근하지 않는다. 연속 모드의 30초 규칙은 그대로다. 8초·60초는 첫 값이며 실주행으로 확인하지 않았다.
+4. 창이 확정 없이 스스로 끝나면(영구 오류 등) 연속 모드와 같이 서비스를 종료한다.
+5. 창이 도는 중 차량이 다시 연결되면(블루투스 순간 끊김) 창을 취소하고 1로 돌아간다.
+
+**서비스 재시작(2026-11-08)**: 차량 단계를 저장해(`car_phase`, `car_phase_at`) 재시작 때 놓친 이탈을 되살린다. 단계가 바뀔 때와, 차량이 연결돼 있거나 창이 열려 있는 동안 1분마다(`CarRestore.HEARTBEAT_MILLIS`) 저장한다. 재시작하면 `CarRestore.start`가 판단한다.
+- 저장이 `CAR_CONNECTED`/`TRACKING`이고 15분(`FRESH_MILLIS`) 안이면 ‘재시작 직전까지 차량이 연결돼 있었다’고 본다. 지금 차량이 연결돼 있지 않으면 놓친 이탈로 보고 추적 창을 연다(기준 시각은 지금; 이미 60초가 지난 것으로 보지 않는다). 연결돼 있으면 그냥 대기한다.
+- 저장이 `AWAY`면 나이와 무관하게 이탈 상태로 시작해 차량이 연결될 때까지 쉰다.
+- 저장이 오래됐거나 없으면(재부팅이 오래 뒤, 첫 시작 등) 판단하지 않고 ‘차량 없이 시작’처럼 대기한다. 주차 뒤 한참 있다가 재부팅해도 이탈 신호가 나가지 않는다.
+- 사용자가 직접 중지하면(`STOP`) 저장을 지운다. 차량 모드를 끄거나 차량 기기를 바꿔도 지운다. 충돌·OS 종료·업데이트만 저장을 이어받는다.
+- 기기 확인: 대기 상태에서 프로세스를 죽이면 `START_STICKY`로 되살아나 `CAR_RESTORE saved=WAITING`을 읽고 다시 대기했다. 놓친 이탈을 되살리는 경로는 단위 테스트만(실제 차량 연결 필요).
+
+이 모드의 한계: 차량이 연결돼 있는 동안은 거리를 재지 않으므로 Tasker·Webhook의 `TAG_RETURNED`는 만들어지지 않는다(차량 재연결은 스위치만 켠다). 차 안에서 시동만 끄고 머무르면 창이 열려 연속 모드처럼 측정한다. 태그 배터리가 없거나 닿지 않으면 차량 연결이 끊긴 30초 뒤 스위치가 꺼진다. 저널: `CAR_LINK`(source·상태만), `CAR_PHASE`, `CAR_TRACKING_STOPPED`.
+
+## 태그가 UWB를 거부할 때 (2026-11-08)
+
+소유자 인증까지는 되는데 태그가 UWB를 켜지 못하는 경우(11-07 17시대의 ACTIVATE `GATT_WRITE_STATUS_133` 반복)는 태그 배터리 부족일 가능성이 있다고 사용자가 전했다. 확정은 아니다.
+
+- 판정: 한 연결에서 인증 성공 뒤 거리를 한 번도 못 받고 `FailurePolicy.isUwbRefused`(GATT 쓰기 상태 오류, 쓰기 재시도 소진, `UWB_STOPPED_*`, `UWB_OPEN_FAILED_*`, `UWB_CLOSED_*`)로 끝나면 연속 거부로 센다. 거리를 받으면 0으로 돌아간다. `NO_UWB_REPORTS_20S`·`UWB_REPORTS_STALE_20S`는 세지 않는다(닫힌 문도 같은 증상).
+- 연속 2회(`UWB_REFUSALS_BEFORE_NOTICE`)면 저널 `TAG_UWB_UNAVAILABLE`과 폰 알림(‘태그가 UWB를 시작하지 못합니다 … 배터리 확인’)을 한 번 낸다.
+- 재시도 간격을 `UWB_REFUSED_BACKOFF_MILLIS`(5분) 이상으로 늘린다. 실패한 활성화도 약한 배터리를 더 쓰기 때문이다(사용자 재탐색 한계가 더 길면 그 값).
+- 차량 모드 창에서는 별도 처리 없이 60초 규칙이 적용되고, 그때 알림은 UWB 거부 문구를 쓴다.
+- 태그 배터리 잔량은 읽을 수 없다. 삼성 클라우드 태그 기록과 공개 API 상태 모두 `battery` 기능 이름만 있고 값이 없다(`TAG_CLOUD_FIELDS` 저널, `smartthings devices:status` 확인). 그래서 실패 신호로만 안내한다.
+- 미구현 후보: UWB는 포기하고 인증된 BLE 연결을 유지해 연결이 끊기면 이탈로 보는 대체 모드(거리 환산 없음, 연결 유지 시간만 증거).
+
+## 이탈 신호: 켰다 끄기
+
+이탈이 확정되면(실제 이탈 이벤트, 연결 소실 규칙, 차량 모드의 8초·60초 규칙) SmartThings에 `pulse`를 보낸다: `on` → 1.5초(`SwitchPulse.GAP_MILLIS`) → `off`. 이미 꺼진 스위치에 `off`만 보내면 상태가 바뀌지 않아 ‘꺼지면’ 자동화가 다시 실행되지 않기 때문이다. 한 요청(`SwitchRequest.state = pulse`)이 두 단계를 모두 맡아 새 요청이 대기 중인 `on`을 교체하지 못하게 하며, 각 단계는 기존 30초 만료·최신 요청·직렬화 검사를 거친다. `on`이 실패하면 `off`를 보내지 않고 재시도한다(재시도는 `on`부터 다시). 시작 동기화(`on`/`off`)와 차량 재연결(`on`)은 펄스가 아니다. 설정 `smartthings_pulse_on_departure`(기본 ON)를 끄면 `off`만 보낸다. 켜짐 조건의 자동화가 있으면 이탈마다 한 번 실행된다. 기기 미검증(단위 테스트 `SwitchPulseTests`).
 
 ## 거리·이벤트 계약
 
@@ -67,6 +108,7 @@
 - 측정 간격이 `TrackingRate.maxGapMillis`(기본 1.5초, 절전 600ms는 1.8초)를 초과하면 진행 중 이탈 debounce를 새로 계산한다. 이전 시각 이하 콜백은 제외한다.
 - 연결 소실은 debounce를 지우지만 이탈 latch를 유지한다. 재접속·서비스 복원으로 동일 이탈을 반복하지 않는다.
 - `TAG_DISCONNECTED`와 `UWB_MONITORING_ERROR`는 거리 이탈과 별개다. 거리를 모르면 JSON `distanceMeters`는 null이다.
+- **연결 소실과 스위치(2026-11-08)**: 차 문이 닫히면 전파가 막혀 마지막 거리가 가까운 채 끊기므로 거리 엔진만으로는 이탈이 나오지 않는다. 마지막 실제 거리 뒤 `PresencePolicy.LOST_AFTER_MILLIS`(30초) 동안 측정이 없고, 현재 outage가 링크 손실(`FailurePolicy.isLinkLoss`)이며, Bluetooth가 켜져 있고, 엔진이 이미 이탈 상태가 아니면 SmartThings 스위치만 한 번 끈다(`PRESENCE_LINK_LOST`). 이후 실제 거리가 복귀 거리 이하이면 한 번 켠다(`PRESENCE_RESTORED`). 그 사이 실제 이탈/복귀 이벤트가 나오면 이벤트가 스위치를 다시 맡는다. 설정 `smartthings_off_on_link_loss`(기본 ON)로 끈다. `TAG_DISTANCE_EXCEEDED`·`TAG_RETURNED`·Tasker·Webhook·알림은 이 규칙의 영향을 받지 않으며 `TAG_DISCONNECTED`는 여전히 120초 뒤에만 나간다. 기기 미검증.
 - 연결 실패는 모두 저널·UI에 남기지만 외부 이벤트는 `OutageGate`가 정한다. outage는 첫 실패에서 시작해 다음 유효 측정에서 끝나며 이벤트는 outage당 최대 한 번이다. 복구 가능한 실패가 `FailurePolicy.GRACE_MILLIS`(120초) 미만이면 아무것도 내보내지 않는다.
   - `TAG_DISCONNECTED`: 이번 실행에서 태그 인증을 마친 적이 있고 outage가 120초 이상 이어질 때. 복구 불가 실패는 즉시.
   - `UWB_MONITORING_ERROR`: 사용자가 조치할 실패(Bluetooth/UWB OFF 등)가 120초 이상 이어질 때, 복구 불가 실패는 즉시. 태그가 범위 밖이거나 링크가 끊긴 경우(`OWNER_TAG_NOT_FOUND`, `GATT_*`, UWB 수신 중단)는 오류 이벤트를 내지 않는다.
@@ -84,7 +126,7 @@
 |`files/account.vault`|삼성 토큰·태그 정보·소유자 키·선택 ID. `uwbpulse.account.v1` Keystore 키로 암호화|
 |`files/webhook.vault`|Webhook URL/Bearer. 별도 `uwbpulse.webhook.v1` 키|
 |`files/smartthings.vault`|SmartThings 클라이언트 ID·비밀, 액세스/갱신 토큰, 가상 스위치 기기 ID. 별도 `uwbpulse.smartthings.v1` 키|
-|DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases, tracking_rate, rescan_max_millis, last_meters / last_seen_epoch(마지막 상태 한 건)|
+|DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases, tracking_rate(미설정이면 SAVER), rescan_max_millis, smartthings_off_on_link_loss, last_meters / last_seen_epoch(마지막 상태 한 건)|
 |DataStore `probe`|초기 진단 화면의 선택 BLE 주소. 서비스의 소유 태그 식별 기준으로 사용하지 않음|
 |`files/monitor-events.json`|최근 100개 비식별 이벤트. 시각과 거리는 포함|
 |`files/probe-journal.txt`|최근 300줄 상태 저널(줄을 덧붙이다 600줄이 되면 300줄로 정리). 키·토큰·원본 식별자를 기록하지 않음|

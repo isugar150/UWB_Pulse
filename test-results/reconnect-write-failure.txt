@@ -1,0 +1,51 @@
+2026-11-07 KST / Samsung SM-F971N / Android 17 API 37
+Reported reconnect failure on commit 6593343. Owner advertisement matching and mutual authentication succeed; UWB activation/configuration writes repeatedly fail with GATT_WRITE_STATUS_133. No original IDs, addresses, tokens, keys, nonces or ciphertext retained.
+
+2026-11-07T17:03:41.494555+09:00 elapsed=2976648 MONITOR_CONNECTION_ERROR UWB_STOPPED_0
+2026-11-07T17:03:45.747339+09:00 elapsed=2980901 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:03:56.679820+09:00 elapsed=2991833 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T17:03:56.728009+09:00 elapsed=2991881 UWB_STARTED technology=0
+2026-11-07T17:03:56.981055+09:00 elapsed=2992134 MONITOR_CONNECTION_ERROR GATT_WRITE_STATUS_133
+2026-11-07T17:03:57.039270+09:00 elapsed=2992192 GATT_BUSY_RETRY operation=write; attempt=1
+2026-11-07T17:03:57.398750+09:00 elapsed=2992552 GATT_BUSY_RETRY operation=write; attempt=2
+2026-11-07T17:03:57.848696+09:00 elapsed=2993002 GATT_BUSY_RETRY operation=write; attempt=3
+2026-11-07T17:03:58.718727+09:00 elapsed=2993872 TAG_UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T17:04:03.725790+09:00 elapsed=2998879 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:04:13.139272+09:00 elapsed=3008292 MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_133
+2026-11-07T17:04:28.147193+09:00 elapsed=3023300 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:04:37.605774+09:00 elapsed=3032759 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T17:04:37.645253+09:00 elapsed=3032798 UWB_STARTED technology=0
+2026-11-07T17:04:37.912083+09:00 elapsed=3033065 MONITOR_CONNECTION_ERROR GATT_WRITE_STATUS_133
+2026-11-07T17:04:37.960+09:00 elapsed=3033113 GATT_BUSY_RETRY operation=write; attempt=1
+2026-11-07T17:04:38.199805+09:00 elapsed=3033353 GATT_BUSY_RETRY operation=write; attempt=2
+2026-11-07T17:04:38.649836+09:00 elapsed=3033803 GATT_BUSY_RETRY operation=write; attempt=3
+2026-11-07T17:04:39.490516+09:00 elapsed=3034644 TAG_UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T17:04:46.922451+09:00 elapsed=3042076 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:04:54.251875+09:00 elapsed=3049405 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T17:04:54.292796+09:00 elapsed=3049446 UWB_STARTED technology=0
+2026-11-07T17:04:54.557687+09:00 elapsed=3049711 MONITOR_CONNECTION_ERROR GATT_WRITE_STATUS_133
+2026-11-07T17:04:54.609710+09:00 elapsed=3049763 GATT_BUSY_RETRY operation=write; attempt=1
+2026-11-07T17:04:54.850119+09:00 elapsed=3050003 GATT_BUSY_RETRY operation=write; attempt=2
+2026-11-07T17:04:55.300490+09:00 elapsed=3050454 GATT_BUSY_RETRY operation=write; attempt=3
+2026-11-07T17:04:56.169327+09:00 elapsed=3051323 TAG_UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T17:04:58.362126+09:00 elapsed=3053515 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:05:11.223809+09:00 elapsed=3066377 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T17:05:11.263418+09:00 elapsed=3066417 UWB_STARTED technology=0
+2026-11-07T17:05:11.828094+09:00 elapsed=3066981 MONITOR_CONNECTION_ERROR GATT_WRITE_STATUS_133
+2026-11-07T17:05:11.879188+09:00 elapsed=3067032 GATT_BUSY_RETRY operation=write; attempt=1
+2026-11-07T17:05:12.119389+09:00 elapsed=3067273 GATT_BUSY_RETRY operation=write; attempt=2
+2026-11-07T17:05:12.571119+09:00 elapsed=3067724 GATT_BUSY_RETRY operation=write; attempt=3
+2026-11-07T17:05:13.409817+09:00 elapsed=3068563 TAG_UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T17:05:18.418919+09:00 elapsed=3073572 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T17:05:25.513916+09:00 elapsed=3080667 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T17:05:25.553128+09:00 elapsed=3080706 UWB_STARTED technology=0
+2026-11-07T17:05:25.850596+09:00 elapsed=3081004 MONITOR_CONNECTION_ERROR GATT_WRITE_STATUS_133
+2026-11-07T17:05:25.898947+09:00 elapsed=3081052 GATT_BUSY_RETRY operation=write; attempt=1
+2026-11-07T17:05:26.140500+09:00 elapsed=3081294 GATT_BUSY_RETRY operation=write; attempt=2
+2026-11-07T17:05:26.590038+09:00 elapsed=3081743 GATT_BUSY_RETRY operation=write; attempt=3
+2026-11-07T17:05:27.429989+09:00 elapsed=3082583 TAG_UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T17:05:42.448621+09:00 elapsed=3097602 BLE_SCAN_MODE BALANCED
+2026-11-07T17:05:57.467598+09:00 elapsed=3112621 MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+2026-11-07T17:06:57.476813+09:00 elapsed=3172630 BLE_SCAN_MODE LOW_LATENCY
+
+Follow-up: 60-second app connection cooldown, phone Bluetooth restart, phone UWB restart did not recover ranging. User confirmed tag power saving OFF. Temporary diagnostic build: freshly authenticated encrypted STOP acknowledged, ACTIVATE failed with 133; another diagnostic ordering test failed ACTIVATE before starting local phone UWB. All diagnostic source changes reverted and original commit 6593343 APK reinstalled. No tag reset or account/data deletion. App temporarily STOPPED for user comparison with native SmartThings/Samsung Find actual distance. Recovery not confirmed; no root cause attributed yet.
