@@ -1,6 +1,12 @@
 # 다음 개발자를 위한 인계
 
 기준: **2026-11-08 KST / UWB Pulse 0.4.0 (versionCode 5)** + 11-08 변경(차량 블루투스 모드, 이탈 신호 켰다 끄기, 연결 소실 규칙, 서비스 재시작 복구, 태그 UWB 거부 대응, 기본 갱신 600ms, 개발용 adb 명령). 설계·규칙·값·검증 현황·위험은 [CAR_MODE.md](CAR_MODE.md)에 한곳으로 정리했다. 배터리 효과는 미측정.
+
+**최신 요청:** ‘UWB 미측정 1분 후 이탈 신호 보내기’를 차량 설정의 별도 옵션 `car_unmeasured_departure`로 분리했고 기본 OFF다(기존 설치도 미설정이면 OFF). 한 번도 측정 못 한 창은 60초 뒤 스위치를 건드리지 않고 닫는다. 오류 종료도 이 설정을 우회하지 않으며 ON이어도 60초 이전 신호는 없다. 실제 거리 이탈·측정 후 8초 소실·연속 모드 30초·기존 펄스 설정은 유지. 단위 테스트 121개 통과, 실주행 60초 검증은 하지 않았다.
+
+**연결 시간 작업 추가:** [CONNECTION_LATENCY.md](CONNECTION_LATENCY.md). 실제 무선 시험 26회(광고 관측 1회와 복구 후 확인 1회 포함). 차량 끊김 확인 3초와 광고 검색을 겹치도록 변경했다. 광고가 주로 3초 간격으로 관측됐고 연결 지연 편차가 커 일정한 개선을 보장하지 않는다. 단위 117개·합성 vault 계측 3개 통과. 계측 종료 뒤 AGP 기본 제거 옵션 때문에 사용자 앱 데이터가 사라지는 사고가 있었고 사용자가 재로그인했다. 기존 스위치·차량·정책을 복구했다. 원본 저널·마지막 관측 이력은 잃었다. `gradle.properties`의 `android.injected.androidTest.leaveApksInstalledAfterRun=true`를 유지하고 개인 폰에서는 가급적 테스트 APK만 설치 후 `am instrument`를 사용한다. 실제 차량의 새 준비 검색 경로는 미검증이다.
+
+최종 폰 상태: 모니터링 ON·차량 연결 대기, 플랫폼·절전 600ms·재검색 최대 60초·5m/3m/3초, SmartThings·연결 소실 끄기·펄스·부팅 재개 ON, 이벤트 알림 4종 ON. 사용자가 시스템에서 추적 채널을 다시 껐으며 importance=0 확인. 복구 후 실제 HIGH 약 0.91m를 6.987초에 수신한 뒤 태그 세션을 닫고 차량 대기로 복원했다. 실제 차량 잠금 시험은 하지 않았다.
 이 문서는 다음 에이전트가 대화 기록이나 `/tmp`의 조사 파일 없이 현재 소스에서 작업하기 위한 시작점이다.
 
 ## 현재 상태
@@ -50,7 +56,7 @@
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-기준 결과: 단위 테스트 115개 통과, 기기 계측 테스트 3개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). 계측 테스트(`:app:connectedDebugAndroidTest`)는 별도 합성 데이터 vault의 Keystore 왕복·최신 요청 보존·만료 차단을 검사하며 사용자 vault를 읽지 않는다. 실행 전 추적을 정상 중지하고 끝나면 원래 ON/OFF로 복원한다. APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
+기준 결과: 단위 테스트 121개 통과, 기기 계측 테스트 3개 통과, 최근 lintDebug 오류 0 / 경고 0(원본 아이콘은 그대로이며 이전 빌드의 monochrome 경고 1건과 구분). 계측 테스트(`:app:connectedDebugAndroidTest`)는 별도 합성 데이터 vault의 Keystore 왕복·최신 요청 보존·만료 차단을 검사하며 사용자 vault를 읽지 않는다. 실행 전 추적을 정상 중지하고 끝나면 원래 ON/OFF로 복원한다. APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
 
 ## 실기기 수정·확인 절차
 

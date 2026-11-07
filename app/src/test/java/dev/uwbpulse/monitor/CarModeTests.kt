@@ -10,6 +10,26 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CarModeTests {
+    @Test fun speculativeScanRequiresAnEarlierCarLinkAndStopsBeingEligibleOnceTracking() {
+        val machine = CarModeMachine()
+        assertFalse(machine.canPrepareDisconnect)
+        machine.car(false)
+        assertFalse(machine.canPrepareDisconnect)
+        machine.car(true)
+        assertTrue(machine.canPrepareDisconnect)
+        machine.car(false)
+        assertFalse(machine.canPrepareDisconnect)
+        machine.departed()
+        assertFalse(machine.canPrepareDisconnect)
+    }
+    @Test fun speculativeScanOnRestoreRequiresFreshEvidenceOfTheCarLink() {
+        val fresh = CarRestore.start("CAR_CONNECTED",1_000,2_000)
+        assertTrue(CarModeMachine(fresh.phase,fresh.carWasLinked).canPrepareDisconnect)
+        val old = CarRestore.start("CAR_CONNECTED",1_000,1_000+CarRestore.FRESH_MILLIS+1)
+        assertFalse(CarModeMachine(old.phase,old.carWasLinked).canPrepareDisconnect)
+        val waiting = CarRestore.start("WAITING",1_000,2_000)
+        assertFalse(CarModeMachine(waiting.phase,waiting.carWasLinked).canPrepareDisconnect)
+    }
     @Test fun carIsConnectedWhileAnyLinkIsUp() {
         val link = CarLink()
         assertFalse(link.connected)

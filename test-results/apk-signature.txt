@@ -6,3 +6,4 @@ Verified using v3.1 scheme (APK Signature Scheme v3.1): false
 Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
+a1917749b219a05a6781ce2c5c900970b509c1e2da4176f5b5881f8024518be2  app/build/outputs/apk/debug/app-debug.apk

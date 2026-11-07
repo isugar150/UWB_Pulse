@@ -2,6 +2,7 @@ package dev.uwbpulse.monitor.data
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -11,17 +12,23 @@ import android.os.ParcelUuid
 import dev.uwbpulse.monitor.domain.TagCandidate
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 /** FD5A is a SmartTag family service, not proof of model, ownership or UWB support. */
 @SuppressLint("MissingPermission")
 class BleDiscovery(private val context: Context, private val record: (String, String) -> Unit,
     private val matchOwner: (ByteArray) -> String? = { null }) {
-    fun scan(balanced: Boolean = false) = callbackFlow {
+    /** Keep the native scan device: rebuilding it from its address can discard the LE address type. */
+    data class DiscoveredTag(val candidate: TagCandidate, val device: BluetoothDevice) {
+        override fun toString() = "DiscoveredTag(REDACTED)"
+    }
+    fun scan(balanced: Boolean = false) = scanDevices(balanced).map { peers -> peers.map { it.candidate } }
+    fun scanDevices(balanced: Boolean = false, traceAdvertisements: Boolean = false) = callbackFlow {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter
         check(adapter?.isEnabled == true) { "BLUETOOTH_DISABLED" }
         val scanner = checkNotNull(adapter.bluetoothLeScanner) { "BLE_SCANNER_UNAVAILABLE" }
-        val candidates = linkedMapOf<String, TagCandidate>()
+        val candidates = linkedMapOf<String, DiscoveredTag>()
         val owners = HashMap<String, Pair<ByteArray, String?>>() // advertisement bytes -> owner, so a repeated advertisement is verified once
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -34,9 +41,10 @@ class BleDiscovery(private val context: Context, private val record: (String, St
                     val cached = owners[address]?.takeIf { it.first.contentEquals(data) }
                     if (cached != null) cached.second else matchOwner(data).also { owners[address] = data.copyOf() to it }
                 }
+                if (traceAdvertisements && ownerId != null) record("BLE_ADVERTISEMENT", "ageMs=${(android.os.SystemClock.elapsedRealtimeNanos()-result.timestampNanos)/1_000_000}")
                 val candidate = TagCandidate(address, "SmartTag 계열 후보 ${candidates.keys.indexOf(address).takeIf { it >= 0 }?.plus(1) ?: (candidates.size + 1)}", result.isConnectable, uwb,ownerId)
-                if (candidates[address] != candidate) record("BLE_CANDIDATE", "connectable=${candidate.connectable}; advertisedUwb=$uwb; serviceDataBytes=${serviceData?.size ?: 0}; ownerSignatureMatched=${ownerId != null}")
-                candidates[address] = candidate
+                if (candidates[address]?.candidate != candidate) record("BLE_CANDIDATE", "connectable=${candidate.connectable}; advertisedUwb=$uwb; serviceDataBytes=${serviceData?.size ?: 0}; ownerSignatureMatched=${ownerId != null}")
+                candidates[address] = DiscoveredTag(candidate,result.device)
                 trySend(candidates.values.toList())
             }
             override fun onBatchScanResults(results: MutableList<ScanResult>) {

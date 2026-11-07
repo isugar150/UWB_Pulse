@@ -1,9 +1,9 @@
-2026-11-07 KST — SmartThings presence mapping correction
-JDK 25, Android SDK Platform 37, Build Tools 36.0.0
+2026-11-08 KST / optional unmeasured departure signal
+JDK 25 / Android SDK Platform 37 / Build Tools 36.0.0
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 BUILD SUCCESSFUL
-Unit tests: 72 passed, 0 failures, 0 errors.
-Lint: 0 errors, 1 unchanged MonochromeLauncherIcon warning.
-APK v2 signature verified; root and APK licence notices synchronised.
-Device near-ON sync: actual HIGH UWB about 0.90 m, then ST_SWITCH_RESULT state=on httpStatus=200.
-Previous isolated-vault Android instrumentation results (3 passed): instrumentation-review.txt.
+Unit tests: 121 passed; 0 failures, 0 errors.
+Lint 9.5.1: 0 errors, 0 warnings.
+No device instrumentation was run in this task.
+Same-signature update installed; new option OFF, original monitoring ON and hidden channel preserved.
+Actual vehicle timeout/automation not exercised. See unmeasured-switch-option.txt.

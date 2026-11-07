@@ -17,7 +17,7 @@ object PresencePolicy {
     /** Car window, the tag was measured near and then went silent: it just vanished, so a short wait is enough. */
     const val SEEN_THEN_LOST_MILLIS = 8_000L
 
-    /** Car window, the tag was never measured since the car link dropped: lock unless it shows up near. First value, not measured. */
+    /** End a never-measured car window after a minute. Sending a switch signal is a separate opt-in. */
     const val NEVER_MEASURED_MILLIS = 60_000L
 
     /**

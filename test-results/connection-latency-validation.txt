@@ -1,0 +1,556 @@
+2026-11-08 KST / SM-F971N / Android 17 API 37 / USB connected / nearby registered SmartTag2
+26 radio trials total: 25 pre-incident (including one advertisement-only observation), one successful post-recovery check. No automation dispatched by benchmark.
+On-screen delayed: 2/3 actual distance, successful median 9.263 s. Warm scan: 3/3, median 6.626 s; long tail 15.047 s.
+Additional screen-off-requested warm trial: 13.496 s; callback interactive flag not recorded in that build.
+Not a controlled latency guarantee or a test of vehicle locking. See docs/CONNECTION_LATENCY.md.
+
+INCIDENT: Gradle connectedDebugAndroidTest passed 3 synthetic-vault tests but AGP default uninstall removed the target app/data.
+The following install was fresh. The user logged in again; existing switch and unique bonded CAR_AUDIO selection were recovered in-app.
+No credentials/vaults were exported or backed up. Prior journal and last-observation history could not be recovered.
+AGP 9.5.1 source confirmed leaveApksInstalledAfterRun defaults false and uninstall-after-tests negates it.
+gradle.properties now pins android.injected.androidTest.leaveApksInstalledAfterRun=true. No further Gradle device test was run.
+
+SANITIZED RADIO EVIDENCE
+2026-11-08T07:40:55.424066+09:00 elapsed=55610577 BENCH_START mode=baseline; ms=1; rate=SAVER; no automation
+2026-11-08T07:40:55.427034+09:00 elapsed=55610580 BENCH_BLE_SCAN_MODE mode=baseline; ms=4; LOW_LATENCY
+2026-11-08T07:40:55.965922+09:00 elapsed=55611119 BENCH_BLE_CANDIDATE mode=baseline; ms=543; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:40:55.966727+09:00 elapsed=55611120 BENCH_FOUND mode=baseline; ms=544; owner advertisement matched
+2026-11-08T07:40:55.969373+09:00 elapsed=55611123 BENCH_CONNECT_CALL mode=baseline; ms=547; auto=false
+2026-11-08T07:41:02.096650+09:00 elapsed=55617250 BENCH_GATT_CONNECTED mode=baseline; ms=6674; discovering auth and UWB services
+2026-11-08T07:41:02.151959+09:00 elapsed=55617305 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=6729; owner authentication service present
+2026-11-08T07:41:02.152635+09:00 elapsed=55617306 BENCH_READY mode=baseline; ms=6730; services discovered
+2026-11-08T07:41:02.271197+09:00 elapsed=55617424 BENCH_GATT_MTU_READY mode=baseline; ms=6848; mtu=243
+2026-11-08T07:41:02.450328+09:00 elapsed=55617604 BENCH_TAG_AUTH_START mode=baseline; ms=7027; owner mutual challenge-response
+2026-11-08T07:41:02.601361+09:00 elapsed=55617755 BENCH_TAG_AUTHENTICATED mode=baseline; ms=7178; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:41:02.601711+09:00 elapsed=55617755 BENCH_AUTH mode=baseline; ms=7179; mutual proof verified
+2026-11-08T07:41:02.609419+09:00 elapsed=55617763 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=7187; uwbAvailability=3
+2026-11-08T07:41:02.609872+09:00 elapsed=55617763 BENCH_UWB_RATE mode=baseline; ms=7187; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:41:02.642717+09:00 elapsed=55617796 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=7220; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:41:02.644631+09:00 elapsed=55617798 BENCH_UWB_STARTED mode=baseline; ms=7222; technology=0
+2026-11-08T07:41:02.990755+09:00 elapsed=55618144 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=7568; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:41:03.544718+09:00 elapsed=55618698 BENCH_FIRST mode=baseline; ms=8122; meters=0.9100000262260437; confidence=2
+2026-11-08T07:41:03.590359+09:00 elapsed=55618744 BENCH_TAG_UWB_STOPPED mode=baseline; ms=8167; encrypted stop acknowledged
+2026-11-08T07:41:03.592869+09:00 elapsed=55618746 BENCH_CLOSED mode=baseline; ms=8170; GATT released
+2026-11-08T07:41:03.593129+09:00 elapsed=55618746 BENCH_END mode=baseline
+2026-11-08T07:41:11.837772+09:00 elapsed=55626991 BENCH_START mode=keep_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:41:11.838791+09:00 elapsed=55626992 BENCH_BLE_SCAN_MODE mode=keep_scan; ms=1; LOW_LATENCY
+2026-11-08T07:41:16.891916+09:00 elapsed=55632045 BENCH_BLE_CANDIDATE mode=keep_scan; ms=5054; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:41:16.892760+09:00 elapsed=55632046 BENCH_FOUND mode=keep_scan; ms=5055; owner advertisement matched
+2026-11-08T07:41:16.892863+09:00 elapsed=55632046 BENCH_CONNECT_CALL mode=keep_scan; ms=5055; auto=false
+2026-11-08T07:41:19.921075+09:00 elapsed=55635074 BENCH_BLE_CANDIDATE mode=keep_scan; ms=8083; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:41:19.995796+09:00 elapsed=55635149 BENCH_GATT_CONNECTED mode=keep_scan; ms=8158; discovering auth and UWB services
+2026-11-08T07:41:20.053120+09:00 elapsed=55635206 BENCH_UWB_CHARACTERISTICS_FOUND mode=keep_scan; ms=8215; owner authentication service present
+2026-11-08T07:41:20.054349+09:00 elapsed=55635208 BENCH_READY mode=keep_scan; ms=8216; services discovered
+2026-11-08T07:41:20.171216+09:00 elapsed=55635324 BENCH_GATT_MTU_READY mode=keep_scan; ms=8333; mtu=243
+2026-11-08T07:41:20.350539+09:00 elapsed=55635504 BENCH_TAG_AUTH_START mode=keep_scan; ms=8513; owner mutual challenge-response
+2026-11-08T07:41:20.506116+09:00 elapsed=55635659 BENCH_TAG_AUTHENTICATED mode=keep_scan; ms=8668; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:41:20.506687+09:00 elapsed=55635660 BENCH_AUTH mode=keep_scan; ms=8669; mutual proof verified
+2026-11-08T07:41:20.510156+09:00 elapsed=55635663 BENCH_PLATFORM_CAPABILITIES mode=keep_scan; ms=8672; uwbAvailability=3
+2026-11-08T07:41:20.510464+09:00 elapsed=55635664 BENCH_UWB_RATE mode=keep_scan; ms=8673; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:41:20.546738+09:00 elapsed=55635700 BENCH_UWB_LOCAL_OPENED mode=keep_scan; ms=8709; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:41:20.550604+09:00 elapsed=55635704 BENCH_UWB_STARTED mode=keep_scan; ms=8713; technology=0
+2026-11-08T07:41:20.891141+09:00 elapsed=55636044 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=keep_scan; ms=9053; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:41:21.446771+09:00 elapsed=55636600 BENCH_FIRST mode=keep_scan; ms=9609; meters=0.9800000190734863; confidence=2
+2026-11-08T07:41:21.490884+09:00 elapsed=55636644 BENCH_TAG_UWB_STOPPED mode=keep_scan; ms=9653; encrypted stop acknowledged
+2026-11-08T07:41:21.494027+09:00 elapsed=55636647 BENCH_CLOSED mode=keep_scan; ms=9656; GATT released
+2026-11-08T07:41:21.494294+09:00 elapsed=55636647 BENCH_END mode=keep_scan
+2026-11-08T07:41:30.678170+09:00 elapsed=55645831 BENCH_START mode=baseline; ms=0; rate=SAVER; no automation
+2026-11-08T07:41:30.679212+09:00 elapsed=55645832 BENCH_BLE_SCAN_MODE mode=baseline; ms=1; LOW_LATENCY
+2026-11-08T07:41:31.893338+09:00 elapsed=55647047 BENCH_BLE_CANDIDATE mode=baseline; ms=1215; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:41:31.894785+09:00 elapsed=55647048 BENCH_FOUND mode=baseline; ms=1217; owner advertisement matched
+2026-11-08T07:41:31.898081+09:00 elapsed=55647051 BENCH_CONNECT_CALL mode=baseline; ms=1220; auto=false
+2026-11-08T07:41:40.997774+09:00 elapsed=55656151 BENCH_GATT_CONNECTED mode=baseline; ms=10320; discovering auth and UWB services
+2026-11-08T07:41:41.052770+09:00 elapsed=55656206 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=10375; owner authentication service present
+2026-11-08T07:41:41.053726+09:00 elapsed=55656207 BENCH_READY mode=baseline; ms=10376; services discovered
+2026-11-08T07:41:41.171253+09:00 elapsed=55656324 BENCH_GATT_MTU_READY mode=baseline; ms=10493; mtu=243
+2026-11-08T07:41:41.379558+09:00 elapsed=55656533 BENCH_TAG_AUTH_START mode=baseline; ms=10702; owner mutual challenge-response
+2026-11-08T07:41:41.531371+09:00 elapsed=55656685 BENCH_TAG_AUTHENTICATED mode=baseline; ms=10853; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:41:41.531851+09:00 elapsed=55656685 BENCH_AUTH mode=baseline; ms=10854; mutual proof verified
+2026-11-08T07:41:41.535478+09:00 elapsed=55656689 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=10858; uwbAvailability=3
+2026-11-08T07:41:41.535895+09:00 elapsed=55656689 BENCH_UWB_RATE mode=baseline; ms=10858; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:41:41.570874+09:00 elapsed=55656724 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=10893; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:41:41.574169+09:00 elapsed=55656727 BENCH_UWB_STARTED mode=baseline; ms=10896; technology=0
+2026-11-08T07:41:41.920651+09:00 elapsed=55657074 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=11243; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:41:42.473870+09:00 elapsed=55657627 BENCH_FIRST mode=baseline; ms=11796; meters=0.8799999952316284; confidence=2
+2026-11-08T07:41:42.521304+09:00 elapsed=55657674 BENCH_TAG_UWB_STOPPED mode=baseline; ms=11843; encrypted stop acknowledged
+2026-11-08T07:41:42.523718+09:00 elapsed=55657677 BENCH_CLOSED mode=baseline; ms=11846; GATT released
+2026-11-08T07:41:42.523976+09:00 elapsed=55657677 BENCH_END mode=baseline
+2026-11-08T07:41:51.657933+09:00 elapsed=55666811 BENCH_START mode=keep_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:41:51.658958+09:00 elapsed=55666812 BENCH_BLE_SCAN_MODE mode=keep_scan; ms=1; LOW_LATENCY
+2026-11-08T07:41:53.126105+09:00 elapsed=55668279 BENCH_BLE_CANDIDATE mode=keep_scan; ms=1468; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:41:53.127165+09:00 elapsed=55668280 BENCH_FOUND mode=keep_scan; ms=1469; owner advertisement matched
+2026-11-08T07:41:53.127338+09:00 elapsed=55668281 BENCH_CONNECT_CALL mode=keep_scan; ms=1469; auto=false
+2026-11-08T07:41:56.151306+09:00 elapsed=55671305 BENCH_BLE_CANDIDATE mode=keep_scan; ms=4493; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:41:56.215513+09:00 elapsed=55671369 BENCH_GATT_CONNECTED mode=keep_scan; ms=4558; discovering auth and UWB services
+2026-11-08T07:41:56.271512+09:00 elapsed=55671425 BENCH_UWB_CHARACTERISTICS_FOUND mode=keep_scan; ms=4614; owner authentication service present
+2026-11-08T07:41:56.272109+09:00 elapsed=55671425 BENCH_READY mode=keep_scan; ms=4614; services discovered
+2026-11-08T07:41:56.391218+09:00 elapsed=55671544 BENCH_GATT_MTU_READY mode=keep_scan; ms=4733; mtu=243
+2026-11-08T07:41:56.570276+09:00 elapsed=55671723 BENCH_TAG_AUTH_START mode=keep_scan; ms=4912; owner mutual challenge-response
+2026-11-08T07:41:56.722870+09:00 elapsed=55671876 BENCH_TAG_AUTHENTICATED mode=keep_scan; ms=5065; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:41:56.723222+09:00 elapsed=55671876 BENCH_AUTH mode=keep_scan; ms=5065; mutual proof verified
+2026-11-08T07:41:56.726609+09:00 elapsed=55671880 BENCH_PLATFORM_CAPABILITIES mode=keep_scan; ms=5069; uwbAvailability=3
+2026-11-08T07:41:56.726934+09:00 elapsed=55671880 BENCH_UWB_RATE mode=keep_scan; ms=5069; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:41:56.761579+09:00 elapsed=55671915 BENCH_UWB_LOCAL_OPENED mode=keep_scan; ms=5104; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:41:56.764217+09:00 elapsed=55671917 BENCH_UWB_STARTED mode=keep_scan; ms=5106; technology=0
+2026-11-08T07:41:57.357664+09:00 elapsed=55672511 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=keep_scan; ms=5700; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:42:08.668076+09:00 elapsed=55683821 BENCH_TAG_UWB_STOPPED mode=keep_scan; ms=17010; encrypted stop acknowledged
+2026-11-08T07:42:08.671927+09:00 elapsed=55683825 BENCH_CLOSED mode=keep_scan; ms=17014; GATT released
+2026-11-08T07:42:08.673932+09:00 elapsed=55683827 BENCH_ERROR mode=keep_scan; UWB_STOPPED_0
+2026-11-08T07:42:08.674291+09:00 elapsed=55683827 BENCH_END mode=keep_scan
+2026-11-08T07:42:16.927899+09:00 elapsed=55692081 BENCH_START mode=auto_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:42:16.928987+09:00 elapsed=55692082 BENCH_BLE_SCAN_MODE mode=auto_scan; ms=1; LOW_LATENCY
+2026-11-08T07:42:19.051230+09:00 elapsed=55694205 BENCH_BLE_CANDIDATE mode=auto_scan; ms=2123; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:42:19.052266+09:00 elapsed=55694205 BENCH_FOUND mode=auto_scan; ms=2124; owner advertisement matched
+2026-11-08T07:42:19.052412+09:00 elapsed=55694206 BENCH_CONNECT_CALL mode=auto_scan; ms=2125; auto=true
+2026-11-08T07:42:19.060716+09:00 elapsed=55694214 BENCH_CLOSED mode=auto_scan; ms=2133; GATT released
+2026-11-08T07:42:19.060984+09:00 elapsed=55694214 BENCH_ERROR mode=auto_scan; GATT_CONNECTION_STATUS_135
+2026-11-08T07:42:19.061077+09:00 elapsed=55694214 BENCH_END mode=auto_scan
+2026-11-08T07:42:27.202083+09:00 elapsed=55702355 BENCH_START mode=auto; ms=0; rate=SAVER; no automation
+2026-11-08T07:42:27.203392+09:00 elapsed=55702357 BENCH_BLE_SCAN_MODE mode=auto; ms=2; LOW_LATENCY
+2026-11-08T07:42:28.072975+09:00 elapsed=55703226 BENCH_BLE_CANDIDATE mode=auto; ms=871; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:42:28.073783+09:00 elapsed=55703227 BENCH_FOUND mode=auto; ms=872; owner advertisement matched
+2026-11-08T07:42:28.075552+09:00 elapsed=55703229 BENCH_CONNECT_CALL mode=auto; ms=874; auto=true
+2026-11-08T07:42:28.080361+09:00 elapsed=55703234 BENCH_CLOSED mode=auto; ms=879; GATT released
+2026-11-08T07:42:28.080582+09:00 elapsed=55703234 BENCH_ERROR mode=auto; GATT_CONNECTION_STATUS_135
+2026-11-08T07:42:28.080659+09:00 elapsed=55703234 BENCH_END mode=auto
+2026-11-08T07:42:36.396804+09:00 elapsed=55711550 BENCH_START mode=settle; ms=0; rate=SAVER; no automation
+2026-11-08T07:42:36.397848+09:00 elapsed=55711551 BENCH_BLE_SCAN_MODE mode=settle; ms=1; LOW_LATENCY
+2026-11-08T07:42:37.082141+09:00 elapsed=55712235 BENCH_BLE_CANDIDATE mode=settle; ms=685; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:42:37.083363+09:00 elapsed=55712237 BENCH_FOUND mode=settle; ms=687; owner advertisement matched
+2026-11-08T07:42:37.337317+09:00 elapsed=55712491 BENCH_CONNECT_CALL mode=settle; ms=940; auto=false
+2026-11-08T07:42:40.186747+09:00 elapsed=55715340 BENCH_GATT_CONNECTED mode=settle; ms=3790; discovering auth and UWB services
+2026-11-08T07:42:40.304431+09:00 elapsed=55715458 BENCH_UWB_CHARACTERISTICS_FOUND mode=settle; ms=3908; owner authentication service present
+2026-11-08T07:42:40.305013+09:00 elapsed=55715458 BENCH_READY mode=settle; ms=3908; services discovered
+2026-11-08T07:42:40.422049+09:00 elapsed=55715575 BENCH_GATT_MTU_READY mode=settle; ms=4025; mtu=243
+2026-11-08T07:42:40.540853+09:00 elapsed=55715694 BENCH_TAG_AUTH_START mode=settle; ms=4144; owner mutual challenge-response
+2026-11-08T07:42:40.693455+09:00 elapsed=55715847 BENCH_TAG_AUTHENTICATED mode=settle; ms=4297; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:42:40.694126+09:00 elapsed=55715847 BENCH_AUTH mode=settle; ms=4297; mutual proof verified
+2026-11-08T07:42:40.698484+09:00 elapsed=55715852 BENCH_PLATFORM_CAPABILITIES mode=settle; ms=4302; uwbAvailability=3
+2026-11-08T07:42:40.698825+09:00 elapsed=55715852 BENCH_UWB_RATE mode=settle; ms=4302; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:42:40.734472+09:00 elapsed=55715888 BENCH_UWB_LOCAL_OPENED mode=settle; ms=4338; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:42:40.736740+09:00 elapsed=55715890 BENCH_UWB_STARTED mode=settle; ms=4340; technology=0
+2026-11-08T07:42:41.080603+09:00 elapsed=55716234 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=settle; ms=4684; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:42:53.851953+09:00 elapsed=55729005 BENCH_STOP_ERROR mode=settle; ms=17455; IllegalStateException
+2026-11-08T07:42:53.852694+09:00 elapsed=55729006 BENCH_CLOSED mode=settle; ms=17456; GATT released
+2026-11-08T07:42:53.852986+09:00 elapsed=55729006 BENCH_ERROR mode=settle; UWB_STOPPED_0
+2026-11-08T07:42:53.853120+09:00 elapsed=55729006 BENCH_END mode=settle
+2026-11-08T07:43:32.655365+09:00 elapsed=55767809 BENCH_START mode=native; ms=1; rate=SAVER; no automation
+2026-11-08T07:43:32.659572+09:00 elapsed=55767813 BENCH_BLE_SCAN_MODE mode=native; ms=5; LOW_LATENCY
+2026-11-08T07:43:41.352581+09:00 elapsed=55776506 BENCH_BLE_CANDIDATE mode=native; ms=8698; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:43:41.353412+09:00 elapsed=55776507 BENCH_FOUND mode=native; ms=8699; owner advertisement matched
+2026-11-08T07:43:41.355053+09:00 elapsed=55776508 BENCH_CONNECT_CALL mode=native; ms=8700; auto=false
+2026-11-08T07:43:47.459446+09:00 elapsed=55782613 BENCH_GATT_CONNECTED mode=native; ms=14805; discovering auth and UWB services
+2026-11-08T07:43:47.512744+09:00 elapsed=55782666 BENCH_UWB_CHARACTERISTICS_FOUND mode=native; ms=14858; owner authentication service present
+2026-11-08T07:43:47.513330+09:00 elapsed=55782667 BENCH_READY mode=native; ms=14858; services discovered
+2026-11-08T07:43:47.631878+09:00 elapsed=55782785 BENCH_GATT_MTU_READY mode=native; ms=14977; mtu=243
+2026-11-08T07:43:47.810419+09:00 elapsed=55782964 BENCH_TAG_AUTH_START mode=native; ms=15156; owner mutual challenge-response
+2026-11-08T07:43:47.963249+09:00 elapsed=55783116 BENCH_TAG_AUTHENTICATED mode=native; ms=15308; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:43:47.963744+09:00 elapsed=55783117 BENCH_AUTH mode=native; ms=15309; mutual proof verified
+2026-11-08T07:43:47.971511+09:00 elapsed=55783125 BENCH_PLATFORM_CAPABILITIES mode=native; ms=15317; uwbAvailability=3
+2026-11-08T07:43:47.971959+09:00 elapsed=55783125 BENCH_UWB_RATE mode=native; ms=15317; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:43:48.012802+09:00 elapsed=55783166 BENCH_UWB_LOCAL_OPENED mode=native; ms=15358; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:43:48.014716+09:00 elapsed=55783168 BENCH_UWB_STARTED mode=native; ms=15360; technology=0
+2026-11-08T07:43:48.351537+09:00 elapsed=55783505 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=native; ms=15697; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:43:48.840144+09:00 elapsed=55783993 BENCH_FIRST mode=native; ms=16185; meters=0.9200000166893005; confidence=2
+2026-11-08T07:43:48.891130+09:00 elapsed=55784044 BENCH_TAG_UWB_STOPPED mode=native; ms=16236; encrypted stop acknowledged
+2026-11-08T07:43:48.893764+09:00 elapsed=55784047 BENCH_CLOSED mode=native; ms=16239; GATT released
+2026-11-08T07:43:48.894020+09:00 elapsed=55784047 BENCH_END mode=native
+2026-11-08T07:43:57.710146+09:00 elapsed=55792863 BENCH_START mode=baseline; ms=0; rate=SAVER; no automation
+2026-11-08T07:43:57.711214+09:00 elapsed=55792864 BENCH_BLE_SCAN_MODE mode=baseline; ms=1; LOW_LATENCY
+2026-11-08T07:43:59.513192+09:00 elapsed=55794666 BENCH_BLE_CANDIDATE mode=baseline; ms=1803; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:43:59.513941+09:00 elapsed=55794667 BENCH_FOUND mode=baseline; ms=1804; owner advertisement matched
+2026-11-08T07:43:59.515599+09:00 elapsed=55794669 BENCH_CONNECT_CALL mode=baseline; ms=1806; auto=false
+2026-11-08T07:44:02.617902+09:00 elapsed=55797771 BENCH_GATT_CONNECTED mode=baseline; ms=4908; discovering auth and UWB services
+2026-11-08T07:44:02.673722+09:00 elapsed=55797827 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=4964; owner authentication service present
+2026-11-08T07:44:02.674728+09:00 elapsed=55797828 BENCH_READY mode=baseline; ms=4965; services discovered
+2026-11-08T07:44:02.791787+09:00 elapsed=55797945 BENCH_GATT_MTU_READY mode=baseline; ms=5082; mtu=243
+2026-11-08T07:44:02.971248+09:00 elapsed=55798124 BENCH_TAG_AUTH_START mode=baseline; ms=5261; owner mutual challenge-response
+2026-11-08T07:44:03.123986+09:00 elapsed=55798277 BENCH_TAG_AUTHENTICATED mode=baseline; ms=5414; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:44:03.124665+09:00 elapsed=55798278 BENCH_AUTH mode=baseline; ms=5415; mutual proof verified
+2026-11-08T07:44:03.127749+09:00 elapsed=55798281 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=5418; uwbAvailability=3
+2026-11-08T07:44:03.128080+09:00 elapsed=55798281 BENCH_UWB_RATE mode=baseline; ms=5418; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:44:03.162522+09:00 elapsed=55798316 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=5453; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:44:03.165103+09:00 elapsed=55798318 BENCH_UWB_STARTED mode=baseline; ms=5455; technology=0
+2026-11-08T07:44:03.511362+09:00 elapsed=55798665 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=5801; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:44:03.988609+09:00 elapsed=55799142 BENCH_FIRST mode=baseline; ms=6279; meters=0.9200000166893005; confidence=2
+2026-11-08T07:44:04.051655+09:00 elapsed=55799205 BENCH_TAG_UWB_STOPPED mode=baseline; ms=6342; encrypted stop acknowledged
+2026-11-08T07:44:04.055007+09:00 elapsed=55799208 BENCH_CLOSED mode=baseline; ms=6345; GATT released
+2026-11-08T07:44:04.055319+09:00 elapsed=55799208 BENCH_END mode=baseline
+2026-11-08T07:44:12.270256+09:00 elapsed=55807423 BENCH_START mode=native; ms=0; rate=SAVER; no automation
+2026-11-08T07:44:12.271365+09:00 elapsed=55807425 BENCH_BLE_SCAN_MODE mode=native; ms=2; LOW_LATENCY
+2026-11-08T07:44:20.638148+09:00 elapsed=55815791 BENCH_BLE_CANDIDATE mode=native; ms=8368; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:44:20.638999+09:00 elapsed=55815792 BENCH_FOUND mode=native; ms=8369; owner advertisement matched
+2026-11-08T07:44:20.640735+09:00 elapsed=55815794 BENCH_CONNECT_CALL mode=native; ms=8371; auto=false
+2026-11-08T07:44:29.755623+09:00 elapsed=55824909 BENCH_GATT_CONNECTED mode=native; ms=17486; discovering auth and UWB services
+2026-11-08T07:44:29.811141+09:00 elapsed=55824964 BENCH_UWB_CHARACTERISTICS_FOUND mode=native; ms=17541; owner authentication service present
+2026-11-08T07:44:29.811582+09:00 elapsed=55824965 BENCH_READY mode=native; ms=17542; services discovered
+2026-11-08T07:44:29.930907+09:00 elapsed=55825084 BENCH_GATT_MTU_READY mode=native; ms=17661; mtu=243
+2026-11-08T07:44:30.111274+09:00 elapsed=55825264 BENCH_TAG_AUTH_START mode=native; ms=17841; owner mutual challenge-response
+2026-11-08T07:44:30.267319+09:00 elapsed=55825421 BENCH_TAG_AUTHENTICATED mode=native; ms=17997; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:44:30.267737+09:00 elapsed=55825421 BENCH_AUTH mode=native; ms=17998; mutual proof verified
+2026-11-08T07:44:30.270608+09:00 elapsed=55825424 BENCH_PLATFORM_CAPABILITIES mode=native; ms=18001; uwbAvailability=3
+2026-11-08T07:44:30.270959+09:00 elapsed=55825424 BENCH_UWB_RATE mode=native; ms=18001; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:44:30.310316+09:00 elapsed=55825464 BENCH_UWB_LOCAL_OPENED mode=native; ms=18040; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:44:30.312687+09:00 elapsed=55825466 BENCH_UWB_STARTED mode=native; ms=18043; technology=0
+2026-11-08T07:44:30.651742+09:00 elapsed=55825805 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=native; ms=18382; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:44:31.133004+09:00 elapsed=55826286 BENCH_FIRST mode=native; ms=18863; meters=0.8999999761581421; confidence=2
+2026-11-08T07:44:31.191253+09:00 elapsed=55826344 BENCH_TAG_UWB_STOPPED mode=native; ms=18921; encrypted stop acknowledged
+2026-11-08T07:44:31.194044+09:00 elapsed=55826347 BENCH_CLOSED mode=native; ms=18924; GATT released
+2026-11-08T07:44:31.194305+09:00 elapsed=55826347 BENCH_END mode=native
+2026-11-08T07:44:39.676314+09:00 elapsed=55834829 BENCH_START mode=native_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:44:39.677370+09:00 elapsed=55834831 BENCH_BLE_SCAN_MODE mode=native_scan; ms=2; LOW_LATENCY
+2026-11-08T07:44:41.629566+09:00 elapsed=55836783 BENCH_BLE_CANDIDATE mode=native_scan; ms=1954; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:44:41.631039+09:00 elapsed=55836784 BENCH_FOUND mode=native_scan; ms=1955; owner advertisement matched
+2026-11-08T07:44:41.631295+09:00 elapsed=55836784 BENCH_CONNECT_CALL mode=native_scan; ms=1955; auto=false
+2026-11-08T07:44:47.648363+09:00 elapsed=55842802 BENCH_BLE_CANDIDATE mode=native_scan; ms=7973; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:44:47.736216+09:00 elapsed=55842889 BENCH_GATT_CONNECTED mode=native_scan; ms=8060; discovering auth and UWB services
+2026-11-08T07:44:47.793182+09:00 elapsed=55842946 BENCH_UWB_CHARACTERISTICS_FOUND mode=native_scan; ms=8117; owner authentication service present
+2026-11-08T07:44:47.794030+09:00 elapsed=55842947 BENCH_READY mode=native_scan; ms=8118; services discovered
+2026-11-08T07:44:47.912487+09:00 elapsed=55843066 BENCH_GATT_MTU_READY mode=native_scan; ms=8237; mtu=243
+2026-11-08T07:44:48.091182+09:00 elapsed=55843244 BENCH_TAG_AUTH_START mode=native_scan; ms=8415; owner mutual challenge-response
+2026-11-08T07:44:48.245050+09:00 elapsed=55843398 BENCH_TAG_AUTHENTICATED mode=native_scan; ms=8569; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:44:48.245309+09:00 elapsed=55843398 BENCH_AUTH mode=native_scan; ms=8569; mutual proof verified
+2026-11-08T07:44:48.247695+09:00 elapsed=55843401 BENCH_PLATFORM_CAPABILITIES mode=native_scan; ms=8572; uwbAvailability=3
+2026-11-08T07:44:48.247873+09:00 elapsed=55843401 BENCH_UWB_RATE mode=native_scan; ms=8572; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:44:48.278735+09:00 elapsed=55843432 BENCH_UWB_LOCAL_OPENED mode=native_scan; ms=8603; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:44:48.280987+09:00 elapsed=55843434 BENCH_UWB_STARTED mode=native_scan; ms=8605; technology=0
+2026-11-08T07:44:48.631681+09:00 elapsed=55843785 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=native_scan; ms=8956; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:44:49.116012+09:00 elapsed=55844269 BENCH_FIRST mode=native_scan; ms=9440; meters=0.8999999761581421; confidence=2
+2026-11-08T07:44:49.170947+09:00 elapsed=55844324 BENCH_TAG_UWB_STOPPED mode=native_scan; ms=9495; encrypted stop acknowledged
+2026-11-08T07:44:49.172529+09:00 elapsed=55844326 BENCH_CLOSED mode=native_scan; ms=9497; GATT released
+2026-11-08T07:44:49.172686+09:00 elapsed=55844326 BENCH_END mode=native_scan
+2026-11-08T07:44:57.430335+09:00 elapsed=55852584 BENCH_START mode=baseline; ms=0; rate=SAVER; no automation
+2026-11-08T07:44:57.431515+09:00 elapsed=55852585 BENCH_BLE_SCAN_MODE mode=baseline; ms=2; LOW_LATENCY
+2026-11-08T07:44:59.631911+09:00 elapsed=55854785 BENCH_BLE_CANDIDATE mode=baseline; ms=2202; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:44:59.633198+09:00 elapsed=55854786 BENCH_FOUND mode=baseline; ms=2203; owner advertisement matched
+2026-11-08T07:44:59.636013+09:00 elapsed=55854789 BENCH_CONNECT_CALL mode=baseline; ms=2206; auto=false
+2026-11-08T07:45:02.734798+09:00 elapsed=55857888 BENCH_GATT_CONNECTED mode=baseline; ms=5305; discovering auth and UWB services
+2026-11-08T07:45:02.793019+09:00 elapsed=55857946 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=5363; owner authentication service present
+2026-11-08T07:45:02.793898+09:00 elapsed=55857947 BENCH_READY mode=baseline; ms=5364; services discovered
+2026-11-08T07:45:02.911998+09:00 elapsed=55858065 BENCH_GATT_MTU_READY mode=baseline; ms=5482; mtu=243
+2026-11-08T07:45:03.091355+09:00 elapsed=55858245 BENCH_TAG_AUTH_START mode=baseline; ms=5661; owner mutual challenge-response
+2026-11-08T07:45:03.246329+09:00 elapsed=55858400 BENCH_TAG_AUTHENTICATED mode=baseline; ms=5816; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:45:03.246684+09:00 elapsed=55858400 BENCH_AUTH mode=baseline; ms=5817; mutual proof verified
+2026-11-08T07:45:03.249809+09:00 elapsed=55858403 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=5820; uwbAvailability=3
+2026-11-08T07:45:03.250155+09:00 elapsed=55858403 BENCH_UWB_RATE mode=baseline; ms=5820; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:45:03.283859+09:00 elapsed=55858437 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=5854; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:45:03.287081+09:00 elapsed=55858440 BENCH_UWB_STARTED mode=baseline; ms=5857; technology=0
+2026-11-08T07:45:03.632036+09:00 elapsed=55858785 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=6202; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:45:04.114325+09:00 elapsed=55859268 BENCH_FIRST mode=baseline; ms=6684; meters=0.8999999761581421; confidence=2
+2026-11-08T07:45:04.171258+09:00 elapsed=55859324 BENCH_TAG_UWB_STOPPED mode=baseline; ms=6741; encrypted stop acknowledged
+2026-11-08T07:45:04.173798+09:00 elapsed=55859327 BENCH_CLOSED mode=baseline; ms=6744; GATT released
+2026-11-08T07:45:04.174048+09:00 elapsed=55859327 BENCH_END mode=baseline
+2026-11-08T07:45:13.040566+09:00 elapsed=55868194 BENCH_START mode=native; ms=0; rate=SAVER; no automation
+2026-11-08T07:45:13.041562+09:00 elapsed=55868195 BENCH_BLE_SCAN_MODE mode=native; ms=1; LOW_LATENCY
+2026-11-08T07:45:20.795358+09:00 elapsed=55875949 BENCH_BLE_CANDIDATE mode=native; ms=7754; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:45:20.796769+09:00 elapsed=55875950 BENCH_FOUND mode=native; ms=7756; owner advertisement matched
+2026-11-08T07:45:20.800158+09:00 elapsed=55875953 BENCH_CONNECT_CALL mode=native; ms=7759; auto=false
+2026-11-08T07:45:23.876206+09:00 elapsed=55879029 BENCH_GATT_CONNECTED mode=native; ms=10835; discovering auth and UWB services
+2026-11-08T07:45:23.933711+09:00 elapsed=55879087 BENCH_UWB_CHARACTERISTICS_FOUND mode=native; ms=10893; owner authentication service present
+2026-11-08T07:45:23.934992+09:00 elapsed=55879088 BENCH_READY mode=native; ms=10894; services discovered
+2026-11-08T07:45:24.051761+09:00 elapsed=55879205 BENCH_GATT_MTU_READY mode=native; ms=11011; mtu=243
+2026-11-08T07:45:24.231286+09:00 elapsed=55879384 BENCH_TAG_AUTH_START mode=native; ms=11190; owner mutual challenge-response
+2026-11-08T07:45:24.382724+09:00 elapsed=55879536 BENCH_TAG_AUTHENTICATED mode=native; ms=11342; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:45:24.383087+09:00 elapsed=55879536 BENCH_AUTH mode=native; ms=11342; mutual proof verified
+2026-11-08T07:45:24.386637+09:00 elapsed=55879540 BENCH_PLATFORM_CAPABILITIES mode=native; ms=11346; uwbAvailability=3
+2026-11-08T07:45:24.386972+09:00 elapsed=55879540 BENCH_UWB_RATE mode=native; ms=11346; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:45:24.420240+09:00 elapsed=55879573 BENCH_UWB_LOCAL_OPENED mode=native; ms=11379; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:45:24.423075+09:00 elapsed=55879576 BENCH_UWB_STARTED mode=native; ms=11382; technology=0
+2026-11-08T07:45:24.771590+09:00 elapsed=55879925 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=native; ms=11731; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:45:25.322479+09:00 elapsed=55880476 BENCH_FIRST mode=native; ms=12282; meters=0.9100000262260437; confidence=2
+2026-11-08T07:45:25.371526+09:00 elapsed=55880525 BENCH_TAG_UWB_STOPPED mode=native; ms=12331; encrypted stop acknowledged
+2026-11-08T07:45:25.374341+09:00 elapsed=55880528 BENCH_CLOSED mode=native; ms=12333; GATT released
+2026-11-08T07:45:25.374620+09:00 elapsed=55880528 BENCH_END mode=native
+2026-11-08T07:46:06.699833+09:00 elapsed=55921853 BENCH_START mode=delayed; ms=1; rate=SAVER; no automation
+2026-11-08T07:46:09.707581+09:00 elapsed=55924861 BENCH_BLE_SCAN_MODE mode=delayed; ms=3009; LOW_LATENCY
+2026-11-08T07:46:11.733434+09:00 elapsed=55926887 BENCH_BLE_CANDIDATE mode=delayed; ms=5035; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:46:11.734534+09:00 elapsed=55926888 BENCH_FOUND mode=delayed; ms=5036; owner advertisement matched
+2026-11-08T07:46:11.737146+09:00 elapsed=55926890 BENCH_CONNECT_CALL mode=delayed; ms=5038; auto=false
+2026-11-08T07:46:14.829178+09:00 elapsed=55929982 BENCH_GATT_CONNECTED mode=delayed; ms=8130; discovering auth and UWB services
+2026-11-08T07:46:14.884054+09:00 elapsed=55930037 BENCH_UWB_CHARACTERISTICS_FOUND mode=delayed; ms=8185; owner authentication service present
+2026-11-08T07:46:14.884876+09:00 elapsed=55930038 BENCH_READY mode=delayed; ms=8186; services discovered
+2026-11-08T07:46:15.002034+09:00 elapsed=55930155 BENCH_GATT_MTU_READY mode=delayed; ms=8303; mtu=243
+2026-11-08T07:46:15.180541+09:00 elapsed=55930334 BENCH_TAG_AUTH_START mode=delayed; ms=8482; owner mutual challenge-response
+2026-11-08T07:46:15.334295+09:00 elapsed=55930487 BENCH_TAG_AUTHENTICATED mode=delayed; ms=8635; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:46:15.334729+09:00 elapsed=55930488 BENCH_AUTH mode=delayed; ms=8636; mutual proof verified
+2026-11-08T07:46:15.341878+09:00 elapsed=55930495 BENCH_PLATFORM_CAPABILITIES mode=delayed; ms=8643; uwbAvailability=3
+2026-11-08T07:46:15.342080+09:00 elapsed=55930495 BENCH_UWB_RATE mode=delayed; ms=8643; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:46:15.375141+09:00 elapsed=55930528 BENCH_UWB_LOCAL_OPENED mode=delayed; ms=8676; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:46:15.376850+09:00 elapsed=55930530 BENCH_UWB_STARTED mode=delayed; ms=8678; technology=0
+2026-11-08T07:46:15.722232+09:00 elapsed=55930875 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=delayed; ms=9023; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:46:16.274523+09:00 elapsed=55931428 BENCH_FIRST mode=delayed; ms=9576; meters=0.9100000262260437; confidence=2
+2026-11-08T07:46:16.321690+09:00 elapsed=55931475 BENCH_TAG_UWB_STOPPED mode=delayed; ms=9623; encrypted stop acknowledged
+2026-11-08T07:46:16.324350+09:00 elapsed=55931478 BENCH_CLOSED mode=delayed; ms=9625; GATT released
+2026-11-08T07:46:16.324618+09:00 elapsed=55931478 BENCH_END mode=delayed
+2026-11-08T07:46:25.310988+09:00 elapsed=55940464 BENCH_START mode=warm_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:46:25.312139+09:00 elapsed=55940465 BENCH_BLE_SCAN_MODE mode=warm_scan; ms=1; LOW_LATENCY
+2026-11-08T07:46:32.788047+09:00 elapsed=55947941 BENCH_BLE_CANDIDATE mode=warm_scan; ms=7477; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:46:32.788966+09:00 elapsed=55947942 BENCH_FOUND mode=warm_scan; ms=7478; owner advertisement matched
+2026-11-08T07:46:32.791016+09:00 elapsed=55947944 BENCH_CONNECT_CALL mode=warm_scan; ms=7480; auto=false
+2026-11-08T07:46:38.906366+09:00 elapsed=55954060 BENCH_GATT_CONNECTED mode=warm_scan; ms=13596; discovering auth and UWB services
+2026-11-08T07:46:38.964371+09:00 elapsed=55954118 BENCH_UWB_CHARACTERISTICS_FOUND mode=warm_scan; ms=13653; owner authentication service present
+2026-11-08T07:46:38.965400+09:00 elapsed=55954119 BENCH_READY mode=warm_scan; ms=13655; services discovered
+2026-11-08T07:46:39.082686+09:00 elapsed=55954236 BENCH_GATT_MTU_READY mode=warm_scan; ms=13772; mtu=243
+2026-11-08T07:46:39.261956+09:00 elapsed=55954415 BENCH_TAG_AUTH_START mode=warm_scan; ms=13951; owner mutual challenge-response
+2026-11-08T07:46:39.412733+09:00 elapsed=55954566 BENCH_TAG_AUTHENTICATED mode=warm_scan; ms=14102; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:46:39.413101+09:00 elapsed=55954566 BENCH_AUTH mode=warm_scan; ms=14102; mutual proof verified
+2026-11-08T07:46:39.416380+09:00 elapsed=55954570 BENCH_PLATFORM_CAPABILITIES mode=warm_scan; ms=14106; uwbAvailability=3
+2026-11-08T07:46:39.416716+09:00 elapsed=55954570 BENCH_UWB_RATE mode=warm_scan; ms=14106; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:46:39.450348+09:00 elapsed=55954604 BENCH_UWB_LOCAL_OPENED mode=warm_scan; ms=14139; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:46:39.452076+09:00 elapsed=55954605 BENCH_UWB_STARTED mode=warm_scan; ms=14141; technology=0
+2026-11-08T07:46:39.802268+09:00 elapsed=55954955 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=warm_scan; ms=14491; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:46:40.358122+09:00 elapsed=55955511 BENCH_FIRST mode=warm_scan; ms=15047; meters=0.8999999761581421; confidence=2
+2026-11-08T07:46:40.401964+09:00 elapsed=55955555 BENCH_TAG_UWB_STOPPED mode=warm_scan; ms=15091; encrypted stop acknowledged
+2026-11-08T07:46:40.404316+09:00 elapsed=55955557 BENCH_CLOSED mode=warm_scan; ms=15093; GATT released
+2026-11-08T07:46:40.404558+09:00 elapsed=55955558 BENCH_END mode=warm_scan
+2026-11-08T07:46:49.478147+09:00 elapsed=55964631 BENCH_START mode=delayed; ms=0; rate=SAVER; no automation
+2026-11-08T07:46:52.481337+09:00 elapsed=55967635 BENCH_BLE_SCAN_MODE mode=delayed; ms=3003; LOW_LATENCY
+2026-11-08T07:46:53.886985+09:00 elapsed=55969040 BENCH_BLE_CANDIDATE mode=delayed; ms=4409; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:46:53.888342+09:00 elapsed=55969042 BENCH_FOUND mode=delayed; ms=4410; owner advertisement matched
+2026-11-08T07:46:53.891169+09:00 elapsed=55969044 BENCH_CONNECT_CALL mode=delayed; ms=4413; auto=false
+2026-11-08T07:46:56.979194+09:00 elapsed=55972132 BENCH_GATT_CONNECTED mode=delayed; ms=7501; discovering auth and UWB services
+2026-11-08T07:46:57.035023+09:00 elapsed=55972188 BENCH_UWB_CHARACTERISTICS_FOUND mode=delayed; ms=7557; owner authentication service present
+2026-11-08T07:46:57.036012+09:00 elapsed=55972189 BENCH_READY mode=delayed; ms=7558; services discovered
+2026-11-08T07:46:57.152497+09:00 elapsed=55972306 BENCH_GATT_MTU_READY mode=delayed; ms=7675; mtu=243
+2026-11-08T07:46:57.331648+09:00 elapsed=55972485 BENCH_TAG_AUTH_START mode=delayed; ms=7854; owner mutual challenge-response
+2026-11-08T07:46:57.483923+09:00 elapsed=55972637 BENCH_TAG_AUTHENTICATED mode=delayed; ms=8006; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:46:57.484270+09:00 elapsed=55972637 BENCH_AUTH mode=delayed; ms=8006; mutual proof verified
+2026-11-08T07:46:57.487185+09:00 elapsed=55972640 BENCH_PLATFORM_CAPABILITIES mode=delayed; ms=8009; uwbAvailability=3
+2026-11-08T07:46:57.487510+09:00 elapsed=55972641 BENCH_UWB_RATE mode=delayed; ms=8010; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:46:57.522428+09:00 elapsed=55972676 BENCH_UWB_LOCAL_OPENED mode=delayed; ms=8045; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:46:57.525488+09:00 elapsed=55972679 BENCH_UWB_STARTED mode=delayed; ms=8048; technology=0
+2026-11-08T07:46:57.872022+09:00 elapsed=55973025 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=delayed; ms=8394; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:46:58.427032+09:00 elapsed=55973580 BENCH_FIRST mode=delayed; ms=8949; meters=0.9300000071525574; confidence=2
+2026-11-08T07:46:58.472026+09:00 elapsed=55973625 BENCH_TAG_UWB_STOPPED mode=delayed; ms=8994; encrypted stop acknowledged
+2026-11-08T07:46:58.474652+09:00 elapsed=55973628 BENCH_CLOSED mode=delayed; ms=8997; GATT released
+2026-11-08T07:46:58.474907+09:00 elapsed=55973628 BENCH_END mode=delayed
+2026-11-08T07:47:07.237937+09:00 elapsed=55982391 BENCH_START mode=warm_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:47:07.238961+09:00 elapsed=55982392 BENCH_BLE_SCAN_MODE mode=warm_scan; ms=1; LOW_LATENCY
+2026-11-08T07:47:08.874002+09:00 elapsed=55984027 BENCH_BLE_CANDIDATE mode=warm_scan; ms=1636; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:47:10.240046+09:00 elapsed=55985393 BENCH_FOUND mode=warm_scan; ms=3002; owner advertisement matched
+2026-11-08T07:47:10.244373+09:00 elapsed=55985398 BENCH_CONNECT_CALL mode=warm_scan; ms=3007; auto=false
+2026-11-08T07:47:11.968718+09:00 elapsed=55987122 BENCH_GATT_CONNECTED mode=warm_scan; ms=4731; discovering auth and UWB services
+2026-11-08T07:47:12.024959+09:00 elapsed=55987178 BENCH_UWB_CHARACTERISTICS_FOUND mode=warm_scan; ms=4787; owner authentication service present
+2026-11-08T07:47:12.026150+09:00 elapsed=55987179 BENCH_READY mode=warm_scan; ms=4788; services discovered
+2026-11-08T07:47:12.143270+09:00 elapsed=55987296 BENCH_GATT_MTU_READY mode=warm_scan; ms=4905; mtu=243
+2026-11-08T07:47:12.352224+09:00 elapsed=55987505 BENCH_TAG_AUTH_START mode=warm_scan; ms=5114; owner mutual challenge-response
+2026-11-08T07:47:12.534171+09:00 elapsed=55987687 BENCH_TAG_AUTHENTICATED mode=warm_scan; ms=5296; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:47:12.534589+09:00 elapsed=55987688 BENCH_AUTH mode=warm_scan; ms=5297; mutual proof verified
+2026-11-08T07:47:12.537395+09:00 elapsed=55987691 BENCH_PLATFORM_CAPABILITIES mode=warm_scan; ms=5300; uwbAvailability=3
+2026-11-08T07:47:12.537783+09:00 elapsed=55987691 BENCH_UWB_RATE mode=warm_scan; ms=5300; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:47:12.573053+09:00 elapsed=55987726 BENCH_UWB_LOCAL_OPENED mode=warm_scan; ms=5335; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:47:12.575923+09:00 elapsed=55987729 BENCH_UWB_STARTED mode=warm_scan; ms=5338; technology=0
+2026-11-08T07:47:12.922041+09:00 elapsed=55988075 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=warm_scan; ms=5684; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:47:13.475968+09:00 elapsed=55988629 BENCH_FIRST mode=warm_scan; ms=6238; meters=0.9300000071525574; confidence=2
+2026-11-08T07:47:13.522011+09:00 elapsed=55988675 BENCH_TAG_UWB_STOPPED mode=warm_scan; ms=6284; encrypted stop acknowledged
+2026-11-08T07:47:13.524723+09:00 elapsed=55988678 BENCH_CLOSED mode=warm_scan; ms=6287; GATT released
+2026-11-08T07:47:13.525018+09:00 elapsed=55988678 BENCH_END mode=warm_scan
+2026-11-08T07:47:21.794944+09:00 elapsed=55996948 BENCH_START mode=delayed; ms=0; rate=SAVER; no automation
+2026-11-08T07:47:24.800499+09:00 elapsed=55999954 BENCH_BLE_SCAN_MODE mode=delayed; ms=3006; LOW_LATENCY
+2026-11-08T07:47:27.009303+09:00 elapsed=56002162 BENCH_BLE_CANDIDATE mode=delayed; ms=5214; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:47:27.010676+09:00 elapsed=56002164 BENCH_FOUND mode=delayed; ms=5216; owner advertisement matched
+2026-11-08T07:47:27.013852+09:00 elapsed=56002167 BENCH_CONNECT_CALL mode=delayed; ms=5219; auto=false
+2026-11-08T07:47:37.025782+09:00 elapsed=56012179 BENCH_CLOSED mode=delayed; ms=15231; GATT released
+2026-11-08T07:47:37.027623+09:00 elapsed=56012181 BENCH_ERROR mode=delayed; GATT_CONNECTION_STATUS_147
+2026-11-08T07:47:37.027821+09:00 elapsed=56012181 BENCH_END mode=delayed
+2026-11-08T07:47:45.951445+09:00 elapsed=56021105 BENCH_START mode=warm_scan; ms=0; rate=SAVER; no automation
+2026-11-08T07:47:45.952419+09:00 elapsed=56021106 BENCH_BLE_SCAN_MODE mode=warm_scan; ms=1; LOW_LATENCY
+2026-11-08T07:47:48.038444+09:00 elapsed=56023192 BENCH_BLE_CANDIDATE mode=warm_scan; ms=2087; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:47:48.954302+09:00 elapsed=56024108 BENCH_FOUND mode=warm_scan; ms=3002; owner advertisement matched
+2026-11-08T07:47:48.958809+09:00 elapsed=56024112 BENCH_CONNECT_CALL mode=warm_scan; ms=3007; auto=false
+2026-11-08T07:47:51.128238+09:00 elapsed=56026281 BENCH_GATT_CONNECTED mode=warm_scan; ms=5176; discovering auth and UWB services
+2026-11-08T07:47:51.182147+09:00 elapsed=56026335 BENCH_UWB_CHARACTERISTICS_FOUND mode=warm_scan; ms=5230; owner authentication service present
+2026-11-08T07:47:51.182572+09:00 elapsed=56026336 BENCH_READY mode=warm_scan; ms=5231; services discovered
+2026-11-08T07:47:51.303459+09:00 elapsed=56026457 BENCH_GATT_MTU_READY mode=warm_scan; ms=5352; mtu=243
+2026-11-08T07:47:51.481936+09:00 elapsed=56026635 BENCH_TAG_AUTH_START mode=warm_scan; ms=5530; owner mutual challenge-response
+2026-11-08T07:47:51.636413+09:00 elapsed=56026790 BENCH_TAG_AUTHENTICATED mode=warm_scan; ms=5685; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:47:51.636773+09:00 elapsed=56026790 BENCH_AUTH mode=warm_scan; ms=5685; mutual proof verified
+2026-11-08T07:47:51.639830+09:00 elapsed=56026793 BENCH_PLATFORM_CAPABILITIES mode=warm_scan; ms=5688; uwbAvailability=3
+2026-11-08T07:47:51.640158+09:00 elapsed=56026793 BENCH_UWB_RATE mode=warm_scan; ms=5688; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:47:51.675618+09:00 elapsed=56026829 BENCH_UWB_LOCAL_OPENED mode=warm_scan; ms=5724; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:47:51.678661+09:00 elapsed=56026832 BENCH_UWB_STARTED mode=warm_scan; ms=5727; technology=0
+2026-11-08T07:47:52.022329+09:00 elapsed=56027176 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=warm_scan; ms=6070; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:47:52.578071+09:00 elapsed=56027731 BENCH_FIRST mode=warm_scan; ms=6626; meters=0.9200000166893005; confidence=2
+2026-11-08T07:47:52.622415+09:00 elapsed=56027776 BENCH_TAG_UWB_STOPPED mode=warm_scan; ms=6671; encrypted stop acknowledged
+2026-11-08T07:47:52.624862+09:00 elapsed=56027778 BENCH_CLOSED mode=warm_scan; ms=6673; GATT released
+2026-11-08T07:47:52.625107+09:00 elapsed=56027778 BENCH_END mode=warm_scan
+2026-11-08T07:48:12.140204+09:00 elapsed=56047293 BENCH_START mode=advertising; ms=0; advertisement intervals only; no connection
+2026-11-08T07:48:12.142927+09:00 elapsed=56047296 BENCH_BLE_SCAN_MODE mode=advertising; ms=3; LOW_LATENCY
+2026-11-08T07:48:12.237822+09:00 elapsed=56047391 BENCH_BLE_ADVERTISEMENT mode=advertising; ms=98; ageMs=2
+2026-11-08T07:48:12.238277+09:00 elapsed=56047391 BENCH_BLE_CANDIDATE mode=advertising; ms=98; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:48:15.261674+09:00 elapsed=56050415 BENCH_BLE_ADVERTISEMENT mode=advertising; ms=3122; ageMs=0
+2026-11-08T07:48:18.267108+09:00 elapsed=56053420 BENCH_BLE_ADVERTISEMENT mode=advertising; ms=6127; ageMs=0
+2026-11-08T07:48:24.274232+09:00 elapsed=56059427 BENCH_BLE_ADVERTISEMENT mode=advertising; ms=12134; ageMs=0
+2026-11-08T07:48:27.148481+09:00 elapsed=56062302 BENCH_SCAN_CLOSED mode=advertising; ms=15009; no GATT or UWB session opened
+2026-11-08T07:48:27.149097+09:00 elapsed=56062302 BENCH_END mode=advertising
+2026-11-08T07:48:36.151441+09:00 elapsed=56071305 BENCH_START mode=high; ms=2; rate=SAVER; no automation
+2026-11-08T07:48:36.152923+09:00 elapsed=56071306 BENCH_BLE_SCAN_MODE mode=high; ms=3; LOW_LATENCY
+2026-11-08T07:48:36.281002+09:00 elapsed=56071434 BENCH_BLE_CANDIDATE mode=high; ms=131; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:48:36.281434+09:00 elapsed=56071435 BENCH_FOUND mode=high; ms=132; owner advertisement matched; nativeType=1
+2026-11-08T07:48:36.282441+09:00 elapsed=56071436 BENCH_CONNECT_CALL mode=high; ms=133; auto=false
+2026-11-08T07:48:42.417040+09:00 elapsed=56077570 BENCH_GATT_CONNECTED mode=high; ms=6267; discovering auth and UWB services
+2026-11-08T07:48:42.472478+09:00 elapsed=56077626 BENCH_UWB_CHARACTERISTICS_FOUND mode=high; ms=6323; owner authentication service present
+2026-11-08T07:48:42.472969+09:00 elapsed=56077626 BENCH_READY mode=high; ms=6323; services discovered
+2026-11-08T07:48:42.473490+09:00 elapsed=56077627 BENCH_GATT_HIGH_PRIORITY mode=high; ms=6324; connection priority requested; accepted=true
+2026-11-08T07:48:42.592264+09:00 elapsed=56077745 BENCH_GATT_MTU_READY mode=high; ms=6442; mtu=243
+2026-11-08T07:48:42.772601+09:00 elapsed=56077926 BENCH_TAG_AUTH_START mode=high; ms=6623; owner mutual challenge-response
+2026-11-08T07:48:42.920946+09:00 elapsed=56078074 BENCH_TAG_AUTHENTICATED mode=high; ms=6771; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:48:42.921328+09:00 elapsed=56078075 BENCH_AUTH mode=high; ms=6771; mutual proof verified
+2026-11-08T07:48:42.929890+09:00 elapsed=56078083 BENCH_PLATFORM_CAPABILITIES mode=high; ms=6780; uwbAvailability=3
+2026-11-08T07:48:42.930310+09:00 elapsed=56078083 BENCH_UWB_RATE mode=high; ms=6780; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:48:42.965481+09:00 elapsed=56078119 BENCH_UWB_LOCAL_OPENED mode=high; ms=6816; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:48:42.966736+09:00 elapsed=56078120 BENCH_UWB_STARTED mode=high; ms=6817; technology=0
+2026-11-08T07:48:43.616736+09:00 elapsed=56078770 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=high; ms=7467; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:48:54.780746+09:00 elapsed=56089934 BENCH_TAG_UWB_STOPPED mode=high; ms=18631; encrypted stop acknowledged
+2026-11-08T07:48:54.785015+09:00 elapsed=56089938 BENCH_CLOSED mode=high; ms=18635; GATT released
+2026-11-08T07:48:54.786672+09:00 elapsed=56089940 BENCH_ERROR mode=high; UWB_STOPPED_0
+2026-11-08T07:48:54.786878+09:00 elapsed=56089940 BENCH_END mode=high
+2026-11-08T07:49:03.637130+09:00 elapsed=56098790 BENCH_START mode=baseline; ms=0; rate=SAVER; no automation
+2026-11-08T07:49:03.638215+09:00 elapsed=56098791 BENCH_BLE_SCAN_MODE mode=baseline; ms=1; LOW_LATENCY
+2026-11-08T07:49:06.594567+09:00 elapsed=56101748 BENCH_BLE_CANDIDATE mode=baseline; ms=2958; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:49:06.595639+09:00 elapsed=56101749 BENCH_FOUND mode=baseline; ms=2959; owner advertisement matched; nativeType=1
+2026-11-08T07:49:06.598407+09:00 elapsed=56101752 BENCH_CONNECT_CALL mode=baseline; ms=2962; auto=false
+2026-11-08T07:49:09.689196+09:00 elapsed=56104842 BENCH_GATT_CONNECTED mode=baseline; ms=6052; discovering auth and UWB services
+2026-11-08T07:49:09.745237+09:00 elapsed=56104898 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=6108; owner authentication service present
+2026-11-08T07:49:09.746465+09:00 elapsed=56104900 BENCH_READY mode=baseline; ms=6110; services discovered
+2026-11-08T07:49:09.863073+09:00 elapsed=56105016 BENCH_GATT_MTU_READY mode=baseline; ms=6226; mtu=243
+2026-11-08T07:49:10.042414+09:00 elapsed=56105196 BENCH_TAG_AUTH_START mode=baseline; ms=6406; owner mutual challenge-response
+2026-11-08T07:49:10.196641+09:00 elapsed=56105350 BENCH_TAG_AUTHENTICATED mode=baseline; ms=6560; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:49:10.197266+09:00 elapsed=56105350 BENCH_AUTH mode=baseline; ms=6560; mutual proof verified
+2026-11-08T07:49:10.201714+09:00 elapsed=56105355 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=6565; uwbAvailability=3
+2026-11-08T07:49:10.202115+09:00 elapsed=56105355 BENCH_UWB_RATE mode=baseline; ms=6565; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:49:10.236278+09:00 elapsed=56105389 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=6599; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:49:10.238894+09:00 elapsed=56105392 BENCH_UWB_STARTED mode=baseline; ms=6602; technology=0
+2026-11-08T07:49:10.582453+09:00 elapsed=56105736 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=6946; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:49:23.361318+09:00 elapsed=56118515 BENCH_STOP_ERROR mode=baseline; ms=19724; IllegalStateException
+2026-11-08T07:49:23.362235+09:00 elapsed=56118515 BENCH_CLOSED mode=baseline; ms=19725; GATT released
+2026-11-08T07:49:23.362592+09:00 elapsed=56118516 BENCH_ERROR mode=baseline; UWB_STOPPED_0
+2026-11-08T07:49:23.362760+09:00 elapsed=56118516 BENCH_END mode=baseline
+2026-11-08T07:49:32.187067+09:00 elapsed=56127340 BENCH_START mode=high; ms=0; rate=SAVER; no automation
+2026-11-08T07:49:32.188297+09:00 elapsed=56127341 BENCH_BLE_SCAN_MODE mode=high; ms=1; LOW_LATENCY
+2026-11-08T07:49:32.247836+09:00 elapsed=56127401 BENCH_BLE_CANDIDATE mode=high; ms=61; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:49:32.248468+09:00 elapsed=56127402 BENCH_FOUND mode=high; ms=62; owner advertisement matched; nativeType=1
+2026-11-08T07:49:32.249784+09:00 elapsed=56127403 BENCH_CONNECT_CALL mode=high; ms=63; auto=false
+2026-11-08T07:49:32.456981+09:00 elapsed=56127610 BENCH_GATT_CONNECTED mode=high; ms=270; discovering auth and UWB services
+2026-11-08T07:49:32.512360+09:00 elapsed=56127666 BENCH_UWB_CHARACTERISTICS_FOUND mode=high; ms=326; owner authentication service present
+2026-11-08T07:49:32.512819+09:00 elapsed=56127666 BENCH_READY mode=high; ms=326; services discovered
+2026-11-08T07:49:32.513289+09:00 elapsed=56127666 BENCH_GATT_HIGH_PRIORITY mode=high; ms=326; connection priority requested; accepted=true
+2026-11-08T07:49:32.633152+09:00 elapsed=56127786 BENCH_GATT_MTU_READY mode=high; ms=446; mtu=243
+2026-11-08T07:49:32.811885+09:00 elapsed=56127965 BENCH_TAG_AUTH_START mode=high; ms=625; owner mutual challenge-response
+2026-11-08T07:49:32.962025+09:00 elapsed=56128115 BENCH_TAG_AUTHENTICATED mode=high; ms=775; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:49:32.962488+09:00 elapsed=56128116 BENCH_AUTH mode=high; ms=776; mutual proof verified
+2026-11-08T07:49:32.965361+09:00 elapsed=56128119 BENCH_PLATFORM_CAPABILITIES mode=high; ms=779; uwbAvailability=3
+2026-11-08T07:49:32.965698+09:00 elapsed=56128119 BENCH_UWB_RATE mode=high; ms=779; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:49:33.000481+09:00 elapsed=56128154 BENCH_UWB_LOCAL_OPENED mode=high; ms=814; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:49:33.003328+09:00 elapsed=56128157 BENCH_UWB_STARTED mode=high; ms=816; technology=0
+2026-11-08T07:49:33.350233+09:00 elapsed=56128503 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=high; ms=1163; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:49:33.928076+09:00 elapsed=56129081 BENCH_FIRST mode=high; ms=1741; meters=0.9100000262260437; confidence=2
+2026-11-08T07:49:33.979964+09:00 elapsed=56129133 BENCH_TAG_UWB_STOPPED mode=high; ms=1793; encrypted stop acknowledged
+2026-11-08T07:49:33.982021+09:00 elapsed=56129135 BENCH_CLOSED mode=high; ms=1795; GATT released
+2026-11-08T07:49:33.982158+09:00 elapsed=56129135 BENCH_END mode=high
+2026-11-08T07:49:42.442429+09:00 elapsed=56137596 BENCH_START mode=baseline; ms=0; rate=SAVER; no automation
+2026-11-08T07:49:42.443467+09:00 elapsed=56137597 BENCH_BLE_SCAN_MODE mode=baseline; ms=1; LOW_LATENCY
+2026-11-08T07:49:43.592586+09:00 elapsed=56138746 BENCH_BLE_CANDIDATE mode=baseline; ms=1150; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:49:43.594131+09:00 elapsed=56138747 BENCH_FOUND mode=baseline; ms=1151; owner advertisement matched; nativeType=1
+2026-11-08T07:49:43.596701+09:00 elapsed=56138750 BENCH_CONNECT_CALL mode=baseline; ms=1154; auto=false
+2026-11-08T07:49:46.686297+09:00 elapsed=56141839 BENCH_GATT_CONNECTED mode=baseline; ms=4243; discovering auth and UWB services
+2026-11-08T07:49:46.745786+09:00 elapsed=56141899 BENCH_UWB_CHARACTERISTICS_FOUND mode=baseline; ms=4303; owner authentication service present
+2026-11-08T07:49:46.747053+09:00 elapsed=56141900 BENCH_READY mode=baseline; ms=4304; services discovered
+2026-11-08T07:49:46.863549+09:00 elapsed=56142017 BENCH_GATT_MTU_READY mode=baseline; ms=4421; mtu=243
+2026-11-08T07:49:47.042437+09:00 elapsed=56142196 BENCH_TAG_AUTH_START mode=baseline; ms=4600; owner mutual challenge-response
+2026-11-08T07:49:47.193994+09:00 elapsed=56142347 BENCH_TAG_AUTHENTICATED mode=baseline; ms=4751; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:49:47.194331+09:00 elapsed=56142348 BENCH_AUTH mode=baseline; ms=4751; mutual proof verified
+2026-11-08T07:49:47.197233+09:00 elapsed=56142350 BENCH_PLATFORM_CAPABILITIES mode=baseline; ms=4754; uwbAvailability=3
+2026-11-08T07:49:47.197585+09:00 elapsed=56142351 BENCH_UWB_RATE mode=baseline; ms=4755; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:49:47.232276+09:00 elapsed=56142385 BENCH_UWB_LOCAL_OPENED mode=baseline; ms=4789; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:49:47.234857+09:00 elapsed=56142388 BENCH_UWB_STARTED mode=baseline; ms=4792; technology=0
+2026-11-08T07:49:47.582418+09:00 elapsed=56142736 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=baseline; ms=5140; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:49:48.134232+09:00 elapsed=56143287 BENCH_FIRST mode=baseline; ms=5691; meters=0.9100000262260437; confidence=2
+2026-11-08T07:49:48.182691+09:00 elapsed=56143336 BENCH_TAG_UWB_STOPPED mode=baseline; ms=5740; encrypted stop acknowledged
+2026-11-08T07:49:48.185069+09:00 elapsed=56143338 BENCH_CLOSED mode=baseline; ms=5742; GATT released
+2026-11-08T07:49:48.185321+09:00 elapsed=56143338 BENCH_END mode=baseline
+2026-11-08T07:52:07.952181+09:00 elapsed=56283105 BENCH_START mode=warm_scan; ms=1; rate=SAVER; no automation
+2026-11-08T07:52:07.955831+09:00 elapsed=56283109 BENCH_BLE_SCAN_MODE mode=warm_scan; ms=5; LOW_LATENCY
+2026-11-08T07:52:10.889328+09:00 elapsed=56286043 BENCH_BLE_CANDIDATE mode=warm_scan; ms=2938; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T07:52:10.954055+09:00 elapsed=56286107 BENCH_FOUND mode=warm_scan; ms=3003; owner advertisement matched; nativeType=1
+2026-11-08T07:52:10.956987+09:00 elapsed=56286110 BENCH_CONNECT_CALL mode=warm_scan; ms=3006; auto=false
+2026-11-08T07:52:19.972702+09:00 elapsed=56295126 BENCH_GATT_CONNECTED mode=warm_scan; ms=12022; discovering auth and UWB services
+2026-11-08T07:52:20.026525+09:00 elapsed=56295180 BENCH_UWB_CHARACTERISTICS_FOUND mode=warm_scan; ms=12076; owner authentication service present
+2026-11-08T07:52:20.027701+09:00 elapsed=56295181 BENCH_READY mode=warm_scan; ms=12077; services discovered
+2026-11-08T07:52:20.143254+09:00 elapsed=56295296 BENCH_GATT_MTU_READY mode=warm_scan; ms=12192; mtu=243
+2026-11-08T07:52:20.322833+09:00 elapsed=56295476 BENCH_TAG_AUTH_START mode=warm_scan; ms=12372; owner mutual challenge-response
+2026-11-08T07:52:20.475121+09:00 elapsed=56295628 BENCH_TAG_AUTHENTICATED mode=warm_scan; ms=12524; mutual owner proof verified; encrypted command channel ready
+2026-11-08T07:52:20.475492+09:00 elapsed=56295629 BENCH_AUTH mode=warm_scan; ms=12525; mutual proof verified
+2026-11-08T07:52:20.490189+09:00 elapsed=56295643 BENCH_PLATFORM_CAPABILITIES mode=warm_scan; ms=12539; uwbAvailability=3
+2026-11-08T07:52:20.490527+09:00 elapsed=56295644 BENCH_UWB_RATE mode=warm_scan; ms=12540; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T07:52:20.530114+09:00 elapsed=56295683 BENCH_UWB_LOCAL_OPENED mode=warm_scan; ms=12579; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T07:52:20.531788+09:00 elapsed=56295685 BENCH_UWB_STARTED mode=warm_scan; ms=12581; technology=0
+2026-11-08T07:52:20.892682+09:00 elapsed=56296046 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=warm_scan; ms=12942; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T07:52:21.446520+09:00 elapsed=56296600 BENCH_FIRST mode=warm_scan; ms=13496; meters=0.9100000262260437; confidence=2
+2026-11-08T07:52:21.523893+09:00 elapsed=56296677 BENCH_TAG_UWB_STOPPED mode=warm_scan; ms=13573; encrypted stop acknowledged
+2026-11-08T07:52:21.526073+09:00 elapsed=56296679 BENCH_CLOSED mode=warm_scan; ms=13575; GATT released
+2026-11-08T07:52:21.526234+09:00 elapsed=56296679 BENCH_END mode=warm_scan
+
+POST-RECOVERY RADIO CHECK
+2026-11-08T08:02:36.154326+09:00 elapsed=56911308 BENCH_START mode=warm_scan; ms=2; rate=SAVER; interactive=true; activityVisible=true; no automation
+2026-11-08T08:02:36.162808+09:00 elapsed=56911316 BENCH_BLE_SCAN_MODE mode=warm_scan; ms=11; LOW_LATENCY
+2026-11-08T08:02:38.537943+09:00 elapsed=56913691 BENCH_BLE_CANDIDATE mode=warm_scan; ms=2386; connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-08T08:02:39.160326+09:00 elapsed=56914314 BENCH_FOUND mode=warm_scan; ms=3008; owner advertisement matched; nativeType=1
+2026-11-08T08:02:39.163126+09:00 elapsed=56914316 BENCH_CONNECT_CALL mode=warm_scan; ms=3011; auto=false
+2026-11-08T08:02:41.653723+09:00 elapsed=56916807 BENCH_GATT_CONNECTED mode=warm_scan; ms=5502; discovering auth and UWB services
+2026-11-08T08:02:41.709010+09:00 elapsed=56916862 BENCH_UWB_CHARACTERISTICS_FOUND mode=warm_scan; ms=5557; owner authentication service present
+2026-11-08T08:02:41.709487+09:00 elapsed=56916863 BENCH_READY mode=warm_scan; ms=5558; services discovered
+2026-11-08T08:02:41.828321+09:00 elapsed=56916982 BENCH_GATT_MTU_READY mode=warm_scan; ms=5676; mtu=243
+2026-11-08T08:02:42.007986+09:00 elapsed=56917161 BENCH_TAG_AUTH_START mode=warm_scan; ms=5856; owner mutual challenge-response
+2026-11-08T08:02:42.160253+09:00 elapsed=56917313 BENCH_TAG_AUTHENTICATED mode=warm_scan; ms=6008; mutual owner proof verified; encrypted command channel ready
+2026-11-08T08:02:42.160726+09:00 elapsed=56917314 BENCH_AUTH mode=warm_scan; ms=6009; mutual proof verified
+2026-11-08T08:02:42.166617+09:00 elapsed=56917320 BENCH_PLATFORM_CAPABILITIES mode=warm_scan; ms=6015; uwbAvailability=3
+2026-11-08T08:02:42.166827+09:00 elapsed=56917320 BENCH_UWB_RATE mode=warm_scan; ms=6015; requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+2026-11-08T08:02:42.211506+09:00 elapsed=56917365 BENCH_UWB_LOCAL_OPENED mode=warm_scan; ms=6060; Platform RAW UWB-only; encrypted peer OOB required
+2026-11-08T08:02:42.214328+09:00 elapsed=56917368 BENCH_UWB_STARTED mode=warm_scan; ms=6062; technology=0
+2026-11-08T08:02:42.578981+09:00 elapsed=56917732 BENCH_OOB_ENCRYPTED_ACKNOWLEDGED mode=warm_scan; ms=6427; UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-08T08:02:43.138855+09:00 elapsed=56918292 BENCH_FIRST mode=warm_scan; ms=6987; meters=0.9100000262260437; confidence=2; interactive=true; activityVisible=true
+2026-11-08T08:02:43.177984+09:00 elapsed=56918331 BENCH_TAG_UWB_STOPPED mode=warm_scan; ms=7026; encrypted stop acknowledged
+2026-11-08T08:02:43.180633+09:00 elapsed=56918334 BENCH_CLOSED mode=warm_scan; ms=7029; GATT released
+2026-11-08T08:02:43.180935+09:00 elapsed=56918334 BENCH_END mode=warm_scan
+
+POST-RECOVERY SETTINGS AND SERVICE EVIDENCE
+2026-11-08T07:56:05.755586+09:00 elapsed=56520909 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=2
+2026-11-08T07:57:01.255203+09:00 elapsed=56576408 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=2
+2026-11-08T07:57:06.876191+09:00 elapsed=56582029 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=2
+2026-11-08T07:57:40.420197+09:00 elapsed=56615573 ACCOUNT_CONNECTED owner device list loaded; secrets stored in Android Keystore envelope
+2026-11-08T07:57:40.430928+09:00 elapsed=56615584 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=2
+2026-11-08T07:59:02.653559+09:00 elapsed=56697807 DEBUG_COMMAND tracking_rate=SAVER; return_distance=set; car_device=recovered; car_mode=true; smartthings=true; off_on_link_loss=true; pulse=true
+2026-11-08T07:59:12.874493+09:00 elapsed=56708028 DEBUG_COMMAND smartthings_device=recovered
+2026-11-08T08:00:26.643974+09:00 elapsed=56781797 DEBUG_SETTINGS monitoring=false; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; notifications=4; channelImportance=0
+2026-11-08T08:00:26.644130+09:00 elapsed=56781797 DEBUG_COMMAND tracking_notification=hidden
+2026-11-08T08:00:26.734825+09:00 elapsed=56781888 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=0
+2026-11-08T08:00:26.899427+09:00 elapsed=56782053 DEBUG_COMMAND monitor=start:sent
+2026-11-08T08:00:26.911047+09:00 elapsed=56782064 MONITOR_RESTORE manual=true; backend=PLATFORM; threshold=5.0; dwell=3000
+2026-11-08T08:00:26.913607+09:00 elapsed=56782067 MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; carMode=true; interactive=true; batteryExempt=false
+2026-11-08T08:00:26.932720+09:00 elapsed=56782086 CAR_LINK connected=false; via=seed
+2026-11-08T08:00:29.942825+09:00 elapsed=56785096 CAR_PHASE started without the car link; tag left alone until the car links
+2026-11-08T08:01:00.789130+09:00 elapsed=56815942 DEBUG_SETTINGS monitoring=true; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; notifications=4; channelImportance=2
+2026-11-08T08:01:00.789347+09:00 elapsed=56815943 DEBUG_COMMAND nothing
+2026-11-08T08:02:08.703236+09:00 elapsed=56883856 DEBUG_COMMAND monitor=stop:sent
+2026-11-08T08:02:10.212626+09:00 elapsed=56885366 TRACKING_NOTIFICATION_STATUS visible=true; channelImportance=2
+2026-11-08T08:03:11.228171+09:00 elapsed=56946381 DEBUG_COMMAND tracking_notification=hidden
+2026-11-08T08:03:11.309298+09:00 elapsed=56946462 DEBUG_COMMAND monitor=start:sent
+2026-11-08T08:03:11.322656+09:00 elapsed=56946476 MONITOR_RESTORE manual=true; backend=PLATFORM; threshold=5.0; dwell=3000
+2026-11-08T08:03:11.328616+09:00 elapsed=56946482 MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; carMode=true; interactive=true; batteryExempt=false
+2026-11-08T08:03:11.340938+09:00 elapsed=56946494 CAR_LINK connected=false; via=seed
+2026-11-08T08:03:14.357920+09:00 elapsed=56949511 CAR_PHASE started without the car link; tag left alone until the car links
+2026-11-08T08:03:39.264288+09:00 elapsed=56974417 DEBUG_SETTINGS monitoring=true; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; notifications=4; channelImportance=2
+2026-11-08T08:03:39.264515+09:00 elapsed=56974418 DEBUG_COMMAND nothing
+2026-11-08T08:06:49.243249+09:00 elapsed=57164396 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=0
+2026-11-08T08:07:29.842253+09:00 elapsed=57204995 DEBUG_SETTINGS monitoring=true; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; notifications=4; channelImportance=0
+2026-11-08T08:07:29.842419+09:00 elapsed=57204996 DEBUG_COMMAND nothing
+2026-11-08T08:07:56.422345+09:00 elapsed=57231576 DEBUG_COMMAND monitor=stop:sent
+2026-11-08T08:07:57.956390+09:00 elapsed=57233110 TRACKING_NOTIFICATION_STATUS visible=false; channelImportance=0
+2026-11-08T08:07:58.091079+09:00 elapsed=57233244 DEBUG_COMMAND monitor=start:sent
+2026-11-08T08:07:58.115634+09:00 elapsed=57233269 MONITOR_RESTORE manual=true; backend=PLATFORM; threshold=5.0; dwell=3000
+2026-11-08T08:07:58.118384+09:00 elapsed=57233272 MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; carMode=true; interactive=true; batteryExempt=false
+2026-11-08T08:07:58.133021+09:00 elapsed=57233286 CAR_LINK connected=false; via=seed
+2026-11-08T08:08:01.142057+09:00 elapsed=57236295 CAR_PHASE started without the car link; tag left alone until the car links
+2026-11-08T08:08:25.962302+09:00 elapsed=57261115 DEBUG_SETTINGS monitoring=true; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; notifications=4; channelImportance=0
+2026-11-08T08:08:25.962548+09:00 elapsed=57261116 DEBUG_COMMAND nothing

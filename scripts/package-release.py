@@ -26,6 +26,8 @@ EVIDENCE = (
     "threshold-events-device.txt",
     "review-stability-validation.txt", "instrumentation-review.txt",
     "presence-mapping-validation.txt",
+    "connection-latency-validation.txt",
+    "unmeasured-switch-option.txt",
 )
 
 

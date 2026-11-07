@@ -28,9 +28,11 @@ JDK 25, Android SDK Platform 37, Build Tools 36.0.0을 사용한다. daemon JVM 
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 115개, 기기 계측 테스트는 3개, Lint 오류 0 / monochrome 아이콘 경고 1이다. 새 테스트를 추가하면 문서의 개수도 갱신한다. 계측 테스트는 `./gradlew :app:connectedDebugAndroidTest`로 실행하며 별도 합성 데이터 vault만 사용한다. 실행 전 추적을 정상 중지하고, 끝나면 원래 ON/OFF 상태로 복원한다.
+macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 121개, 기기 계측 테스트는 3개, 최근 lintDebug 오류 0 / 경고 0이다(과거 빌드는 monochrome 아이콘 경고 1, 원본 아이콘은 그대로다). 새 테스트를 추가하면 문서의 개수도 갱신한다. 계측 테스트는 `./gradlew :app:connectedDebugAndroidTest`로 실행하며 별도 합성 데이터 vault만 사용한다. 실행 전 추적을 정상 중지하고, 끝나면 원래 ON/OFF 상태로 복원한다.
 
 기기 설정은 화면을 넘겨 누르지 말고 `adb shell am broadcast -n dev.uwbpulse.monitor/.debug.DebugCommandReceiver --es tracking_rate NORMAL --ez car_mode true --es monitor start|stop` 형식의 개발용 명령으로 바꾼다(전체 키는 `docs/HANDOFF.md`). 실제 무선 검증은 별도다. `docs/HANDOFF.md`의 재현 절차를 따른다. 재부팅 검증 중에는 부팅 후 자동 재개 증거를 얻기 전에 앱 Activity를 열지 않는다. 실기기 시험을 하지 않았다면 그 사실을 명확히 기록한다.
+
+**개인 폰 계측 주의:** AGP 9.5.1의 connected 테스트는 기본값으로 종료 뒤 대상 앱을 제거해 데이터를 지운다. 저장소의 `gradle.properties`에는 `android.injected.androidTest.leaveApksInstalledAfterRun=true`가 필수다. 개인 폰에서는 가급적 `assembleDebugAndroidTest` → 테스트 APK만 `adb install -r` → `adb shell am instrument -w ...`로 실행한다. 이 보존 옵션을 끄거나 앱 제거·데이터 초기화가 포함된 테스트 작업을 실행하지 않는다. `ConnectionBenchmarkService`는 계측이 아닌 별도 디버그 무선 시험이며 자동화 전송을 호출하지 않는다.
 
 ## 저장소와 배포
 

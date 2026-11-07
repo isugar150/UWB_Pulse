@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
                     valueRange=0f..rescanChoices.lastIndex.toFloat(),steps=rescanChoices.size - 2)
                 Text("연결이 끊기면 2·5·15·60초로 간격을 늘려 가며 태그를 다시 찾습니다. 이 값은 그 최대 간격이며 기본은 1분입니다. 길수록 배터리를 아끼지만 복귀 후 다시 잡히기까지 오래 걸릴 수 있습니다. 바로 적용됩니다.",style=MaterialTheme.typography.bodySmall)
                 HorizontalDivider()
-                CarModeSettings(vm,prefs.carMode,prefs.carAddress,prefs.carName,state.running)
+                CarModeSettings(vm,prefs.carMode,prefs.carAddress,prefs.carName,state.running,prefs.carUnmeasuredDeparture)
                 HorizontalDivider()
                 Text("이벤트 알림",style=MaterialTheme.typography.titleMedium)
                 MonitorEventType.entries.forEach { type -> Toggle(label(type),type in prefs.notifications) { vm.notification(type,it) } }
@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity() {
     @Composable private fun Toggle(title: String,value: Boolean,change: (Boolean)->Unit) {
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text(title,Modifier.weight(1f).padding(top=12.dp));Switch(value,change) }
     }
-    @Composable private fun CarModeSettings(vm: ProbeViewModel,enabled: Boolean,address: String,name: String,running: Boolean) {
+    @Composable private fun CarModeSettings(vm: ProbeViewModel,enabled: Boolean,address: String,name: String,running: Boolean,unmeasuredDeparture: Boolean) {
         val bonded by vm.bondedDevices.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) { if (granted(Manifest.permission.BLUETOOTH_CONNECT)) vm.refreshBonded() }
         Text("차량 블루투스 연동",style=MaterialTheme.typography.titleMedium)
@@ -220,7 +220,9 @@ class MainActivity : ComponentActivity() {
         bonded.forEach { device: BondedDevice ->
             FilterChip(selected=device.address == address,onClick={ if (running) vm.error.value = "모니터링을 중지한 상태에서 바꾸세요." else vm.chooseCar(device) },label={Text(device.name)})
         }
-        Text("켜면 차량이 폰에 블루투스로 연결돼 있는 동안 태그를 검색·연결·측정하지 않아 태그 배터리를 거의 쓰지 않습니다. 차량이 연결됐다가 끊기면(3초 확인) 그때 태그에 연결해 거리를 재고, 이탈 임계거리를 넘거나 태그가 30초 넘게 닿지 않으면 스위치를 끄고 다시 쉽니다. 차량이 다시 연결되면 스위치를 켭니다. 시작할 때 차량이 연결돼 있지 않으면 아무것도 하지 않고 차량이 연결되길 기다립니다. 거리 이벤트는 실제 UWB 거리로만 만들어지며 Tasker·Webhook 복귀 이벤트는 이 모드에서 차량 연결로 대신하지 않습니다. 모니터링을 중지한 상태에서 바꾸고 다음 시작부터 적용됩니다. 꺼 두면 지금처럼 계속 측정합니다.",style=MaterialTheme.typography.bodySmall)
+        Text("차량이 연결된 동안은 태그를 측정하지 않습니다. 차량 연결이 끊기면 3초 확인과 태그 검색을 함께 진행하고, 실제 거리 이탈 또는 측정하던 태그의 신호가 8초 넘게 끊기면 이탈 신호를 보냅니다. 차량이 다시 연결되면 스위치를 켭니다. 차량 연결 없이 시작하면 연결을 기다립니다. 차량 기기와 연동 모드는 모니터링을 중지한 상태에서 바꾸세요.",style=MaterialTheme.typography.bodySmall)
+        Toggle("UWB 미측정 1분 후 이탈 신호 보내기",unmeasuredDeparture,vm::carUnmeasuredDeparture)
+        Text("기본 OFF. 차량 연결이 끊긴 뒤 태그 거리를 한 번도 측정하지 못하면 1분 후 추적을 종료하고 스위치 상태를 유지합니다. 이 옵션을 켜면 이때 이탈 신호도 보냅니다. ‘이탈 때 켰다 끄기’ 설정이 켜져 있으면 스위치를 켰다 끕니다. 바로 적용됩니다.",style=MaterialTheme.typography.bodySmall)
     }
     @Composable private fun SmartThingsSettings(vm: ProbeViewModel,enabled: Boolean,offOnLinkLoss: Boolean,pulse: Boolean) {
         val view by vm.smartThings.collectAsStateWithLifecycle()

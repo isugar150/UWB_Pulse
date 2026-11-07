@@ -1,0 +1,14 @@
+2026-11-08 KST / UWB unmeasured departure option
+New setting car_unmeasured_departure defaults false for fresh and existing installs.
+Disabled: finish the never-measured window after 60 seconds without switch signal or lock notice.
+Enabled: permit a signal only after the 60-second limit; early permanent errors cannot bypass it.
+Actual distance departure, seen-then-lost 8-second rule and continuous-mode 30-second rule are unchanged.
+121 unit tests passed; 0 failures or errors. Lint: 0 errors, 0 warnings. Debug build succeeded.
+No instrumentation, reset, reboot, account operation or real switch signal test in this task.
+Normal monitoring stopped before same-signature adb install -r, then original ON state resumed.
+Real vehicle 60-second timeout and end-to-end SmartThings automation remain untested.
+
+Controlled device settings evidence:
+2026-11-08T08:13:23.674309+09:00 elapsed=57558827 DEBUG_SETTINGS monitoring=false; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; carUnmeasuredDeparture=false; notifications=4; channelImportance=0
+2026-11-08T08:13:23.674440+09:00 elapsed=57558828 DEBUG_COMMAND car_unmeasured_departure=false
+2026-11-08T08:14:00.177051+09:00 elapsed=57595330 DEBUG_SETTINGS monitoring=true; rate=SAVER; threshold=5.0; returned=3.0; dwell=3000; carMode=true; carConfigured=true; smartthings=true; switchConfigured=true; selectedTag=true; resume=true; offOnLinkLoss=true; pulse=true; carUnmeasuredDeparture=false; notifications=4; channelImportance=0

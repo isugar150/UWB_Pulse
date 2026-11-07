@@ -36,6 +36,7 @@ data class MonitorPreferences(
     val carName: String = "",
     val carPhase: String = "",
     val carPhaseAt: Long = 0,
+    val carUnmeasuredDeparture: Boolean = false,
 ) {
     /** Car-Bluetooth tracking needs both the switch and a chosen device; otherwise the service tracks continuously as before. */
     val carDevice: BondedDevice? get() = if (carMode && android.bluetooth.BluetoothAdapter.checkBluetoothAddress(carAddress)) BondedDevice(carName,carAddress) else null
@@ -64,6 +65,7 @@ class MonitorSettings(private val context: Context) {
     private val carName = stringPreferencesKey("car_name")
     private val carPhase = stringPreferencesKey("car_phase")
     private val carPhaseAt = longPreferencesKey("car_phase_at")
+    private val carUnmeasuredDeparture = booleanPreferencesKey("car_unmeasured_departure")
     private fun decode(values: Preferences): MonitorPreferences =
         MonitorPreferences(
             runCatching {
@@ -80,7 +82,7 @@ class MonitorSettings(private val context: Context) {
             TrackingRate.parse(values[rate]),RescanPolicy.coerce(values[rescan] ?: RescanPolicy.DEFAULT_MAX_MILLIS),
             LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]),values[smartThings] ?: false,values[offOnLinkLoss] ?: true,values[pulse] ?: true,
             values[carMode] ?: false,values[carAddress].orEmpty(),values[carName].orEmpty(),
-            values[carPhase].orEmpty(),values[carPhaseAt] ?: 0)
+            values[carPhase].orEmpty(),values[carPhaseAt] ?: 0,values[carUnmeasuredDeparture] ?: false)
     val state = context.monitorPreferences.data.map(::decode).stateIn(scope,SharingStarted.Eagerly,MonitorPreferences())
     suspend fun persisted() = decode(context.monitorPreferences.data.first())
     suspend fun setThreshold(value: Double) = context.monitorPreferences.edit {
@@ -101,6 +103,7 @@ class MonitorSettings(private val context: Context) {
     suspend fun smartThings(enabled: Boolean) = context.monitorPreferences.edit { it[smartThings] = enabled }
     suspend fun offOnLinkLoss(enabled: Boolean) = context.monitorPreferences.edit { it[offOnLinkLoss] = enabled }
     suspend fun pulseOnDeparture(enabled: Boolean) = context.monitorPreferences.edit { it[pulse] = enabled }
+    suspend fun carUnmeasuredDeparture(enabled: Boolean) = context.monitorPreferences.edit { it[carUnmeasuredDeparture] = enabled }
     /** The saved phase belongs to one car and one mode: changing either forgets it. */
     suspend fun carMode(enabled: Boolean) = context.monitorPreferences.edit { it[carMode] = enabled; it.remove(carPhase); it.remove(carPhaseAt) }
     suspend fun car(device: BondedDevice) = context.monitorPreferences.edit { it[carAddress] = device.address; it[carName] = device.name; it.remove(carPhase); it.remove(carPhaseAt) }

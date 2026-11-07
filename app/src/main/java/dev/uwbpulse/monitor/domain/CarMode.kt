@@ -40,6 +40,8 @@ class CarModeMachine(start: Phase = Phase.UNKNOWN, private val carWasLinkedBefor
     enum class Phase { UNKNOWN, CAR_CONNECTED, WAITING, TRACKING, AWAY }
     enum class Action { NONE, ENTER_CAR, START_TRACKING, STOP_TRACKING, WAIT }
     var phase = start; private set
+    /** Only a possible loss of a known car link may start a scan during the confirmation delay. */
+    val canPrepareDisconnect: Boolean get() = phase == Phase.CAR_CONNECTED || (phase == Phase.UNKNOWN && carWasLinkedBeforeStart)
 
     /** A confirmed car link change. A new car link always wins: it ends any window and means "present". */
     fun car(connected: Boolean): Action = when {

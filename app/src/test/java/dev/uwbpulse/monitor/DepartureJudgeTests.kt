@@ -7,6 +7,29 @@ import org.junit.Test
 
 /** Timelines of one car window. Times are milliseconds after the car link dropped. */
 class DepartureJudgeTests {
+    @Test fun neverMeasuredTimeoutClosesTheWindowWithoutASwitchSignalByDefault() {
+        assertFalse(dev.uwbpulse.monitor.data.MonitorPreferences().carUnmeasuredDeparture)
+        val judge = DepartureJudge(0)
+        assertTrue(judge.lost(PresencePolicy.NEVER_MEASURED_MILLIS,true))
+        assertFalse(judge.shouldSignalDeparture(PresencePolicy.NEVER_MEASURED_MILLIS))
+        assertFalse(judge.shouldSignalDeparture(10 * PresencePolicy.NEVER_MEASURED_MILLIS))
+    }
+    @Test fun unmeasuredSignalRequiresOptInAndCanBeTurnedOffAgain() {
+        val judge = DepartureJudge(0)
+        assertTrue(judge.shouldSignalDeparture(PresencePolicy.NEVER_MEASURED_MILLIS,onNeverMeasured=true))
+        assertFalse(judge.shouldSignalDeparture(PresencePolicy.NEVER_MEASURED_MILLIS,onNeverMeasured=false))
+    }
+    @Test fun anEarlyConnectionFailureDoesNotBypassTheOneMinuteLimitEvenWhenEnabled() {
+        val judge = DepartureJudge(10_000)
+        assertFalse(judge.shouldSignalDeparture(11_000,onNeverMeasured=true))
+        assertFalse(judge.shouldSignalDeparture(10_000 + PresencePolicy.NEVER_MEASURED_MILLIS - 1,onNeverMeasured=true))
+    }
+    @Test fun disablingTheUnmeasuredSignalPreservesTheSeenThenLostRule() {
+        val judge = DepartureJudge(0).also { it.measurement(2_000) }
+        val at = 2_000 + PresencePolicy.SEEN_THEN_LOST_MILLIS
+        assertTrue(judge.lost(at,true))
+        assertTrue(judge.shouldSignalDeparture(at,onNeverMeasured=false))
+    }
     private val seen = PresencePolicy.SEEN_THEN_LOST_MILLIS
     private val never = PresencePolicy.NEVER_MEASURED_MILLIS
     private fun DepartureJudge.firstLostTick(from: Long, until: Long, bluetoothOn: Boolean = true): Long? =

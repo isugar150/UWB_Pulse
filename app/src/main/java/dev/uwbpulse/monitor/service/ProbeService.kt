@@ -66,14 +66,15 @@ class ProbeService : Service() {
         }
         return START_STICKY // Re-read desired state on system recreation; never resume a user-stopped session.
     }
-    private suspend fun addressFor(cloudId: String, attempt: Int): String {
-        store.update { it.copy(stage="내 태그 검색",detail="소유자 광고 서명을 확인하고 있습니다.",measurement=null) }
+    private suspend fun deviceFor(cloudId: String, attempt: Int, showStage: Boolean = true,
+                                  confirmation: Deferred<Unit>? = null): BleDiscovery.DiscoveredTag {
+        if (showStage) store.update { it.copy(stage="내 태그 검색",detail="소유자 광고 서명을 확인하고 있습니다.",measurement=null) }
         return try {
             withTimeout(15_000) {
                 BleDiscovery(this@ProbeService,store::record,app.account::matchAdvertisement)
-                    .scan(RescanPolicy.balancedScan(attempt,store.activityVisible))
-                    .map { candidates -> candidates.firstOrNull { it.cloudTagId == cloudId && it.connectable }?.address }
-                    .filterNotNull().first()
+                    .scanDevices(RescanPolicy.balancedScan(attempt,store.activityVisible))
+                    .map { candidates -> candidates.firstOrNull { it.candidate.cloudTagId == cloudId && it.candidate.connectable } }
+                    .filterNotNull().map { peer -> confirmation?.await(); peer }.first()
             }
         } catch (_: TimeoutCancellationException) { error("OWNER_TAG_NOT_FOUND") }
     }
@@ -97,7 +98,7 @@ class ProbeService : Service() {
     }
 
     /** One tracking window of the car mode: when it decides the user walked away it calls [onDeparted] once and the window is stopped. */
-    private class CarWindow(val anchorElapsedMillis: Long,val onDeparted: () -> Unit)
+    private class CarWindow(val anchorElapsedMillis: Long,val preparedPeer: Deferred<Result<BleDiscovery.DiscoveredTag>>?,val onDeparted: () -> Unit)
     private sealed interface CarSignal {
         data class Link(val connected: Boolean) : CarSignal
         data class WindowEnded(val id: Int) : CarSignal
@@ -141,41 +142,63 @@ class ProbeService : Service() {
                         // Judge the live state, not the signal that woke us: a "connected" signal may already be stale, and any
                         // reading of "lost" must hold for a while before it starts a window (a flapping profile is not a departure).
                         var linked = link.connected
-                        if (!linked) {
-                            delay(CarModeMachine.DISCONNECT_CONFIRM_MILLIS)
-                            linked = link.connected
+                        var prepared: Deferred<Result<BleDiscovery.DiscoveredTag>>? = null
+                        var preparationConfirmed: CompletableDeferred<Unit>? = null
+                        if (!linked && machine.canPrepareDisconnect) {
+                            store.record("CAR_PRE_SCAN","scan overlaps the 3 s confirmation; no GATT or events before confirmation")
+                            val confirmed = CompletableDeferred<Unit>()
+                            preparationConfirmed = confirmed
+                            prepared = async {
+                                try { Result.success(deviceFor(cloudId,0,showStage=false,confirmation=confirmed)) }
+                                catch (e: CancellationException) { throw e }
+                                catch (e: Exception) { Result.failure(e) }
+                            }
                         }
-                        when (machine.car(linked)) {
-                            CarModeMachine.Action.ENTER_CAR -> {
-                                window?.cancelAndJoin(); window = null
-                                app.settings.away(alias,false) // the car link, not a distance, says the user is back
-                                app.events.syncSmartThings("on")
-                                persistPhase()
-                                store.record("CAR_PHASE","car linked; tag left alone; switch=on")
-                                store.update { it.copy(running=true,stage="차량 연결됨 · 대기",detail="차량 블루투스가 연결돼 있어 태그를 측정하지 않습니다.",measurement=null,lastReportAgeMillis=null) }
-                                updateNotification("차량 연결됨 · 태그 대기")
+                        try {
+                            if (!linked) {
+                                delay(CarModeMachine.DISCONNECT_CONFIRM_MILLIS)
+                                linked = link.connected
                             }
-                            CarModeMachine.Action.START_TRACKING -> {
-                                val id = ++windowId
-                                val anchor = SystemClock.elapsedRealtime()
-                                persistPhase()
-                                store.record("CAR_PHASE",if (start.carWasLinked && id == 1) "restart: the car link was up before the restart and is gone now; tracking window $id started" else "car link lost; tracking window $id started")
-                                store.update { it.copy(running=true,stage="차량 연결 해제",detail="태그에 연결해 거리를 확인합니다.",measurement=null) }
-                                window = launch {
-                                    try {
-                                        track(cloudId,backend,CarWindow(anchor) {
-                                            if (machine.departed() == CarModeMachine.Action.STOP_TRACKING) window?.cancel()
-                                        })
-                                    } finally { signals.trySend(CarSignal.WindowEnded(id)) }
+                            when (machine.car(linked)) {
+                                CarModeMachine.Action.ENTER_CAR -> {
+                                    window?.cancelAndJoin(); window = null
+                                    app.settings.away(alias,false) // the car link, not a distance, says the user is back
+                                    app.events.syncSmartThings("on")
+                                    persistPhase()
+                                    store.record("CAR_PHASE","car linked; tag left alone; switch=on")
+                                    store.update { it.copy(running=true,stage="차량 연결됨 · 대기",detail="차량 블루투스가 연결돼 있어 태그를 측정하지 않습니다.",measurement=null,lastReportAgeMillis=null) }
+                                    updateNotification("차량 연결됨 · 태그 대기")
                                 }
+                                CarModeMachine.Action.START_TRACKING -> {
+                                    val id = ++windowId
+                                    val anchor = SystemClock.elapsedRealtime()
+                                    preparationConfirmed?.complete(Unit)
+                                    persistPhase()
+                                    store.record("CAR_PHASE",if (start.carWasLinked && id == 1) "restart: the car link was up before the restart and is gone now; tracking window $id started" else "car link lost; tracking window $id started")
+                                    store.update { it.copy(running=true,stage="차량 연결 해제",detail="태그에 연결해 거리를 확인합니다.",measurement=null) }
+                                    val preparedPeer = prepared
+                                    window = launch {
+                                        try {
+                                            track(cloudId,backend,CarWindow(anchor,preparedPeer) {
+                                                if (machine.departed() == CarModeMachine.Action.STOP_TRACKING) window?.cancel()
+                                            })
+                                        } finally { preparedPeer?.cancel(); signals.trySend(CarSignal.WindowEnded(id)) }
+                                    }
+                                    prepared = null // the window now owns cancellation of this scan
+                                }
+                                CarModeMachine.Action.WAIT -> {
+                                    persistPhase()
+                                    store.record("CAR_PHASE","started without the car link; tag left alone until the car links")
+                                    store.update { it.copy(running=true,stage="차량 연결 대기",detail="차량 블루투스가 연결될 때까지 태그를 측정하지 않습니다.",measurement=null,lastReportAgeMillis=null) }
+                                    updateNotification("차량 연결 대기 · 태그 쉼")
+                                }
+                                else -> Unit
                             }
-                            CarModeMachine.Action.WAIT -> {
-                                persistPhase()
-                                store.record("CAR_PHASE","started without the car link; tag left alone until the car links")
-                                store.update { it.copy(running=true,stage="차량 연결 대기",detail="차량 블루투스가 연결될 때까지 태그를 측정하지 않습니다.",measurement=null,lastReportAgeMillis=null) }
-                                updateNotification("차량 연결 대기 · 태그 쉼")
+                        } finally {
+                            if (prepared != null) {
+                                prepared.cancelAndJoin()
+                                store.record("CAR_PRE_SCAN_CANCELLED","car link recovered or confirmation cancelled; no tag connection")
                             }
-                            else -> Unit
                         }
                     }
                     is CarSignal.WindowEnded -> {
@@ -220,11 +243,14 @@ class ProbeService : Service() {
         var uwbRefusals = 0 // authenticated, but the tag would not start UWB, in a row
         var uwbNoticeSent = false
         var departureHandled = false
-        /** The user walked away without a distance event: switch signal (if enabled) and, in a car window, the end of the window. */
+        var preparedPeer = car?.preparedPeer // first attempt only: a reconnect always uses a fresh advertisement
+        /** Finish a lost-tag window; an unmeasured tag needs explicit opt-in before any switch signal. */
         fun departure(reason: String,silentMillis: Long) {
             if (departureHandled) return
             departureHandled = true
-            if (switchSync.linkLost(engine.away) != null) {
+            val signalAllowed = judge?.shouldSignalDeparture(SystemClock.elapsedRealtime(),app.settings.state.value.carUnmeasuredDeparture) ?: true
+            if (!signalAllowed) store.record("CAR_UNMEASURED_NO_SIGNAL","reason=$reason; silentMs=$silentMillis; window ended without changing the switch")
+            if (signalAllowed && switchSync.linkLost(engine.away) != null) {
                 store.record("PRESENCE_LINK_LOST","reason=$reason; silentMs=$silentMillis; measuredInWindow=${judge?.measured}; car=${car != null}; distance events are not created")
                 app.events.departed()
                 if (car != null && judge?.measured != true) noticeNoTag(if (uwbRefusals >= FailurePolicy.UWB_REFUSALS_BEFORE_NOTICE) NoTagNotice.UWB_REFUSED else NoTagNotice.NOT_MEASURED)
@@ -256,10 +282,11 @@ class ProbeService : Service() {
                 var authenticatedNow = false
                 var reportedNow = false
                 try {
-                    val address = addressFor(cloudId,retries)
+                    val prepared = preparedPeer.also { preparedPeer = null }
+                    val peer = prepared?.await()?.getOrThrow() ?: deviceFor(cloudId,retries)
                     coroutineScope {
                         launch { val status = transport.disconnected.await(); error("GATT_DISCONNECTED_$status") }
-                        transport.connect(address)
+                        transport.connect(peer.device)
                         store.update { it.copy(stage="소유자 인증",detail="태그의 암호학적 응답 확인 중") }
                         app.account.credentials(cloudId).use { transport.authenticate(it.masterSecret) }
                         hasAuthenticated = true; authenticatedNow = true
@@ -356,8 +383,7 @@ class ProbeService : Service() {
                     transport.close()
                 }
                 if (!retry) {
-                    // A car window that cannot continue (permanent error) must not end silently, and must not take the service down:
-                    // the default applies (the user left: signal, and say why when the tag was never measured). The service keeps running for the next drive.
+                    // Keep the service for the next drive. Unmeasured failures obey the same opt-in and minimum wait as the timer.
                     if (car != null) departure("window_failed:${failure ?: "unknown"}",judge?.silentMillis(SystemClock.elapsedRealtime()) ?: 0)
                     break
                 }
@@ -426,10 +452,13 @@ class ProbeService : Service() {
         private const val HIDDEN_UI_MILLIS = 1_000L
         private const val LAST_STATE_MILLIS = 60_000L
         fun ensureNotificationChannel(context: android.content.Context) {
+            val manager = context.getSystemService(NotificationManager::class.java)
+            // Existing importance belongs to the user (including a restored hidden channel).
+            if (manager.getNotificationChannel(CHANNEL) != null) return
             val channel = NotificationChannel(CHANNEL,"추적 중 알림",NotificationManager.IMPORTANCE_LOW)
             channel.description = "모니터링 서비스 상태 표시. 이 채널을 꺼도 추적은 유지됩니다."
             if (Build.VERSION.SDK_INT >= 33) channel.setBlockable(true)
-            context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            manager.createNotificationChannel(channel)
         }
     }
 }

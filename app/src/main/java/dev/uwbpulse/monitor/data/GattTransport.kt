@@ -73,11 +73,15 @@ class GattTransport(private val context: Context, private val record: (String, S
         }
         override fun onCharacteristicChanged(client: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) { indication(characteristic,value) }
     }
-    suspend fun connect(address: String) {
+    /** Address reconstruction and autoConnect are retained for explicit comparison experiments. */
+    suspend fun connect(address: String, autoConnect: Boolean = false) {
         val adapter = context.getSystemService(BluetoothManager::class.java).adapter
         check(adapter.isEnabled) { "BLUETOOTH_DISABLED" }
+        connect(adapter.getRemoteDevice(address), autoConnect)
+    }
+    suspend fun connect(device: BluetoothDevice, autoConnect: Boolean = false) {
         @Suppress("DEPRECATION")
-        val connection = adapter.getRemoteDevice(address).connectGatt(context,false,callback,BluetoothDevice.TRANSPORT_LE)
+        val connection = device.connectGatt(context,autoConnect,callback,BluetoothDevice.TRANSPORT_LE)
         gatt = checkNotNull(connection) { "GATT_CONNECT_REJECTED" }
         try { withTimeout(15_000) { ready.await() } }
         catch (_: TimeoutCancellationException) { error("GATT_CONNECT_OR_DISCOVERY_TIMEOUT") }
@@ -116,6 +120,11 @@ class GattTransport(private val context: Context, private val record: (String, S
     fun lowPower() {
         val accepted = runCatching { gatt?.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }.getOrNull() == true
         record("GATT_LOW_POWER","connection priority requested; accepted=$accepted")
+    }
+    /** Explicit comparison experiment; ordinary tracking does not request HIGH. */
+    fun highPriority() {
+        val accepted = runCatching { gatt?.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH) }.getOrNull() == true
+        record("GATT_HIGH_PRIORITY", "connection priority requested; accepted=$accepted")
     }
     suspend fun deactivate() {
         if (!activated || disconnected.isCompleted) return

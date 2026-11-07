@@ -14,4 +14,8 @@ class DepartureJudge(anchorElapsedMillis: Long) {
     fun silentMillis(nowElapsedMillis: Long): Long = (nowElapsedMillis - evidenceAt).coerceAtLeast(0)
     fun lost(nowElapsedMillis: Long, bluetoothOn: Boolean): Boolean =
         PresencePolicy.isLostInCarWindow(silentMillis(nowElapsedMillis), measured, bluetoothOn)
+
+    /** An unmeasured window still ends after a minute, but sends a switch signal only by explicit opt-in. */
+    fun shouldSignalDeparture(nowElapsedMillis: Long, onNeverMeasured: Boolean = false): Boolean =
+        measured || (onNeverMeasured && silentMillis(nowElapsedMillis) >= PresencePolicy.NEVER_MEASURED_MILLIS)
 }

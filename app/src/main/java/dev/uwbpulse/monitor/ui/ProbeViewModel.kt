@@ -119,6 +119,7 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun offOnLinkLoss(enabled: Boolean) = viewModelScope.launch { settings.offOnLinkLoss(enabled) }
     fun pulseOnDeparture(enabled: Boolean) = viewModelScope.launch { settings.pulseOnDeparture(enabled) }
+    fun carUnmeasuredDeparture(enabled: Boolean) = viewModelScope.launch { settings.carUnmeasuredDeparture(enabled) }
     val bondedDevices = MutableStateFlow<List<BondedDevice>>(emptyList())
     fun refreshBonded() { bondedDevices.value = CarBluetooth(getApplication()) { _, _ -> }.bonded() }
     fun carMode(enabled: Boolean) = viewModelScope.launch {

@@ -1,111 +1,156 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<testsuites tests="72" failures="0" errors="0" skipped="0">
-  <testsuite name="dev.uwbpulse.monitor.ConnectionRecoveryTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.507Z" hostname="jmkimui-MacBookPro.local" time="0.054">
-    <properties />
-    <testcase name="balancedScanOnlyStartsAfterSustainedHiddenFailures" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.007" />
+<testsuites tests="121" failures="0" errors="0" skipped="0">
+  <testsuite name="dev.uwbpulse.monitor.CarModeTests" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.238Z" time="0.006">
+    <testcase name="repeatedIdenticalEventsReportNoChange" classname="dev.uwbpulse.monitor.CarModeTests" time="0.001" />
+    <testcase name="debounceIsShorterThanThePresenceWindow" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="aSavedDepartureStaysADepartureHoweverOldAndIdlesUntilTheCarLinks" classname="dev.uwbpulse.monitor.CarModeTests" time="0.001" />
+    <testcase name="speculativeScanRequiresAnEarlierCarLinkAndStopsBeingEligibleOnceTracking" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="aRecentSavedCarLinkMeansTheRestartMayHaveMissedTheDeparture" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="leavingTheCarStartsOneWindowAndADepartureEndsIt" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="lostAclLinkEndsEveryProfileEvenIfTheirBroadcastsWereMissed" classname="dev.uwbpulse.monitor.CarModeTests" time="0.001" />
+    <testcase name="profilesAloneKeepTheCarConnectedUntilBothDrop" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="seedReflectsTheProfilesThatAreConnectedNow" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="theNextCarLinkAlwaysWinsAndStartsOver" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="speculativeScanOnRestoreRequiresFreshEvidenceOfTheCarLink" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="startingWithTheCarLinkedIdlesAndStartingWithoutItOnlyWaits" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="restartAfterAMissedDropOpensAWindowAndAnUnchangedCarLinkJustIdles" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="carIsConnectedWhileAnyLinkIsUp" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="aDepartureOutsideAWindowIsIgnored" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+    <testcase name="heartbeatIsMuchShorterThanTheFreshnessLimit" classname="dev.uwbpulse.monitor.CarModeTests" time="0.0" />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.ConnectionRecoveryTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.246Z" time="0.047">
+    <testcase name="balancedScanOnlyStartsAfterSustainedHiddenFailures" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.005" />
     <testcase name="authenticationTimeoutsRetryWithoutImmediateAutomation" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.003" />
-    <testcase name="successfulCapabilityQueryIsReturned" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.016" />
+    <testcase name="successfulCapabilityQueryIsReturned" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.015" />
     <testcase name="newSessionDoesNotInheritAStaleDeadlineAndRetainsCounters" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.0" />
     <testcase name="newSessionStillDetectsStalenessAfterItsOwnFirstReport" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.0" />
     <testcase name="operationTimeoutBecomesRetryableConnectionError" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.016" />
     <testcase name="cancellationFromCallerRemainsCancellation" classname="dev.uwbpulse.monitor.ConnectionRecoveryTests" time="0.007" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.DistanceEventEngineTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.563Z" hostname="jmkimui-MacBookPro.local" time="0.002">
-    <properties />
-    <testcase name="gapsCannotAccumulateDwellTime" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.001" />
-    <testcase name="invalidHysteresisRejected" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+  <testsuite name="dev.uwbpulse.monitor.DepartureJudgeTests" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.294Z" time="0.004">
+    <testcase name="disablingTheUnmeasuredSignalPreservesTheSeenThenLostRule" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.001" />
+    <testcase name="aClockThatGoesBackwardsCountsAsNoSilence" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="bluetoothComingBackOnLocksAtOnceWhenTheSilenceIsAlreadyLongEnough" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="aMeasurementResetsTheClockSoSittingInTheCarNeverLocks" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="tagNeverFoundLocksAtTheNeverMeasuredLimit" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.001" />
+    <testcase name="neverMeasuredTimeoutClosesTheWindowWithoutASwitchSignalByDefault" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.001" />
+    <testcase name="tagFoundNearThenDoorClosesLocksAfterTheShortWaitCountedFromTheLastDistance" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="aMeasurementJustBeforeTheNeverMeasuredLimitChangesTheRuleToTheShortOne" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.001" />
+    <testcase name="unmeasuredSignalRequiresOptInAndCanBeTurnedOffAgain" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="bluetoothSwitchedOffByTheUserNeverLocksHoweverLongTheSilence" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+    <testcase name="anEarlyConnectionFailureDoesNotBypassTheOneMinuteLimitEvenWhenEnabled" classname="dev.uwbpulse.monitor.DepartureJudgeTests" time="0.0" />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.DistanceEventEngineTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.299Z" time="0.001">
+    <testcase name="gapsCannotAccumulateDwellTime" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="invalidHysteresisRejected" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.001" />
     <testcase name="sustainedExitFiresOnceAndOnlyRearmsAfterReturn" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
     <testcase name="disconnectNeverCreatesAnExitAndPreservesExistingAwayLatch" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
-    <testcase name="restoredAwayStateRequiresAnActualReturnBeforeAnotherExit" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.001" />
+    <testcase name="restoredAwayStateRequiresAnActualReturnBeforeAnotherExit" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
     <testcase name="invalidSamplesAndPolicyChangesResetDebounce" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
     <testcase name="outOfOrderReportsDoNotChangeState" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
     <testcase name="equalityAtThresholdBreaksPendingExit" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.FailurePolicyTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.566Z" hostname="jmkimui-MacBookPro.local" time="0.002">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.FailurePolicyTests" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.301Z" time="0.002">
+    <testcase name="supervisionTimeoutIsLinkLossButAnAttStatusEightStaysPermanent" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="userFixableFailureBecomesAnErrorOnlyAfterTheGracePeriod" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="ownerProofFailureIsRetriedAFewTimesThenBecomesPermanent" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.001" />
     <testcase name="retryClassificationIsUnchanged" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="noDisconnectIsPublishedForATagThatWasNeverConnected" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
+    <testcase name="onlyAnActivationRefusalCountsAsTheTagNotStartingUwb" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.001" />
     <testcase name="lastingLinkLossPublishesOneDisconnectAndNeverAnError" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="permanentFailuresArePublishedImmediately" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
+    <testcase name="aRefusingTagIsRetriedRarely" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="transientReconnectFailuresPublishNothing" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
     <testcase name="onlyRealLinkDropsCountAsLinkLoss" classname="dev.uwbpulse.monitor.FailurePolicyTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.OwnerCredentialCacheTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.569Z" hostname="jmkimui-MacBookPro.local" time="0.011">
-    <properties />
-    <testcase name="returnedSecretsAreIndependentAndClearOnClose" classname="dev.uwbpulse.monitor.OwnerCredentialCacheTests" time="0.002" />
+  <testsuite name="dev.uwbpulse.monitor.OwnerCredentialCacheTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.305Z" time="0.01">
+    <testcase name="returnedSecretsAreIndependentAndClearOnClose" classname="dev.uwbpulse.monitor.OwnerCredentialCacheTests" time="0.001" />
     <testcase name="concurrentReadersAlwaysReceiveACompleteSnapshot" classname="dev.uwbpulse.monitor.OwnerCredentialCacheTests" time="0.007" />
     <testcase name="invalidKeyIsRejectedAndSecretDescriptionIsRedacted" classname="dev.uwbpulse.monitor.OwnerCredentialCacheTests" time="0.001" />
     <testcase name="replacingOrClearingKeysTakesEffectWithoutATokenLock" classname="dev.uwbpulse.monitor.OwnerCredentialCacheTests" time="0.001" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.ProbeTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.581Z" hostname="jmkimui-MacBookPro.local" time="0.002">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.PresencePolicyTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.315Z" time="0.001">
+    <testcase name="carWindowWaitsShortAfterATagWasSeenAndLongerWhenItNeverWas" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="aTagThatWasNeverMeasuredDecidesNothing" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="lostOnlyAfterTheSilenceWindowOfALostLink" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="carWindowIgnoresTheFailureKindButNotABluetoothTheUserSwitchedOff" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="windowCoversAnOrdinaryReconnectButIsShorterThanTheExternalGracePeriod" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="radiosTheUserSwitchedOffAreNotAWalkAway" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+    <testcase name="neverMeasuredWindowCoversTwoConnectionAttemptsButIsShorterThanTheExternalGracePeriod" classname="dev.uwbpulse.monitor.PresencePolicyTests" time="0.0" />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.ProbeTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.317Z" time="0.001">
     <testcase name="freshDistanceExpiresWithoutInventingNewEvidence" classname="dev.uwbpulse.monitor.ProbeTests" time="0.0" />
     <testcase name="invalidAddressRejected" classname="dev.uwbpulse.monitor.ProbeTests" time="0.0" />
     <testcase name="packetMatchesPinnedUtagLayout" classname="dev.uwbpulse.monitor.ProbeTests" time="0.001" />
     <testcase name="onlyValidActualCallbacksCountAsBackgroundEvidence" classname="dev.uwbpulse.monitor.ProbeTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.ResumePolicyTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.584Z" hostname="jmkimui-MacBookPro.local" time="0.001">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.ResumePolicyTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.319Z" time="0.0">
     <testcase name="bootRestoresOnlyPreviouslyEnabledMonitoring" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
     <testcase name="bootOptOutDoesNotDisableProcessRecovery" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
     <testcase name="maximumThresholdIsTenMeters" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
     <testcase name="manualStopIsNeverOverridden" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.SmartTagCryptoTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.587Z" hostname="jmkimui-MacBookPro.local" time="0.019">
-    <properties />
-    <testcase name="wrongProofNeverEnablesCommandsAndCannotBeRetriedInSameSession" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.017" />
-    <testcase name="ownerAdvertisementSignatureMatchesAndTamperingFails" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.001" />
-    <testcase name="kdfAndMutualAuthenticationMatchIndependentOpenSslVectors" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.0" />
-    <testcase name="cloudSharedSecretUsesFirst16BytesForOwnerMaster" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.001" />
+  <testsuite name="dev.uwbpulse.monitor.SmartTagCryptoTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.320Z" time="0.013">
+    <testcase name="wrongProofNeverEnablesCommandsAndCannotBeRetriedInSameSession" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.012" />
+    <testcase name="ownerAdvertisementSignatureMatchesAndTamperingFails" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.0" />
+    <testcase name="kdfAndMutualAuthenticationMatchIndependentOpenSslVectors" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.001" />
+    <testcase name="cloudSharedSecretUsesFirst16BytesForOwnerMaster" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.0" />
     <testcase name="reflectionAndUnauthenticatedCommandsRejected" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.SmartThingsSwitchTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.607Z" hostname="jmkimui-MacBookPro.local" time="0.006">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.SmartThingsSwitchTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.334Z" time="0.004">
     <testcase name="tokenIsRenewedBeforeItExpires" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
     <testcase name="defaultRedirectNeverReachesAThirdPartyServer" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.0" />
-    <testcase name="onlyExitAndReturnMoveTheSwitch" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
+    <testcase name="onlyExitAndReturnMoveTheSwitch" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.0" />
     <testcase name="tokenResponseIsParsedAndTheRefreshTokenIsOptional" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
     <testcase name="invalidDeviceIdAndStateAreRejected" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
     <testcase name="eventRequestHasTheDocumentedShape" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.0" />
-    <testcase name="clientAuthenticationUsesHttpBasic" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
+    <testcase name="clientAuthenticationUsesHttpBasic" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.0" />
     <testcase name="formsAndAuthorizationUrlAreEncoded" classname="dev.uwbpulse.monitor.SmartThingsSwitchTests" time="0.001" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.SwitchDeliveryTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.614Z" hostname="jmkimui-MacBookPro.local" time="0.015">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.SwitchDeliveryTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.339Z" time="0.012">
     <testcase name="expiresAtThirtySecondsAndRejectsClockRollback" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.0" />
     <testcase name="expiredRequestNeverReachesTheNetwork" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.003" />
     <testcase name="replacedRequestCannotResendAfterUnauthorizedResponse" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.001" />
     <testcase name="freshRequestReturnsHttpStatus" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.001" />
-    <testcase name="requestThatExpiresWhileWaitingForPreviousHttpIsDropped" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.004" />
+    <testcase name="requestThatExpiresWhileWaitingForPreviousHttpIsDropped" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.003" />
     <testcase name="replacementWaitsForCancelledInFlightHttpToActuallyReturn" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.003" />
-    <testcase name="changedTargetOrClearedQueuePreventsDelivery" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.001" />
+    <testcase name="changedTargetOrClearedQueuePreventsDelivery" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.0" />
     <testcase name="requestDescriptionNeverExposesTarget" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.0" />
     <testcase name="expiryDuringTokenRefreshPreventsThePost" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.001" />
     <testcase name="replacedRequestNeverReachesTheNetwork" classname="dev.uwbpulse.monitor.SwitchDeliveryTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.SwitchPresenceSyncTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.630Z" hostname="jmkimui-MacBookPro.local" time="0.001">
-    <properties />
-    <testcase name="restoredAwayStateStaysOffUntilAnActualReturn" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.001" />
+  <testsuite name="dev.uwbpulse.monitor.SwitchPresenceSyncTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.352Z" time="0.001">
+    <testcase name="lostLinkTurnsOffOnceAndNearAgainTurnsOnOnce" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
+    <testcase name="restoredAwayStateStaysOffUntilAnActualReturn" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
+    <testcase name="lostLinkIsIgnoredWhenAlreadyAwayDisabledOrSwitchedOff" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.001" />
+    <testcase name="lostLinkNeverCreatesADistanceEvent" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
     <testcase name="firstFarMeasurementWaitsForTheExitDwellThenSendsOffViaEvent" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
+    <testcase name="anActualDistanceEventTakesOverFromALostLink" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
     <testcase name="firstNearMeasurementTurnsOnOnceWithoutInventingAReturn" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
     <testcase name="enablingRequiresANewValidMeasurementAndReinitializesOnce" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
+    <testcase name="disablingSmartThingsClearsALostLinkSoTheNextRunReinitializes" classname="dev.uwbpulse.monitor.SwitchPresenceSyncTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.TrackingPolicyTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.632Z" hostname="jmkimui-MacBookPro.local" time="0.001">
-    <properties />
+  <testsuite name="dev.uwbpulse.monitor.SwitchPulseTests" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.353Z" time="0.002">
+    <testcase name="aFailedOnStopsThePulseBeforeOffAndReportsThatStatus" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.001" />
+    <testcase name="pulseSendsOnThenWaitsThenOffAndReturnsTheFinalStatus" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.0" />
+    <testcase name="departureStateFollowsTheSetting" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.0" />
+    <testcase name="aDroppedOnMeansNothingWasSent" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.001" />
+    <testcase name="aDroppedOffAfterAnOnIsReportedAsDropped" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.0" />
+    <testcase name="gapIsShortEnoughToFitTheDeliveryLifetime" classname="dev.uwbpulse.monitor.SwitchPulseTests" time="0.0" />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.TrackingPolicyTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.356Z" time="0.002">
     <testcase name="slowerRateWidensGapAndStalenessLimits" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
-    <testcase name="absurdRangingIntervalRejected" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
-    <testcase name="rescanMaximumCapsOrExtendsTheLadder" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.001" />
-    <testcase name="tagConfigurationCarriesOnlyTheRangingIntervalChange" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
-    <testcase name="defaultRateKeepsThePreviousBehaviour" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
+    <testcase name="normalRateKeepsThePreviousBehaviour" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
+    <testcase name="absurdRangingIntervalRejected" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.001" />
+    <testcase name="rescanMaximumCapsOrExtendsTheLadder" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
+    <testcase name="tagConfigurationCarriesOnlyTheRangingIntervalChange" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.001" />
     <testcase name="slowRateDoesNotRestartDebounceOnAnOrdinaryMissedRound" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
+    <testcase name="unsetRateIsTheSaverAndAStoredChoiceIsKept" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
     <testcase name="rescanLadderAtDefaultMatchesThePreviousBackoff" classname="dev.uwbpulse.monitor.TrackingPolicyTests" time="0.0" />
   </testsuite>
-  <testsuite name="dev.uwbpulse.monitor.WebhookPolicyTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-07T07:42:20.634Z" hostname="jmkimui-MacBookPro.local" time="0.001">
-    <properties />
-    <testcase name="headerInjectionAndFragmentsRejected" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.0" />
-    <testcase name="httpsConfigurationAccepted" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.001" />
+  <testsuite name="dev.uwbpulse.monitor.WebhookPolicyTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-07T23:11:00.358Z" time="0.001">
+    <testcase name="headerInjectionAndFragmentsRejected" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.001" />
+    <testcase name="httpsConfigurationAccepted" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.0" />
     <testcase name="httpAndEmbeddedCredentialsRejected" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.0" />
   </testsuite>
 </testsuites>
