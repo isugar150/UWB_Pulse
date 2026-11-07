@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites tests="24" failures="0" errors="0" skipped="0">
+  <testsuite name="dev.uwbpulse.monitor.DistanceEventEngineTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-07T00:17:19.860Z" time="0.004">
+    <properties />
+    <testcase name="gapsCannotAccumulateDwellTime" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.001" />
+    <testcase name="invalidHysteresisRejected" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="sustainedExitFiresOnceAndOnlyRearmsAfterReturn" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="disconnectNeverCreatesAnExitAndPreservesExistingAwayLatch" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="restoredAwayStateRequiresAnActualReturnBeforeAnotherExit" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="invalidSamplesAndPolicyChangesResetDebounce" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="outOfOrderReportsDoNotChangeState" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <testcase name="equalityAtThresholdBreaksPendingExit" classname="dev.uwbpulse.monitor.DistanceEventEngineTests" time="0.0" />
+    <system-out />
+    <system-err />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.ProbeTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T00:17:19.865Z" time="0.01">
+    <properties />
+    <testcase name="freshDistanceExpiresWithoutInventingNewEvidence" classname="dev.uwbpulse.monitor.ProbeTests" time="0.0" />
+    <testcase name="invalidAddressRejected" classname="dev.uwbpulse.monitor.ProbeTests" time="0.001" />
+    <testcase name="packetMatchesPinnedUtagLayout" classname="dev.uwbpulse.monitor.ProbeTests" time="0.009" />
+    <testcase name="onlyValidActualCallbacksCountAsBackgroundEvidence" classname="dev.uwbpulse.monitor.ProbeTests" time="0.0" />
+    <system-out />
+    <system-err />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.ResumePolicyTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-07T00:17:19.876Z" time="0.001">
+    <properties />
+    <testcase name="bootRestoresOnlyPreviouslyEnabledMonitoring" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
+    <testcase name="bootOptOutDoesNotDisableProcessRecovery" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.001" />
+    <testcase name="maximumThresholdIsTenMeters" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
+    <testcase name="manualStopIsNeverOverridden" classname="dev.uwbpulse.monitor.ResumePolicyTests" time="0.0" />
+    <system-out />
+    <system-err />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.SmartTagCryptoTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-07T00:17:19.878Z" time="0.017">
+    <properties />
+    <testcase name="wrongProofNeverEnablesCommandsAndCannotBeRetriedInSameSession" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.013" />
+    <testcase name="ownerAdvertisementSignatureMatchesAndTamperingFails" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.001" />
+    <testcase name="kdfAndMutualAuthenticationMatchIndependentOpenSslVectors" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.0" />
+    <testcase name="cloudSharedSecretUsesFirst16BytesForOwnerMaster" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.002" />
+    <testcase name="reflectionAndUnauthenticatedCommandsRejected" classname="dev.uwbpulse.monitor.SmartTagCryptoTests" time="0.001" />
+    <system-out />
+    <system-err />
+  </testsuite>
+  <testsuite name="dev.uwbpulse.monitor.WebhookPolicyTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-07T00:17:19.896Z" time="0.001">
+    <properties />
+    <testcase name="headerInjectionAndFragmentsRejected" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.0" />
+    <testcase name="httpsConfigurationAccepted" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.0" />
+    <testcase name="httpAndEmbeddedCredentialsRejected" classname="dev.uwbpulse.monitor.WebhookPolicyTests" time="0.001" />
+    <system-out />
+    <system-err />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,2 @@
+<!-- Tasker resolves these resources by the names in runtime annotations. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/tasker_*" />

@@ -1,0 +1,7 @@
+<resources>
+    <string name="tasker_event_label">UWB event</string>
+    <string name="tasker_distance_label">Actual UWB distance (m), empty when unavailable</string>
+    <string name="tasker_threshold_label">Distance threshold (m)</string>
+    <string name="tasker_timestamp_label">Event time (ISO 8601)</string>
+    <string name="tasker_tag_label">Local pseudonymous tag identifier</string>
+</resources>

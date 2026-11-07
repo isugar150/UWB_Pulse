@@ -1,0 +1,213 @@
+2026-11-07T08:13:25.831133+09:00 elapsed=730073236 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:13:25.831633+09:00 elapsed=730073237 ACTIVITY_VISIBLE true
+2026-11-07T08:13:58.898873+09:00 elapsed=730106304 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:14:13.909267+09:00 elapsed=730121315 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:15:16.487739+09:00 elapsed=730183893 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:15:16.487916+09:00 elapsed=730183893 ACTIVITY_VISIBLE true
+2026-11-07T08:15:32.170674+09:00 elapsed=730199576 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:15:47.179736+09:00 elapsed=730214585 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:16:28.728535+09:00 elapsed=730256134 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:16:28.728699+09:00 elapsed=730256134 ACTIVITY_VISIBLE true
+2026-11-07T08:16:50.413434+09:00 elapsed=730277819 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:17:00.459919+09:00 elapsed=730287865 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:17:00.462497+09:00 elapsed=730287868 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:17:12.166342+09:00 elapsed=730299572 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:17:27.171989+09:00 elapsed=730314577 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:18:24.116407+09:00 elapsed=730371522 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:18:24.116552+09:00 elapsed=730371522 ACTIVITY_VISIBLE true
+2026-11-07T08:18:31.278015+09:00 elapsed=730378683 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:18:34.300162+09:00 elapsed=730381705 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20
+2026-11-07T08:18:46.288248+09:00 elapsed=730393694 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:18:50.025973+09:00 elapsed=730397431 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:18:52.330901+09:00 elapsed=730399736 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20
+2026-11-07T08:19:05.031837+09:00 elapsed=730412437 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:19:26.914174+09:00 elapsed=730434319 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:19:28.486134+09:00 elapsed=730435891 GATT_CONNECTED service discovery requested
+2026-11-07T08:19:28.542467+09:00 elapsed=730435948 UWB_CHARACTERISTICS_FOUND model and owner authentication remain unverified
+2026-11-07T08:19:28.692874+09:00 elapsed=730436098 PLATFORM_CAPABILITIES uwbAvailability=3
+2026-11-07T08:19:28.736716+09:00 elapsed=730436142 UWB_LOCAL_OPENED Platform RAW UWB-only; sending experimental OOB
+2026-11-07T08:19:28.739951+09:00 elapsed=730436145 UWB_STARTED technology=0
+2026-11-07T08:19:28.785911+09:00 elapsed=730436191 PROBE_ERROR GATT_WRITE_STATUS_132
+2026-11-07T08:19:28.839349+09:00 elapsed=730436245 UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T08:19:28.841461+09:00 elapsed=730436247 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:20:48.623636+09:00 elapsed=730516029 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:20:48.623802+09:00 elapsed=730516029 ACTIVITY_VISIBLE true
+2026-11-07T08:20:53.465724+09:00 elapsed=730520871 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:21:03.477038+09:00 elapsed=730530882 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:21:03.478428+09:00 elapsed=730530884 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:21:22.739212+09:00 elapsed=730550145 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:21:32.749019+09:00 elapsed=730560154 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:21:32.751685+09:00 elapsed=730560157 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:25:52.669812+09:00 elapsed=730820075 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=READ_ONLY_ENCRYPTED_OOB_GATE
+2026-11-07T08:25:52.671304+09:00 elapsed=730820077 ACTIVITY_VISIBLE true
+2026-11-07T08:25:57.505081+09:00 elapsed=730824910 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:26:07.522057+09:00 elapsed=730834927 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:26:07.523827+09:00 elapsed=730834929 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:39:09.353994+09:00 elapsed=731616759 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=READ_ONLY_ENCRYPTED_OOB_GATE
+2026-11-07T08:39:09.354314+09:00 elapsed=731616760 ACTIVITY_VISIBLE true
+2026-11-07T08:39:12.525119+09:00 elapsed=731619930 ACTIVITY_VISIBLE false
+2026-11-07T08:39:40.283670+09:00 elapsed=731647689 ACCOUNT_CONNECTED owner device list loaded; secrets stored in Android Keystore envelope
+2026-11-07T08:39:40.294581+09:00 elapsed=731647700 ACTIVITY_VISIBLE true
+2026-11-07T08:43:46.090740+09:00 elapsed=731893496 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T08:43:46.090956+09:00 elapsed=731893496 ACTIVITY_VISIBLE true
+2026-11-07T08:43:50.859909+09:00 elapsed=731898265 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:43:52.730207+09:00 elapsed=731900136 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=false
+2026-11-07T08:44:05.866083+09:00 elapsed=731913271 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:45:49.763322+09:00 elapsed=732017169 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T08:45:49.763492+09:00 elapsed=732017169 ACCOUNT_CONNECT_FAILED IllegalStateException
+2026-11-07T08:45:49.789111+09:00 elapsed=732017194 ACTIVITY_VISIBLE true
+2026-11-07T08:47:09.444267+09:00 elapsed=732096850 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:47:14.099523+09:00 elapsed=732101505 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-07T08:47:24.452363+09:00 elapsed=732111858 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:47:42.876906+09:00 elapsed=732130282 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:47:44.248943+09:00 elapsed=732131654 GATT_CONNECTED discovering auth and UWB services
+2026-11-07T08:47:44.304032+09:00 elapsed=732131709 UWB_CHARACTERISTICS_FOUND owner authentication service present
+2026-11-07T08:47:44.422204+09:00 elapsed=732131828 GATT_MTU_READY mtu=243
+2026-11-07T08:47:44.601493+09:00 elapsed=732132007 TAG_AUTH_START owner mutual challenge-response
+2026-11-07T08:47:44.754422+09:00 elapsed=732132160 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T08:47:44.789126+09:00 elapsed=732132194 PLATFORM_CAPABILITIES uwbAvailability=3
+2026-11-07T08:47:44.858037+09:00 elapsed=732132263 UWB_LOCAL_OPENED Platform RAW UWB-only; encrypted peer OOB required
+2026-11-07T08:47:44.859879+09:00 elapsed=732132265 UWB_STARTED technology=0
+2026-11-07T08:47:45.202038+09:00 elapsed=732132607 OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-07T08:47:45.778056+09:00 elapsed=732133183 UWB_REPORT meters=0.949999988079071; confidence=2; activityVisible=true; interactive=true; total=1; background=0; screenOff=0
+2026-11-07T08:47:46.967269+09:00 elapsed=732134373 UWB_REPORT meters=0.9200000166893005; confidence=2; activityVisible=true; interactive=true; total=6; background=0; screenOff=0
+2026-11-07T08:47:48.167782+09:00 elapsed=732135573 UWB_REPORT meters=1.0299999713897705; confidence=2; activityVisible=true; interactive=true; total=11; background=0; screenOff=0
+2026-11-07T08:47:49.367874+09:00 elapsed=732136773 UWB_REPORT meters=1.7100000381469727; confidence=2; activityVisible=true; interactive=true; total=16; background=0; screenOff=0
+2026-11-07T08:47:50.571141+09:00 elapsed=732137976 UWB_REPORT meters=0.25; confidence=2; activityVisible=true; interactive=true; total=21; background=0; screenOff=0
+2026-11-07T08:47:51.773832+09:00 elapsed=732139179 UWB_REPORT meters=0.699999988079071; confidence=2; activityVisible=true; interactive=true; total=26; background=0; screenOff=0
+2026-11-07T08:47:52.967195+09:00 elapsed=732140373 UWB_REPORT meters=1.75; confidence=2; activityVisible=true; interactive=true; total=31; background=0; screenOff=0
+2026-11-07T08:47:54.168109+09:00 elapsed=732141573 UWB_REPORT meters=0.8899999856948853; confidence=2; activityVisible=true; interactive=true; total=36; background=0; screenOff=0
+2026-11-07T08:47:55.367215+09:00 elapsed=732142773 UWB_REPORT meters=0.25999999046325684; confidence=2; activityVisible=true; interactive=true; total=41; background=0; screenOff=0
+2026-11-07T08:47:56.568016+09:00 elapsed=732143973 UWB_REPORT meters=0.25999999046325684; confidence=2; activityVisible=true; interactive=true; total=46; background=0; screenOff=0
+2026-11-07T08:47:57.767665+09:00 elapsed=732145173 UWB_REPORT meters=0.30000001192092896; confidence=2; activityVisible=true; interactive=true; total=51; background=0; screenOff=0
+2026-11-07T08:47:58.968706+09:00 elapsed=732146374 UWB_REPORT meters=0.9200000166893005; confidence=2; activityVisible=true; interactive=true; total=56; background=0; screenOff=0
+2026-11-07T08:48:00.168351+09:00 elapsed=732147574 UWB_REPORT meters=1.6200000047683716; confidence=2; activityVisible=true; interactive=true; total=61; background=0; screenOff=0
+2026-11-07T08:48:01.366307+09:00 elapsed=732148772 UWB_REPORT meters=0.6800000071525574; confidence=2; activityVisible=true; interactive=true; total=66; background=0; screenOff=0
+2026-11-07T08:48:02.568813+09:00 elapsed=732149974 UWB_REPORT meters=1.1699999570846558; confidence=2; activityVisible=true; interactive=true; total=71; background=0; screenOff=0
+2026-11-07T08:48:03.767054+09:00 elapsed=732151172 UWB_REPORT meters=1.590000033378601; confidence=2; activityVisible=true; interactive=true; total=76; background=0; screenOff=0
+2026-11-07T08:48:04.964851+09:00 elapsed=732152370 UWB_REPORT meters=0.5899999737739563; confidence=2; activityVisible=true; interactive=true; total=81; background=0; screenOff=0
+2026-11-07T08:48:06.166965+09:00 elapsed=732153572 UWB_REPORT meters=0.20999999344348907; confidence=2; activityVisible=true; interactive=true; total=86; background=0; screenOff=0
+2026-11-07T08:48:07.368474+09:00 elapsed=732154774 UWB_REPORT meters=0.5199999809265137; confidence=2; activityVisible=true; interactive=true; total=91; background=0; screenOff=0
+2026-11-07T08:48:08.566931+09:00 elapsed=732155972 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=true; interactive=true; total=96; background=0; screenOff=0
+2026-11-07T08:48:09.766928+09:00 elapsed=732157172 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=101; background=0; screenOff=0
+2026-11-07T08:48:10.968535+09:00 elapsed=732158374 UWB_REPORT meters=1.0; confidence=2; activityVisible=true; interactive=true; total=106; background=0; screenOff=0
+2026-11-07T08:48:12.167682+09:00 elapsed=732159573 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=111; background=0; screenOff=0
+2026-11-07T08:48:13.367489+09:00 elapsed=732160773 UWB_REPORT meters=0.9800000190734863; confidence=2; activityVisible=true; interactive=true; total=116; background=0; screenOff=0
+2026-11-07T08:48:14.568447+09:00 elapsed=732161974 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=true; interactive=true; total=121; background=0; screenOff=0
+2026-11-07T08:48:15.769449+09:00 elapsed=732163175 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=true; interactive=true; total=126; background=0; screenOff=0
+2026-11-07T08:48:16.968122+09:00 elapsed=732164373 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=true; interactive=true; total=131; background=0; screenOff=0
+2026-11-07T08:48:18.168344+09:00 elapsed=732165574 UWB_REPORT meters=0.9399999976158142; confidence=2; activityVisible=true; interactive=true; total=136; background=0; screenOff=0
+2026-11-07T08:48:19.366205+09:00 elapsed=732166772 UWB_REPORT meters=0.949999988079071; confidence=2; activityVisible=true; interactive=true; total=141; background=0; screenOff=0
+2026-11-07T08:48:20.568462+09:00 elapsed=732167974 UWB_REPORT meters=0.9599999785423279; confidence=2; activityVisible=true; interactive=true; total=146; background=0; screenOff=0
+2026-11-07T08:48:21.766835+09:00 elapsed=732169172 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=151; background=0; screenOff=0
+2026-11-07T08:48:22.966480+09:00 elapsed=732170372 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=true; interactive=true; total=156; background=0; screenOff=0
+2026-11-07T08:48:24.168041+09:00 elapsed=732171573 UWB_REPORT meters=1.100000023841858; confidence=2; activityVisible=true; interactive=true; total=161; background=0; screenOff=0
+2026-11-07T08:48:25.366658+09:00 elapsed=732172772 UWB_REPORT meters=1.1299999952316284; confidence=2; activityVisible=true; interactive=true; total=166; background=0; screenOff=0
+2026-11-07T08:48:26.568184+09:00 elapsed=732173974 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=true; interactive=true; total=171; background=0; screenOff=0
+2026-11-07T08:48:27.766869+09:00 elapsed=732175172 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=true; interactive=true; total=176; background=0; screenOff=0
+2026-11-07T08:48:27.855803+09:00 elapsed=732175261 ACTIVITY_VISIBLE false
+2026-11-07T08:48:28.964808+09:00 elapsed=732176370 UWB_REPORT meters=1.0; confidence=2; activityVisible=false; interactive=true; total=181; background=5; screenOff=0
+2026-11-07T08:48:30.165751+09:00 elapsed=732177571 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=true; total=186; background=10; screenOff=0
+2026-11-07T08:48:31.366711+09:00 elapsed=732178772 UWB_REPORT meters=1.1100000143051147; confidence=2; activityVisible=false; interactive=true; total=191; background=15; screenOff=0
+2026-11-07T08:48:32.566238+09:00 elapsed=732179972 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=true; total=196; background=20; screenOff=0
+2026-11-07T08:48:33.766768+09:00 elapsed=732181172 UWB_REPORT meters=1.1299999952316284; confidence=2; activityVisible=false; interactive=true; total=201; background=25; screenOff=0
+2026-11-07T08:48:34.966295+09:00 elapsed=732182372 UWB_REPORT meters=1.1299999952316284; confidence=2; activityVisible=false; interactive=true; total=206; background=30; screenOff=0
+2026-11-07T08:48:36.166876+09:00 elapsed=732183572 UWB_REPORT meters=1.100000023841858; confidence=2; activityVisible=false; interactive=true; total=211; background=35; screenOff=0
+2026-11-07T08:48:37.366574+09:00 elapsed=732184772 UWB_REPORT meters=1.0; confidence=2; activityVisible=false; interactive=true; total=216; background=40; screenOff=0
+2026-11-07T08:48:38.567179+09:00 elapsed=732185973 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=true; total=221; background=45; screenOff=0
+2026-11-07T08:48:39.767109+09:00 elapsed=732187172 UWB_REPORT meters=1.2200000286102295; confidence=2; activityVisible=false; interactive=true; total=226; background=50; screenOff=0
+2026-11-07T08:48:40.965812+09:00 elapsed=732188371 UWB_REPORT meters=1.190000057220459; confidence=2; activityVisible=false; interactive=true; total=231; background=55; screenOff=0
+2026-11-07T08:48:42.165330+09:00 elapsed=732189571 UWB_REPORT meters=1.2300000190734863; confidence=2; activityVisible=false; interactive=true; total=236; background=60; screenOff=0
+2026-11-07T08:48:43.366685+09:00 elapsed=732190772 UWB_REPORT meters=1.2300000190734863; confidence=2; activityVisible=false; interactive=true; total=241; background=65; screenOff=0
+2026-11-07T08:48:44.566159+09:00 elapsed=732191971 UWB_REPORT meters=1.2000000476837158; confidence=2; activityVisible=false; interactive=true; total=246; background=70; screenOff=0
+2026-11-07T08:48:45.765538+09:00 elapsed=732193171 UWB_REPORT meters=1.190000057220459; confidence=2; activityVisible=false; interactive=true; total=251; background=75; screenOff=0
+2026-11-07T08:48:46.966330+09:00 elapsed=732194372 UWB_REPORT meters=1.2100000381469727; confidence=2; activityVisible=false; interactive=true; total=256; background=80; screenOff=0
+2026-11-07T08:48:48.166067+09:00 elapsed=732195571 UWB_REPORT meters=1.159999966621399; confidence=2; activityVisible=false; interactive=true; total=261; background=85; screenOff=0
+2026-11-07T08:48:49.362534+09:00 elapsed=732196768 UWB_REPORT meters=1.2000000476837158; confidence=2; activityVisible=false; interactive=false; total=266; background=90; screenOff=3
+2026-11-07T08:48:50.562864+09:00 elapsed=732197968 UWB_REPORT meters=1.2100000381469727; confidence=2; activityVisible=false; interactive=false; total=271; background=95; screenOff=8
+2026-11-07T08:48:51.763942+09:00 elapsed=732199169 UWB_REPORT meters=1.2100000381469727; confidence=2; activityVisible=false; interactive=false; total=276; background=100; screenOff=13
+2026-11-07T08:48:52.966454+09:00 elapsed=732200372 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=281; background=105; screenOff=18
+2026-11-07T08:48:54.166836+09:00 elapsed=732201572 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=false; interactive=false; total=286; background=110; screenOff=23
+2026-11-07T08:48:55.366487+09:00 elapsed=732202772 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=291; background=115; screenOff=28
+2026-11-07T08:48:56.567887+09:00 elapsed=732203973 UWB_REPORT meters=1.6100000143051147; confidence=2; activityVisible=false; interactive=false; total=296; background=120; screenOff=33
+2026-11-07T08:48:57.766404+09:00 elapsed=732205172 UWB_REPORT meters=1.75; confidence=2; activityVisible=false; interactive=false; total=301; background=125; screenOff=38
+2026-11-07T08:48:58.967184+09:00 elapsed=732206373 UWB_REPORT meters=1.5399999618530273; confidence=2; activityVisible=false; interactive=false; total=306; background=130; screenOff=43
+2026-11-07T08:49:00.164209+09:00 elapsed=732207570 UWB_REPORT meters=0.3199999928474426; confidence=2; activityVisible=false; interactive=false; total=311; background=135; screenOff=48
+2026-11-07T08:49:01.367339+09:00 elapsed=732208773 UWB_REPORT meters=1.3899999856948853; confidence=2; activityVisible=false; interactive=false; total=316; background=140; screenOff=53
+2026-11-07T08:49:02.565874+09:00 elapsed=732209971 UWB_REPORT meters=0.7599999904632568; confidence=2; activityVisible=false; interactive=false; total=321; background=145; screenOff=58
+2026-11-07T08:49:03.765528+09:00 elapsed=732211171 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=false; interactive=false; total=326; background=150; screenOff=63
+2026-11-07T08:49:04.965686+09:00 elapsed=732212371 UWB_REPORT meters=1.2400000095367432; confidence=2; activityVisible=false; interactive=false; total=331; background=155; screenOff=68
+2026-11-07T08:49:06.165394+09:00 elapsed=732213571 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=336; background=160; screenOff=73
+2026-11-07T08:49:07.365840+09:00 elapsed=732214771 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=341; background=165; screenOff=78
+2026-11-07T08:49:08.566943+09:00 elapsed=732215972 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=346; background=170; screenOff=83
+2026-11-07T08:49:09.765613+09:00 elapsed=732217171 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=351; background=175; screenOff=88
+2026-11-07T08:49:10.964625+09:00 elapsed=732218370 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=356; background=180; screenOff=93
+2026-11-07T08:49:12.166549+09:00 elapsed=732219572 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=361; background=185; screenOff=98
+2026-11-07T08:49:13.365541+09:00 elapsed=732220771 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=366; background=190; screenOff=103
+2026-11-07T08:49:14.567770+09:00 elapsed=732221973 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=371; background=195; screenOff=108
+2026-11-07T08:49:15.765940+09:00 elapsed=732223171 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=376; background=200; screenOff=113
+2026-11-07T08:49:16.966428+09:00 elapsed=732224372 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=381; background=205; screenOff=118
+2026-11-07T08:49:18.164596+09:00 elapsed=732225570 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=386; background=210; screenOff=123
+2026-11-07T08:49:19.365011+09:00 elapsed=732226770 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=391; background=215; screenOff=128
+2026-11-07T08:49:20.565400+09:00 elapsed=732227971 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=396; background=220; screenOff=133
+2026-11-07T08:49:21.770501+09:00 elapsed=732229176 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=401; background=225; screenOff=138
+2026-11-07T08:49:22.965672+09:00 elapsed=732230371 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=406; background=230; screenOff=143
+2026-11-07T08:49:24.165672+09:00 elapsed=732231571 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=411; background=235; screenOff=148
+2026-11-07T08:49:25.366139+09:00 elapsed=732232771 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=416; background=240; screenOff=153
+2026-11-07T08:49:26.566434+09:00 elapsed=732233972 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=421; background=245; screenOff=158
+2026-11-07T08:49:27.766614+09:00 elapsed=732235172 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=426; background=250; screenOff=163
+2026-11-07T08:49:28.966576+09:00 elapsed=732236372 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=431; background=255; screenOff=168
+2026-11-07T08:49:30.165277+09:00 elapsed=732237571 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=436; background=260; screenOff=173
+2026-11-07T08:49:31.366771+09:00 elapsed=732238772 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=441; background=265; screenOff=178
+2026-11-07T08:49:32.565544+09:00 elapsed=732239971 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=446; background=270; screenOff=183
+2026-11-07T08:49:33.766570+09:00 elapsed=732241172 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=451; background=275; screenOff=188
+2026-11-07T08:49:34.968403+09:00 elapsed=732242374 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=456; background=280; screenOff=193
+2026-11-07T08:49:36.166222+09:00 elapsed=732243572 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=461; background=285; screenOff=198
+2026-11-07T08:49:37.366102+09:00 elapsed=732244771 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=466; background=290; screenOff=203
+2026-11-07T08:49:38.565517+09:00 elapsed=732245971 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=false; interactive=false; total=471; background=295; screenOff=208
+2026-11-07T08:49:39.765709+09:00 elapsed=732247171 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=476; background=300; screenOff=213
+2026-11-07T08:49:40.966011+09:00 elapsed=732248371 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=481; background=305; screenOff=218
+2026-11-07T08:49:42.164964+09:00 elapsed=732249570 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=486; background=310; screenOff=223
+2026-11-07T08:49:43.367169+09:00 elapsed=732250773 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=491; background=315; screenOff=228
+2026-11-07T08:49:44.566438+09:00 elapsed=732251972 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=496; background=320; screenOff=233
+2026-11-07T08:49:45.767012+09:00 elapsed=732253172 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=501; background=325; screenOff=238
+2026-11-07T08:49:46.968479+09:00 elapsed=732254374 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=506; background=330; screenOff=243
+2026-11-07T08:49:48.162877+09:00 elapsed=732255568 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=511; background=335; screenOff=248
+2026-11-07T08:49:49.367398+09:00 elapsed=732256773 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=516; background=340; screenOff=253
+2026-11-07T08:49:50.566712+09:00 elapsed=732257972 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=521; background=345; screenOff=258
+2026-11-07T08:49:51.766882+09:00 elapsed=732259172 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=526; background=350; screenOff=263
+2026-11-07T08:49:52.966610+09:00 elapsed=732260372 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=531; background=355; screenOff=268
+2026-11-07T08:49:54.167617+09:00 elapsed=732261573 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=536; background=360; screenOff=273
+2026-11-07T08:49:55.367020+09:00 elapsed=732262772 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=false; interactive=false; total=541; background=365; screenOff=278
+2026-11-07T08:49:56.568415+09:00 elapsed=732263974 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=546; background=370; screenOff=283
+2026-11-07T08:49:57.766565+09:00 elapsed=732265172 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=551; background=375; screenOff=288
+2026-11-07T08:49:58.965522+09:00 elapsed=732266371 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=556; background=380; screenOff=293
+2026-11-07T08:50:00.167695+09:00 elapsed=732267573 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=561; background=385; screenOff=298
+2026-11-07T08:50:01.365041+09:00 elapsed=732268770 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=566; background=390; screenOff=303
+2026-11-07T08:50:02.564978+09:00 elapsed=732269970 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=571; background=395; screenOff=308
+2026-11-07T08:50:03.767467+09:00 elapsed=732271173 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=false; interactive=false; total=576; background=400; screenOff=313
+2026-11-07T08:50:04.965728+09:00 elapsed=732272371 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=false; interactive=false; total=581; background=405; screenOff=318
+2026-11-07T08:50:06.166429+09:00 elapsed=732273572 UWB_REPORT meters=1.0299999713897705; confidence=2; activityVisible=false; interactive=false; total=586; background=410; screenOff=323
+2026-11-07T08:50:07.364972+09:00 elapsed=732274770 UWB_REPORT meters=1.0299999713897705; confidence=2; activityVisible=false; interactive=false; total=591; background=415; screenOff=328
+2026-11-07T08:50:08.565593+09:00 elapsed=732275971 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=false; interactive=false; total=596; background=420; screenOff=333
+2026-11-07T08:50:09.764644+09:00 elapsed=732277170 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=601; background=425; screenOff=338
+2026-11-07T08:50:10.965085+09:00 elapsed=732278370 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=606; background=430; screenOff=343
+2026-11-07T08:50:12.165249+09:00 elapsed=732279571 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=611; background=435; screenOff=348
+2026-11-07T08:50:13.365682+09:00 elapsed=732280771 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=616; background=440; screenOff=353
+2026-11-07T08:50:14.566967+09:00 elapsed=732281972 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=621; background=445; screenOff=358
+2026-11-07T08:50:15.765835+09:00 elapsed=732283171 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=626; background=450; screenOff=363
+2026-11-07T08:50:16.964399+09:00 elapsed=732284370 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=631; background=455; screenOff=368
+2026-11-07T08:50:18.165728+09:00 elapsed=732285571 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=636; background=460; screenOff=373
+2026-11-07T08:50:19.367609+09:00 elapsed=732286773 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=641; background=465; screenOff=378
+2026-11-07T08:50:20.567122+09:00 elapsed=732287972 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=646; background=470; screenOff=383
+2026-11-07T08:50:21.766342+09:00 elapsed=732289172 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=651; background=475; screenOff=388
+2026-11-07T08:50:22.965370+09:00 elapsed=732290371 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=false; interactive=false; total=656; background=480; screenOff=393
+2026-11-07T08:50:24.163713+09:00 elapsed=732291569 UWB_REPORT meters=1.0399999618530273; confidence=2; activityVisible=false; interactive=false; total=661; background=485; screenOff=398
+2026-11-07T08:50:25.367395+09:00 elapsed=732292773 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=666; background=490; screenOff=403
+2026-11-07T08:50:26.566509+09:00 elapsed=732293972 UWB_REPORT meters=1.0499999523162842; confidence=2; activityVisible=false; interactive=false; total=671; background=495; screenOff=408
+2026-11-07T08:50:27.765355+09:00 elapsed=732295171 UWB_REPORT meters=1.059999942779541; confidence=2; activityVisible=false; interactive=false; total=676; background=500; screenOff=413
+2026-11-07T08:50:28.966559+09:00 elapsed=732296372 UWB_REPORT meters=1.0; confidence=2; activityVisible=false; interactive=false; total=681; background=505; screenOff=418
+2026-11-07T08:50:30.165391+09:00 elapsed=732297571 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=false; interactive=false; total=686; background=510; screenOff=423
+2026-11-07T08:50:31.365702+09:00 elapsed=732298771 UWB_REPORT meters=0.9700000286102295; confidence=2; activityVisible=false; interactive=false; total=691; background=515; screenOff=428
+2026-11-07T08:50:32.566723+09:00 elapsed=732299972 UWB_REPORT meters=0.9800000190734863; confidence=2; activityVisible=false; interactive=false; total=696; background=520; screenOff=433
+2026-11-07T08:50:33.765720+09:00 elapsed=732301171 UWB_REPORT meters=1.0199999809265137; confidence=2; activityVisible=false; interactive=false; total=701; background=525; screenOff=438

@@ -1,0 +1,26 @@
+[
+  {
+    "event": "TAG_DISTANCE_EXCEEDED",
+    "distanceMeters": 2.319999933242798,
+    "thresholdMeters": 1.5,
+    "timestamp": "2026-11-07T09:09:35.485340+09:00"
+  },
+  {
+    "event": "TAG_RETURNED",
+    "distanceMeters": 0.3400000035762787,
+    "thresholdMeters": 1.5,
+    "timestamp": "2026-11-07T09:09:50.842527+09:00"
+  },
+  {
+    "event": "TAG_DISTANCE_EXCEEDED",
+    "distanceMeters": 2.4600000381469727,
+    "thresholdMeters": 1.5,
+    "timestamp": "2026-11-07T09:21:37.395532+09:00"
+  },
+  {
+    "event": "TAG_RETURNED",
+    "distanceMeters": 0.46000000834465027,
+    "thresholdMeters": 1.5,
+    "timestamp": "2026-11-07T09:21:53.953074+09:00"
+  }
+]

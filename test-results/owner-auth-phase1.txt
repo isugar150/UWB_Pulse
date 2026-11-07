@@ -1,0 +1,106 @@
+2026-11-07T08:13:25.831133+09:00 elapsed=730073236 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:13:25.831633+09:00 elapsed=730073237 ACTIVITY_VISIBLE true
+2026-11-07T08:13:58.898873+09:00 elapsed=730106304 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:14:13.909267+09:00 elapsed=730121315 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:15:16.487739+09:00 elapsed=730183893 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:15:16.487916+09:00 elapsed=730183893 ACTIVITY_VISIBLE true
+2026-11-07T08:15:32.170674+09:00 elapsed=730199576 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:15:47.179736+09:00 elapsed=730214585 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:16:28.728535+09:00 elapsed=730256134 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:16:28.728699+09:00 elapsed=730256134 ACTIVITY_VISIBLE true
+2026-11-07T08:16:50.413434+09:00 elapsed=730277819 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:17:00.459919+09:00 elapsed=730287865 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:17:00.462497+09:00 elapsed=730287868 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:17:12.166342+09:00 elapsed=730299572 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:17:27.171989+09:00 elapsed=730314577 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:18:24.116407+09:00 elapsed=730371522 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:18:24.116552+09:00 elapsed=730371522 ACTIVITY_VISIBLE true
+2026-11-07T08:18:31.278015+09:00 elapsed=730378683 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:18:34.300162+09:00 elapsed=730381705 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20
+2026-11-07T08:18:46.288248+09:00 elapsed=730393694 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:18:50.025973+09:00 elapsed=730397431 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:18:52.330901+09:00 elapsed=730399736 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20
+2026-11-07T08:19:05.031837+09:00 elapsed=730412437 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:19:26.914174+09:00 elapsed=730434319 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:19:28.486134+09:00 elapsed=730435891 GATT_CONNECTED service discovery requested
+2026-11-07T08:19:28.542467+09:00 elapsed=730435948 UWB_CHARACTERISTICS_FOUND model and owner authentication remain unverified
+2026-11-07T08:19:28.692874+09:00 elapsed=730436098 PLATFORM_CAPABILITIES uwbAvailability=3
+2026-11-07T08:19:28.736716+09:00 elapsed=730436142 UWB_LOCAL_OPENED Platform RAW UWB-only; sending experimental OOB
+2026-11-07T08:19:28.739951+09:00 elapsed=730436145 UWB_STARTED technology=0
+2026-11-07T08:19:28.785911+09:00 elapsed=730436191 PROBE_ERROR GATT_WRITE_STATUS_132
+2026-11-07T08:19:28.839349+09:00 elapsed=730436245 UWB_STOP_UNCONFIRMED IllegalStateException
+2026-11-07T08:19:28.841461+09:00 elapsed=730436247 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:20:48.623636+09:00 elapsed=730516029 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8
+2026-11-07T08:20:48.623802+09:00 elapsed=730516029 ACTIVITY_VISIBLE true
+2026-11-07T08:20:53.465724+09:00 elapsed=730520871 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:21:03.477038+09:00 elapsed=730530882 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:21:03.478428+09:00 elapsed=730530884 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:21:22.739212+09:00 elapsed=730550145 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:21:32.749019+09:00 elapsed=730560154 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:21:32.751685+09:00 elapsed=730560157 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:25:52.669812+09:00 elapsed=730820075 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=READ_ONLY_ENCRYPTED_OOB_GATE
+2026-11-07T08:25:52.671304+09:00 elapsed=730820077 ACTIVITY_VISIBLE true
+2026-11-07T08:25:57.505081+09:00 elapsed=730824910 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:26:07.522057+09:00 elapsed=730834927 PROBE_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T08:26:07.523827+09:00 elapsed=730834929 PROBE_STOP UWB/GATT released; no automation event
+2026-11-07T08:39:09.353994+09:00 elapsed=731616759 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=READ_ONLY_ENCRYPTED_OOB_GATE
+2026-11-07T08:39:09.354314+09:00 elapsed=731616760 ACTIVITY_VISIBLE true
+2026-11-07T08:39:12.525119+09:00 elapsed=731619930 ACTIVITY_VISIBLE false
+2026-11-07T08:39:40.283670+09:00 elapsed=731647689 ACCOUNT_CONNECTED owner device list loaded; secrets stored in Android Keystore envelope
+2026-11-07T08:39:40.294581+09:00 elapsed=731647700 ACTIVITY_VISIBLE true
+2026-11-07T08:43:46.090740+09:00 elapsed=731893496 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T08:43:46.090956+09:00 elapsed=731893496 ACTIVITY_VISIBLE true
+2026-11-07T08:43:50.859909+09:00 elapsed=731898265 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:43:52.730207+09:00 elapsed=731900136 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=false
+2026-11-07T08:44:05.866083+09:00 elapsed=731913271 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:45:49.763322+09:00 elapsed=732017169 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T08:45:49.763492+09:00 elapsed=732017169 ACCOUNT_CONNECT_FAILED IllegalStateException
+2026-11-07T08:45:49.789111+09:00 elapsed=732017194 ACTIVITY_VISIBLE true
+2026-11-07T08:47:09.444267+09:00 elapsed=732096850 BLE_SCAN_START FD5A filter; 15 seconds; RSSI not used
+2026-11-07T08:47:14.099523+09:00 elapsed=732101505 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-07T08:47:24.452363+09:00 elapsed=732111858 BLE_SCAN_STOP candidates=1; ownership unverified
+2026-11-07T08:47:42.876906+09:00 elapsed=732130282 PROBE_START backend=PLATFORM; interactive=true; batteryExempt=false
+2026-11-07T08:47:44.248943+09:00 elapsed=732131654 GATT_CONNECTED discovering auth and UWB services
+2026-11-07T08:47:44.304032+09:00 elapsed=732131709 UWB_CHARACTERISTICS_FOUND owner authentication service present
+2026-11-07T08:47:44.422204+09:00 elapsed=732131828 GATT_MTU_READY mtu=243
+2026-11-07T08:47:44.601493+09:00 elapsed=732132007 TAG_AUTH_START owner mutual challenge-response
+2026-11-07T08:47:44.754422+09:00 elapsed=732132160 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T08:47:44.789126+09:00 elapsed=732132194 PLATFORM_CAPABILITIES uwbAvailability=3
+2026-11-07T08:47:44.858037+09:00 elapsed=732132263 UWB_LOCAL_OPENED Platform RAW UWB-only; encrypted peer OOB required
+2026-11-07T08:47:44.859879+09:00 elapsed=732132265 UWB_STARTED technology=0
+2026-11-07T08:47:45.202038+09:00 elapsed=732132607 OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-07T08:47:45.778056+09:00 elapsed=732133183 UWB_REPORT meters=0.949999988079071; confidence=2; activityVisible=true; interactive=true; total=1; background=0; screenOff=0
+2026-11-07T08:47:46.967269+09:00 elapsed=732134373 UWB_REPORT meters=0.9200000166893005; confidence=2; activityVisible=true; interactive=true; total=6; background=0; screenOff=0
+2026-11-07T08:47:48.167782+09:00 elapsed=732135573 UWB_REPORT meters=1.0299999713897705; confidence=2; activityVisible=true; interactive=true; total=11; background=0; screenOff=0
+2026-11-07T08:47:49.367874+09:00 elapsed=732136773 UWB_REPORT meters=1.7100000381469727; confidence=2; activityVisible=true; interactive=true; total=16; background=0; screenOff=0
+2026-11-07T08:47:50.571141+09:00 elapsed=732137976 UWB_REPORT meters=0.25; confidence=2; activityVisible=true; interactive=true; total=21; background=0; screenOff=0
+2026-11-07T08:47:51.773832+09:00 elapsed=732139179 UWB_REPORT meters=0.699999988079071; confidence=2; activityVisible=true; interactive=true; total=26; background=0; screenOff=0
+2026-11-07T08:47:52.967195+09:00 elapsed=732140373 UWB_REPORT meters=1.75; confidence=2; activityVisible=true; interactive=true; total=31; background=0; screenOff=0
+2026-11-07T08:47:54.168109+09:00 elapsed=732141573 UWB_REPORT meters=0.8899999856948853; confidence=2; activityVisible=true; interactive=true; total=36; background=0; screenOff=0
+2026-11-07T08:47:55.367215+09:00 elapsed=732142773 UWB_REPORT meters=0.25999999046325684; confidence=2; activityVisible=true; interactive=true; total=41; background=0; screenOff=0
+2026-11-07T08:47:56.568016+09:00 elapsed=732143973 UWB_REPORT meters=0.25999999046325684; confidence=2; activityVisible=true; interactive=true; total=46; background=0; screenOff=0
+2026-11-07T08:47:57.767665+09:00 elapsed=732145173 UWB_REPORT meters=0.30000001192092896; confidence=2; activityVisible=true; interactive=true; total=51; background=0; screenOff=0
+2026-11-07T08:47:58.968706+09:00 elapsed=732146374 UWB_REPORT meters=0.9200000166893005; confidence=2; activityVisible=true; interactive=true; total=56; background=0; screenOff=0
+2026-11-07T08:48:00.168351+09:00 elapsed=732147574 UWB_REPORT meters=1.6200000047683716; confidence=2; activityVisible=true; interactive=true; total=61; background=0; screenOff=0
+2026-11-07T08:48:01.366307+09:00 elapsed=732148772 UWB_REPORT meters=0.6800000071525574; confidence=2; activityVisible=true; interactive=true; total=66; background=0; screenOff=0
+2026-11-07T08:48:02.568813+09:00 elapsed=732149974 UWB_REPORT meters=1.1699999570846558; confidence=2; activityVisible=true; interactive=true; total=71; background=0; screenOff=0
+2026-11-07T08:48:03.767054+09:00 elapsed=732151172 UWB_REPORT meters=1.590000033378601; confidence=2; activityVisible=true; interactive=true; total=76; background=0; screenOff=0
+2026-11-07T08:48:04.964851+09:00 elapsed=732152370 UWB_REPORT meters=0.5899999737739563; confidence=2; activityVisible=true; interactive=true; total=81; background=0; screenOff=0
+2026-11-07T08:48:06.166965+09:00 elapsed=732153572 UWB_REPORT meters=0.20999999344348907; confidence=2; activityVisible=true; interactive=true; total=86; background=0; screenOff=0
+2026-11-07T08:48:07.368474+09:00 elapsed=732154774 UWB_REPORT meters=0.5199999809265137; confidence=2; activityVisible=true; interactive=true; total=91; background=0; screenOff=0
+2026-11-07T08:48:08.566931+09:00 elapsed=732155972 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=true; interactive=true; total=96; background=0; screenOff=0
+2026-11-07T08:48:09.766928+09:00 elapsed=732157172 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=101; background=0; screenOff=0
+2026-11-07T08:48:10.968535+09:00 elapsed=732158374 UWB_REPORT meters=1.0; confidence=2; activityVisible=true; interactive=true; total=106; background=0; screenOff=0
+2026-11-07T08:48:12.167682+09:00 elapsed=732159573 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=111; background=0; screenOff=0
+2026-11-07T08:48:13.367489+09:00 elapsed=732160773 UWB_REPORT meters=0.9800000190734863; confidence=2; activityVisible=true; interactive=true; total=116; background=0; screenOff=0
+2026-11-07T08:48:14.568447+09:00 elapsed=732161974 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=true; interactive=true; total=121; background=0; screenOff=0
+2026-11-07T08:48:15.769449+09:00 elapsed=732163175 UWB_REPORT meters=1.0099999904632568; confidence=2; activityVisible=true; interactive=true; total=126; background=0; screenOff=0
+2026-11-07T08:48:16.968122+09:00 elapsed=732164373 UWB_REPORT meters=1.0700000524520874; confidence=2; activityVisible=true; interactive=true; total=131; background=0; screenOff=0
+2026-11-07T08:48:18.168344+09:00 elapsed=732165574 UWB_REPORT meters=0.9399999976158142; confidence=2; activityVisible=true; interactive=true; total=136; background=0; screenOff=0
+2026-11-07T08:48:19.366205+09:00 elapsed=732166772 UWB_REPORT meters=0.949999988079071; confidence=2; activityVisible=true; interactive=true; total=141; background=0; screenOff=0
+2026-11-07T08:48:20.568462+09:00 elapsed=732167974 UWB_REPORT meters=0.9599999785423279; confidence=2; activityVisible=true; interactive=true; total=146; background=0; screenOff=0
+2026-11-07T08:48:21.766835+09:00 elapsed=732169172 UWB_REPORT meters=0.9900000095367432; confidence=2; activityVisible=true; interactive=true; total=151; background=0; screenOff=0
+2026-11-07T08:48:22.966480+09:00 elapsed=732170372 UWB_REPORT meters=1.0800000429153442; confidence=2; activityVisible=true; interactive=true; total=156; background=0; screenOff=0
+2026-11-07T08:48:24.168041+09:00 elapsed=732171573 UWB_REPORT meters=1.100000023841858; confidence=2; activityVisible=true; interactive=true; total=161; background=0; screenOff=0
+2026-11-07T08:48:25.366658+09:00 elapsed=732172772 UWB_REPORT meters=1.1299999952316284; confidence=2; activityVisible=true; interactive=true; total=166; background=0; screenOff=0
+2026-11-07T08:48:26.568184+09:00 elapsed=732173974 UWB_REPORT meters=1.090000033378601; confidence=2; activityVisible=true; interactive=true; total=171; background=0; screenOff=0
