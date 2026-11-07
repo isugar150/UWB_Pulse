@@ -29,7 +29,7 @@
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
 |`automation/MonitorEvents.kt`|최근 100개 이벤트, 별도 채널 알림, WorkManager HTTPS Webhook|
-|`automation/SmartThingsSync.kt`|SmartThings OAuth 토큰 저장·갱신, 가상 스위치 이벤트 전송 Worker, 일일 갱신 Worker|
+|`automation/SmartThingsSync.kt`|가상 스위치 이벤트 전송 Worker(저장된 삼성 로그인 토큰 사용, 401이면 한 번 갱신 후 재시도), 선택 사항인 OAuth 토큰 저장·갱신과 일일 갱신 Worker|
 |`domain/SmartThingsSwitch.kt`|가상 스위치 요청·토큰 응답 처리(순수 함수), 이벤트→ON/OFF 매핑|
 |`automation/TaskerEvents.kt`|공식 Tasker 이벤트 플러그인의 설정·필터·변수·명시적 전달|
 
