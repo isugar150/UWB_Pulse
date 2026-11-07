@@ -28,6 +28,7 @@
 |`domain/FailurePolicy.kt`|연결 실패 분류(재시도 가능·링크 손실)와 `OutageGate`: 일시적 재연결 실패를 외부 이벤트에서 제외|
 |`domain/ResumePolicy.kt`|BOOT / 업데이트 / 프로세스 재시작의 저장 ON 복원 조건|
 |`domain/ConnectionTimeout.kt`|개별 연결 시간 초과만 오류로 변환하고 호출자 취소는 그대로 전달|
+|`domain/SwitchPresenceSync.kt`|시작/연동 활성화 후 첫 실제 거리로 스위치 상태를 한 번 동기화. 이탈 debounce와 복귀 latch 유지|
 |`domain/SwitchDelivery.kt`|SmartThings 요청 30초 만료·최신 요청·전송 직렬화와 취소 확인|
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
@@ -102,3 +103,7 @@ manifest에서 backup/기기 전송을 제외한다. 재부팅 전 첫 잠금 �
 - 인증 후·해제 시 비밀 배열을 정리하고 암호화 고정 벡터 테스트를 유지한다.
 
 정확한 출처와 GPL 파생 범위는 [FEASIBILITY.md](FEASIBILITY.md), [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)를 참고한다.
+
+## SmartThings 존재 상태 (최신 사용자 요청)
+
+가까움/복귀는 ON, 이탈은 OFF다. Tasker/Webhook의 이벤트 이름과 거리 판정은 유지한다. 시작/연동 활성화 뒤 첫 유효 측정에서 한 번 초기 상태를 전송하되, 최초 측정이 임계값 밖이고 아직 이탈하지 않았으면 지속 시간을 기다린다. 초기 동기화는 거리 이벤트·알림·Tasker/Webhook을 새로 만들지 않고 동일 dispatcher Channel에 넣어 상태 전환과 전송 순서를 지킨다. 현재 세션 안의 재연결마다 중복 동기화하지 않는다. Worker는 매핑 revision=2인 작업만 허용해 이전 방향으로 만든 대기를 폐기한다.

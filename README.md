@@ -135,7 +135,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ### 방법 A. SmartThings 가상 스위치 (차량 잠금 등)
 
-**이탈하면 SmartThings의 가상 스위치가 켜지고, 복귀하면 꺼집니다.** SmartThings 자동화에서 "그 스위치가 켜지면"을 조건으로 쓰면 됩니다. 내 서버는 필요 없고, 폰이 잠겨 있어도 동작하는 경로입니다. 삼성 로그인 토큰을 SmartThings 공개 API에 쓰는 **비공식** 방식이라는 점을 [안전과 한계](#안전과-한계)에서 확인하세요.
+**가까이 있으면 SmartThings 가상 스위치가 켜지고, 멀어지면 꺼집니다.** 차량 잠금 자동화는 "그 스위치가 꺼지면"을 조건으로 쓰면 됩니다. 시작하거나 연동을 켠 뒤 첫 실제 거리 수신으로 현재 상태를 맞춥니다. 내 서버는 필요 없고, 폰이 잠겨 있어도 동작하는 경로입니다. 삼성 로그인 토큰을 SmartThings 공개 API에 쓰는 **비공식** 방식이라는 점을 [안전과 한계](#안전과-한계)에서 확인하세요.
 
 **① 가상 스위치 만들기 (PC에서 한 번)**
 
@@ -166,13 +166,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 1. UWB Pulse → **설정 → SmartThings 가상 스위치**로 갑니다.
 2. **가상 스위치 기기 ID**에 복사한 `deviceId`를 붙여 넣고 **저장 및 연결**을 누릅니다. OAuth 항목은 **비워 두세요.**
 3. **삼성 로그인 토큰으로 연결 시험 (읽기·쓰기)**을 누릅니다. `읽기 200 · 쓰기 200`이 나오면 통신이 됩니다.
-4. **스위치 끄기 시험**을 눌러 SmartThings 앱의 `UWB_Pulse`가 꺼짐인지 봅니다. (**켜기 시험은 연결한 자동화를 실제로 실행**하니, 자동화를 만든 뒤에는 조심하세요.)
-5. **이탈 시 스위치 켜기 · 복귀 시 끄기**를 켭니다.
+4. **스위치 켜기/끄기 시험**으로 상태 변화를 확인합니다. 두 시험 모두 연결된 자동화를 실제로 실행할 수 있습니다. 먼저 알림 같은 시험용 동작으로 확인하세요.
+5. **가까우면 켜기 · 멀어지면 끄기**를 켭니다.
 
 **③ SmartThings 자동화 만들기 (SmartThings 앱에서)**
 
 1. **자동화 → 만들기**로 갑니다.
-2. **만약**: 기기 상태 → `UWB_Pulse` → **켜짐**.
+2. **만약**: 기기 상태 → `UWB_Pulse` → **꺼짐**.
 3. **그러면**: 실행할 동작(예: 차량 문 잠금 루틴).
 4. **처음에는 알림 보내기 같은 무해한 동작으로 시험**하고, 잘 되는 것을 본 다음에 실제 동작으로 바꾸세요.
 
@@ -203,7 +203,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 |화면을 끄거나 시간이 지나면 멈춘다|**배터리 최적화 설정**에서 제한을 풀고, 삼성 절전·잠자는 앱 목록에서 빼세요. '강제 중지'를 하면 앱을 다시 열어야 합니다|
 |알림이 오지 않는다|알림 권한과 설정의 **이벤트 알림** 스위치를 확인하세요|
 |SmartThings 시험이 `읽기 401` 또는 `403`이다|설정에서 **삼성 계정 연결**로 다시 로그인한 뒤 다시 시험하세요. 계속 막히면 삼성·SmartThings 쪽 정책 때문일 수 있습니다([안전과 한계](#안전과-한계))|
-|SmartThings 스위치는 켜졌는데 자동화가 안 돈다|SmartThings 앱에서 자동화가 켜져 있고 조건이 `UWB_Pulse` **켜짐**인지 확인하세요|
+|SmartThings 스위치가 바뀌었는데 잠금 자동화가 안 돈다|SmartThings 앱에서 자동화가 켜져 있고 조건이 `UWB_Pulse` **꺼짐**인지 확인하세요|
 |빌드가 JDK 오류로 실패한다|JDK 25를 설치하세요|
 |빌드가 SDK 오류로 실패한다|`local.properties`의 `sdk.dir` 경로와 SDK Platform 37·Build Tools 36.0.0 설치 여부를 확인하세요|
 
@@ -239,7 +239,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - 갱신 주기 120/240/600 ms가 실제 콜백 간격으로 반영됨
 - 일시적인 재연결 실패가 외부 이벤트로 나가지 않음
 - Bluetooth/UWB OFF·ON 및 프로세스 종료 후 앱을 열지 않아도 실제 거리 수신 재개(각 1회)
-- SmartThings 가상 스위치: 앱이 서버 없이 직접 호출해 **이탈 시 켜짐, 복귀 시 꺼짐**(이벤트 후 0.1~0.2초에 전송, HTTP 200), 이전 빌드에서 오프라인 신호의 복구 후 전송 확인. 현재 빌드는 30초 만료 적용
+- SmartThings 가상 스위치: 앱이 서버 없이 직접 호출해 이전 빌드에서 이탈·복귀 전송(이벤트 후 0.1~0.2초, HTTP 200) 확인. 현재는 사용자 요청으로 **가까움 ON·이탈 OFF**, 이전 빌드에서 오프라인 신호의 복구 후 전송 확인. 현재 빌드는 30초 만료 적용
 
 **아직 확인하지 못함**
 
@@ -253,7 +253,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 시작은 [인계 문서](docs/HANDOFF.md) → [구조 안내](docs/ARCHITECTURE.md) → [실기기 시험 기록](docs/DEVICE_TESTS.md) 순서를 권합니다. AI 에이전트용 작업 기준은 [AGENTS.md](AGENTS.md), 원래 요구사항은 [요구사항](docs/REQUIREMENTS.ko.md), 알림·루틴·SmartThings 조사는 [자동화 연동 검토](docs/AUTOMATION_REVIEW.md), 기술 분석은 [FEASIBILITY](docs/FEASIBILITY.md)에 있습니다.
 
-빌드와 검증(단위 테스트 68개, 기기 계측 테스트 3개, Lint 오류 0 / 경고 1):
+빌드와 검증(단위 테스트 72개, 기기 계측 테스트 3개, Lint 오류 0 / 경고 1):
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug

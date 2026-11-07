@@ -231,7 +231,7 @@ class MainActivity : ComponentActivity() {
             TextButton(onClick={vm.disconnectSmartThings()}) { Text("연결 해제") }
         }
         OutlinedButton(onClick={vm.probeSmartThingsLogin()},modifier=Modifier.fillMaxWidth()) { Text("삼성 로그인 토큰으로 연결 시험 (읽기·쓰기)") }
-        Toggle("이탈 시 스위치 켜기 · 복귀 시 끄기",enabled) { vm.smartThingsEnabled(it) }
+        Toggle("가까우면 켜기 · 멀어지면 끄기",enabled) { vm.smartThingsEnabled(it) }
         Text("기기 ID만 저장하면 앱에 저장된 삼성 계정 로그인으로 SmartThings 서버에 직접 신호를 보냅니다. OAuth 항목은 비워 두어도 됩니다. 이벤트는 발생 후 30초가 지나면 폐기합니다. 시험 버튼은 실제 이탈 없이 스위치만 바꾸며, 연결된 SmartThings 자동화가 있으면 그것이 실행됩니다. 비밀과 토큰은 Keystore로 암호화해 저장하고 로그에 남기지 않습니다.",style=MaterialTheme.typography.bodySmall)
     }
     @Composable private fun WebhookSettings(vm: ProbeViewModel,enabled: Boolean,includeTag: Boolean) {

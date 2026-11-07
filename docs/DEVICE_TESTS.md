@@ -118,3 +118,9 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 남은 실측: 폰·태그의 비충전 수 시간 소비 전력, 깊은 절전, Tasker 실수신, 외부 Webhook 서버, 실제 SmartThings 401/지연/만료 및 차량 자동화, 다른 기기/AndroidX backend. 단위/계측 테스트의 가짜 전송을 실제 서버 전달 증거로 해석하지 않는다.
 
 최종 상태: 모니터링 ON·부팅 자동 재개 ON(기본), 플랫폼·240ms·재검색 최대 60초, 이탈 5m / 복귀 4.5m / 3초, 추적 채널 OFF, SmartThings ON. 재부팅 때 저장된 거리 5m/4.5m를 확인한 뒤 사용자가 그대로 유지하도록 확정했다. Bluetooth·UWB 모두 ON. 시험용 계측 APK는 제거하고 사용자 앱과 데이터는 유지했다.
+
+## 스위치 방향 수정 (2026-11-07, 16:45 설치본)
+
+최신 사용자 요청으로 가까움/복귀 ON·이탈 OFF로 변경했다. 위의 이탈 ON·복귀 OFF 관측은 이전 방향의 기록이다. 첫 실제 거리로 초기 상태를 한 번 맞추며, 임계값 밖에서 시작하면 이탈 지속 시간을 기다린다. Tasker/Webhook의 거리 이벤트는 바꾸지 않는다.
+
+단위 테스트 72개 통과(방향·초기 동기화 회귀 4개 추가), Lint 오류 0 / 기존 monochrome 경고 1. 같은 서명으로 덮어쓰기 후 16:45:14.949 실제 HIGH 거리 0.90m(activityVisible=false, interactive=false) 수신 → 16:45:15.781 `ST_SWITCH_RESULT state=on httpStatus=200` 확인. 임계 5m·복귀 4.5m·3초·모니터링 ON 유지. 이 수정 뒤 실제 이동으로 이탈 OFF를 다시 만들지는 않았으며 거리 엔진/매핑 단위 테스트로 검증했다. SmartThings 차량 잠금 루틴은 꺼짐 조건으로 사용자가 설정해야 한다.

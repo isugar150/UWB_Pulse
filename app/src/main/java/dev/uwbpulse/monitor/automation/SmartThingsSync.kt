@@ -95,7 +95,7 @@ object SmartThingsProbe {
         var read = SmartThingsHttp.get(statusUrl, bearer(account.accessToken()))
         if (read.status == 401) read = SmartThingsHttp.get(statusUrl, bearer(account.accessToken(renew = true)))
         if (read.status !in 200..299) return Result(read.status, null)
-        // Writing "off" is harmless: nothing is attached to the off state.
+        // This is an explicit write test; either state may trigger the user's configured automation.
         val write = SmartThingsHttp.post(SmartThingsSwitch.eventsUrl(deviceId), bearer(account.accessToken()), "application/json", SmartThingsSwitch.eventsBody("off"))
         return Result(read.status, write.status)
     }
@@ -152,6 +152,7 @@ object SmartThingsClient {
 class SmartThingsSwitchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val app = applicationContext as MonitorApplication
+        if (inputData.getInt(MAPPING_REVISION,0) != SwitchDeliveryPolicy.MAPPING_REVISION) return@withContext Result.success()
         // Old app versions did not timestamp work: discard those queued requests rather than sending stale automation.
         val requestId = inputData.getString(REQUEST_ID) ?: return@withContext Result.success()
         val request = app.smartThings.read().pendingSwitch?.takeIf { it.id == requestId } ?: return@withContext Result.success()
@@ -178,7 +179,7 @@ class SmartThingsSwitchWorker(context: Context, params: WorkerParameters) : Coro
             if (e is IllegalArgumentException || code == "SMARTTHINGS_NOT_CONNECTED" || code == "SMARTTHINGS_REAUTH_REQUIRED") Result.failure() else Result.retry()
         }
     }
-    companion object { const val REQUEST_ID = "requestId" }
+    companion object { const val REQUEST_ID = "requestId"; const val MAPPING_REVISION = "mappingRevision" }
 }
 
 /** The refresh token expires if unused for about a month, so it is renewed daily while the feature is on. */
@@ -212,7 +213,8 @@ object SmartThingsWork {
         if (!SwitchDeliveryPolicy.isFresh(desired,System.currentTimeMillis())) return@withLock
         app.smartThings.update { it.copy(pendingSwitch=desired) }
         val request = OneTimeWorkRequestBuilder<SmartThingsSwitchWorker>()
-            .setInputData(workDataOf(SmartThingsSwitchWorker.REQUEST_ID to desired.id))
+            .setInputData(workDataOf(SmartThingsSwitchWorker.REQUEST_ID to desired.id,
+                SmartThingsSwitchWorker.MAPPING_REVISION to SwitchDeliveryPolicy.MAPPING_REVISION))
             .setConstraints(network).setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.SECONDS).build()
         WorkManager.getInstance(context).enqueueUniqueWork(SWITCH, ExistingWorkPolicy.REPLACE, request)
         Unit

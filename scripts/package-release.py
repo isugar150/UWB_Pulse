@@ -25,6 +25,7 @@ EVIDENCE = (
     "notification-channel-after-reboot.txt", "reboot-auto-resume.txt",
     "threshold-events-device.txt",
     "review-stability-validation.txt", "instrumentation-review.txt",
+    "presence-mapping-validation.txt",
 )
 
 

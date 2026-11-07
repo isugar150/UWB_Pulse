@@ -4,8 +4,8 @@ import java.net.URLEncoder
 import java.util.Base64
 
 /**
- * Mirrors the exit state into a SmartThings virtual switch, so a SmartThings automation can use
- * "switch turned on" as its condition. Pure helpers only: no Android, no network, no secrets in logs.
+ * Mirrors presence into a SmartThings virtual switch: near/returned is on, away is off.
+ * Pure helpers only: no Android, no network, no secrets in logs.
  */
 object SmartThingsSwitch {
     const val API_HOST = "api.smartthings.com"
@@ -20,10 +20,10 @@ object SmartThingsSwitch {
 
     fun isDeviceId(value: String) = deviceIdPattern.matches(value)
 
-    /** Exit turns the switch on, return turns it off. Other events do not touch it. */
+    /** Exit turns the switch off, return turns it on. Unknown distance never changes the switch. */
     fun stateFor(type: MonitorEventType): String? = when (type) {
-        MonitorEventType.TAG_DISTANCE_EXCEEDED -> "on"
-        MonitorEventType.TAG_RETURNED -> "off"
+        MonitorEventType.TAG_DISTANCE_EXCEEDED -> "off"
+        MonitorEventType.TAG_RETURNED -> "on"
         else -> null
     }
 

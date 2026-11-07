@@ -82,7 +82,8 @@ class ProbeService : Service() {
         val rate = initial.trackingRate
         val engine = DistanceEventEngine(initial.policy,rate.maxGapMillis,initialAway=alias in initial.awayTagAliases)
         val evidence = ReceptionEvidence(rate.staleAfterMillis)
-        val settingsJob = scope.launch { app.settings.state.collect { engine.configure(it.policy) } }
+        val switchSync = SwitchPresenceSync(initial.smartThingsEnabled)
+        val settingsJob = scope.launch { app.settings.state.collect { engine.configure(it.policy); switchSync.enabled(it.smartThingsEnabled) } }
         var latest = LastObservation()
         var retries = 0
         var hasAuthenticated = false
@@ -136,6 +137,7 @@ class ProbeService : Service() {
                                 app.settings.away(alias,engine.away)
                                 app.events.publish(it,cloudId,measurement.meters,engine.policy.threshold)
                             }
+                            switchSync.sample(measurement.meters,engine.away,engine.policy,event)?.let { app.events.syncSmartThings(it) }
                             val seenAt = System.currentTimeMillis()
                             latest = LastObservation(measurement.meters,seenAt)
                             val stage = if (engine.away) "이탈 감지됨" else "실제 UWB 수신"

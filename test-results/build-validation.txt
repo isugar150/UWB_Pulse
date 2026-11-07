@@ -1,8 +1,9 @@
-2026-11-07 KST — stability review build
+2026-11-07 KST — SmartThings presence mapping correction
 JDK 25, Android SDK Platform 37, Build Tools 36.0.0
-./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 BUILD SUCCESSFUL
-Unit tests: 68 passed, 0 failures, 0 errors.
+Unit tests: 72 passed, 0 failures, 0 errors.
 Lint: 0 errors, 1 unchanged MonochromeLauncherIcon warning.
 APK v2 signature verified; root and APK licence notices synchronised.
-Android instrumentation: 3 passed on SM-F971N / Android 17. See instrumentation-review.txt.
+Device near-ON sync: actual HIGH UWB about 0.90 m, then ST_SWITCH_RESULT state=on httpStatus=200.
+Previous isolated-vault Android instrumentation results (3 passed): instrumentation-review.txt.

@@ -44,15 +44,26 @@ data class WebhookConfiguration(val url: String = "", val token: String = "") {
 }
 class EventDispatcher(private val app: MonitorApplication) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val pending = Channel<MonitorEvent>(Channel.UNLIMITED)
+    private sealed interface Dispatch {
+        data class Event(val event: MonitorEvent) : Dispatch
+        data class SwitchState(val state: String, val atEpochMillis: Long) : Dispatch
+    }
+    private val pending = Channel<Dispatch>(Channel.UNLIMITED)
     private val file = File(app.filesDir,"monitor-events.json")
     private val webhookVault = SecretVault(app,"webhook")
     private val mutable = MutableStateFlow(loadEvents())
     val events = mutable.asStateFlow()
     init {
         scope.launch {
-            for (event in pending) {
-                try { dispatch(event) }
+            for (item in pending) {
+                try {
+                    when (item) {
+                        is Dispatch.Event -> dispatch(item.event)
+                        is Dispatch.SwitchState -> if (app.settings.persisted().smartThingsEnabled) {
+                            SmartThingsWork.sendState(app,item.state,createdAtEpochMillis=item.atEpochMillis)
+                        }
+                    }
+                }
                 catch (e: CancellationException) { throw e }
                 catch (e: Exception) { app.store.record("EVENT_DISPATCH_ERROR",e.javaClass.simpleName) }
             }
@@ -67,7 +78,10 @@ class EventDispatcher(private val app: MonitorApplication) {
     fun publish(type: MonitorEventType, cloudId: String, meters: Double?, threshold: Double) {
         val alias = MonitorEvent.tagAlias(app.packageName,cloudId)
         val event = MonitorEvent(UUID.randomUUID().toString(),type,alias,meters,threshold,OffsetDateTime.now().toString())
-        check(pending.trySend(event).isSuccess) { "EVENT_QUEUE_CLOSED" }
+        check(pending.trySend(Dispatch.Event(event)).isSuccess) { "EVENT_QUEUE_CLOSED" }
+    }
+    fun syncSmartThings(state: String) {
+        check(pending.trySend(Dispatch.SwitchState(state,System.currentTimeMillis())).isSuccess) { "EVENT_QUEUE_CLOSED" }
     }
     private suspend fun dispatch(event: MonitorEvent) {
             val type = event.type

@@ -1,0 +1,13 @@
+2026-11-07 KST — near ON / away OFF
+Samsung SM-F971N, Android 17 API 37, USB connected.
+Unit tests: 72 passed; Lint 0 errors / 1 existing icon warning.
+Real first-measurement near synchronization succeeded with HTTP 200 while hidden and screen OFF.
+Actual away-OFF movement not repeated; mapping/debounce checked by unit tests.
+Settings kept: threshold 5 m / return 4.5 m / dwell 3 s / NORMAL 240 ms / rescan max 60 s / monitoring ON.
+Reviewed controlled journal excerpts:
+2026-11-07T16:45:01.286921+09:00 elapsed=1856440 MONITOR_RESTORE manual=true; backend=PLATFORM; threshold=5.0; dwell=3000
+2026-11-07T16:45:01.290295+09:00 elapsed=1856443 MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=false; batteryExempt=true
+2026-11-07T16:45:13.962638+09:00 elapsed=1869116 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:45:14.017049+09:00 elapsed=1869170 UWB_STARTED technology=0
+2026-11-07T16:45:15.781824+09:00 elapsed=1870935 ST_SWITCH_RESULT state=on; httpStatus=200; attempt=1
+2026-11-07T16:45:14.949919+09:00 elapsed=1870103 UWB_REPORT meters=0.8999999761581421; confidence=2; activityVisible=false; interactive=false; total=1; background=1; screenOff=1

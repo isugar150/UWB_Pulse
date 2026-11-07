@@ -12,6 +12,7 @@ data class SwitchRequest(val id: String, val state: String, val createdAtEpochMi
 
 object SwitchDeliveryPolicy {
     const val TTL_MILLIS = 30_000L
+    const val MAPPING_REVISION = 2 // Near=ON, away=OFF. Drop pre-update requests that used the opposite meaning.
     fun isFresh(request: SwitchRequest, now: Long): Boolean =
         request.createdAtEpochMillis > 0 && now >= request.createdAtEpochMillis && now - request.createdAtEpochMillis < TTL_MILLIS
 }

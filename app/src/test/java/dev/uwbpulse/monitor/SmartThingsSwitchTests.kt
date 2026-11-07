@@ -9,8 +9,8 @@ class SmartThingsSwitchTests {
     private val device = "123e4567-e89b-12d3-a456-426614174000"
 
     @Test fun onlyExitAndReturnMoveTheSwitch() {
-        assertEquals("on", SmartThingsSwitch.stateFor(MonitorEventType.TAG_DISTANCE_EXCEEDED))
-        assertEquals("off", SmartThingsSwitch.stateFor(MonitorEventType.TAG_RETURNED))
+        assertEquals("off", SmartThingsSwitch.stateFor(MonitorEventType.TAG_DISTANCE_EXCEEDED))
+        assertEquals("on", SmartThingsSwitch.stateFor(MonitorEventType.TAG_RETURNED))
         assertNull(SmartThingsSwitch.stateFor(MonitorEventType.TAG_DISCONNECTED))
         assertNull(SmartThingsSwitch.stateFor(MonitorEventType.UWB_MONITORING_ERROR))
     }

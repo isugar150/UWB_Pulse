@@ -34,6 +34,7 @@
 - **추적 주기(2026-11-07 사용자 요청)**: UWB 갱신 주기 빠름 120 / 기본 240 / 절전 600ms, 이탈 후 재탐색 최대 간격 10초~5분(기본 1분). **기본값은 기존 동작과 같게 유지**한다(240ms, 2→5→15→60초). 실제 콜백은 기본 240ms였다(500ms 아님; 15분 3,549콜백). 120/600ms의 콜백 간격은 기기에서 확인했지만(`test-results/tracking-rate-validation.txt`) 배터리 효과는 측정 전이므로 기본값을 바꾸지 않는다.
 - **이벤트 정책(2026-11-07 사용자 요청)**: 일시적 재연결 실패(120초 미만)는 외부 자동화로 내보내지 않는다. 범위 밖 태그는 오류가 아니라 `TAG_DISCONNECTED`로만 표현한다. 규칙은 `docs/ARCHITECTURE.md` 거리·이벤트 계약 참고. 기기 미검증.
 - **히스토리 정리**: 추적 횟수 카운터는 화면·상태에서 제거하고 진단 저널(`UWB_REPORT`)에만 남긴다. 사용자에게는 마지막 상태(이탈/범위 안, 거리, 시각)만 영속·표시한다. 이벤트 기록 100개는 Tasker 검증용으로 유지한다.
+- **스위치 방향(최신 요청)**: 가까움/복귀 ON, 이탈 OFF. 차량 잠금 조건은 스위치 꺼짐이다. 시작/연동 활성화 뒤 첫 실제 거리로도 한 번 상태를 맞춘다. 과거 이탈 ON·복귀 OFF 시험 기록은 이전 방향의 증거다. 업데이트 전 매핑으로 만든 대기 작업은 버전 검사로 폐기한다.
 - **자동화 만료(이번 검토에서 확정)**: SmartThings 이벤트는 발생 후 30초부터 폐기한다. 새 이벤트·시험 신호는 이전 대기를 교체하며, 실행 중 HTTP도 직렬화한다. 토큰 갱신 뒤와 실제 body 전송 직전에도 취소·최신 요청·만료를 확인한다. 이미 서버로 전송한 동작을 되돌리는 보장은 없다. 이전 버전의 시각 없는 대기 작업은 보내지 않는다.
 - 마지막 확인 시 휴대폰: 모니터링 ON, 자동 재개 ON, 플랫폼 backend, 사용자가 최종 유지하기로 확정한 5m / 4.5m / 3초, 기본 240ms·재검색 최대 60초, 추적 알림 채널 OFF, SmartThings ON. 시험 시작은 1.5m/1.0m였으나 재부팅 때 저장된 5m/4.5m를 확인했고 사용자가 그대로 유지하도록 답했다. 이후 사용자가 바꿀 수 있으므로 다음 작업 때 현재 상태를 다시 확인한다.
 
@@ -49,7 +50,7 @@
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-기준 결과: 단위 테스트 68개 통과, 기기 계측 테스트 3개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). 계측 테스트(`:app:connectedDebugAndroidTest`)는 별도 합성 데이터 vault의 Keystore 왕복·최신 요청 보존·만료 차단을 검사하며 사용자 vault를 읽지 않는다. 실행 전 추적을 정상 중지하고 끝나면 원래 ON/OFF로 복원한다. APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
+기준 결과: 단위 테스트 72개 통과, 기기 계측 테스트 3개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). 계측 테스트(`:app:connectedDebugAndroidTest`)는 별도 합성 데이터 vault의 Keystore 왕복·최신 요청 보존·만료 차단을 검사하며 사용자 vault를 읽지 않는다. 실행 전 추적을 정상 중지하고 끝나면 원래 ON/OFF로 복원한다. APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
 
 ## 실기기 수정·확인 절차
 
@@ -84,7 +85,7 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 |중지 직후 재시작 지연|중지 후 곧바로 시작하면 `GATT_..._147`/`OWNER_TAG_NOT_FOUND`로 첫 수신까지 21~73초. 원인 조사 필요(이전 빌드와 비교 안 함)|
 |일시적 재연결 이벤트 억제 검증|단위 테스트와 기기 시험으로 확인: 짧은 일시 실패는 이벤트 0건, 이동 시험에서 2분 25초 뒤 `TAG_DISCONNECTED` 1회·`UWB_MONITORING_ERROR` 0건·복귀 시 자동 재연결(`test-results/outage-policy-validation.txt`). 남은 확인: 한 번도 연결된 적 없는 태그가 실행 내내 범위 밖인 경우|
 |`TAG_AUTHENTICATION_FAILED` 재시도 검증|12:49:20 사용자 사용 중 한 번의 인증 실패로 서비스가 멈췄다. 이제 연속 3번까지 재시도하고 4번째에 멈춘다(프로토콜·인증 불변 조건은 그대로). 기기에서 실제로 재시도 후 복구하는지 미확인. 원인(`GATT_BUSY_RETRY` 직후 실패)은 미조사|
-|SmartThings 가상 스위치|[SMARTTHINGS_SETUP.md](SMARTTHINGS_SETUP.md). 가상 스위치 생성·‘만약’ 노출·앱 쓰기(삼성 로그인, HTTP 200)와 실제 이탈→ON·복귀→OFF(각 HTTP 200)는 확인됨. 남은 것: 스위치 ON → 차량 잠금 자동화(사용자가 만듦)와 전체 지연, 삼성 로그인 토큰 장기 유효성(401 → 갱신 → 재시도 경로), 막힐 때 OAuth 전환 시험. 오프라인에서 시험 신호(OFF)를 보낸 뒤 네트워크가 돌아오면 전송되는 것은 확인했다(오프라인 중 ON→OFF 교체 경로는 미시험). 로그인 토큰 사용은 비공식. 전송 결과는 진단 로그의 `ST_SWITCH_RESULT`(`httpStatus`)에만 남고 화면에는 나오지 않는다|
+|SmartThings 가상 스위치|[SMARTTHINGS_SETUP.md](SMARTTHINGS_SETUP.md). 가상 스위치 생성·‘만약’ 노출·앱 쓰기(삼성 로그인, HTTP 200)와 이전 빌드의 실제 이탈→ON·복귀→OFF(각 HTTP 200)는 확인됨. 현재 매핑은 가까움 ON·이탈 OFF로 변경. 남은 것: 스위치 OFF → 차량 잠금 자동화(사용자가 만듦)와 전체 지연, 삼성 로그인 토큰 장기 유효성(401 → 갱신 → 재시도 경로), 막힐 때 OAuth 전환 시험. 오프라인에서 시험 신호(OFF)를 보낸 뒤 네트워크가 돌아오면 전송되는 것은 확인했다(오프라인 중 ON→OFF 교체 경로는 미시험). 로그인 토큰 사용은 비공식. 전송 결과는 진단 로그의 `ST_SWITCH_RESULT`(`httpStatus`)에만 남고 화면에는 나오지 않는다|
 |SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md)는 조사 기록이다. 알림 기반 루틴 경로는 가상 스위치 방식으로 대체되었고 시험하지 않았다. 새 작업은 위 가상 스위치 항목에서 시작한다|
 |배터리·장기 안정성|비충전·기본 최적화·깊은 절전·수 시간 시험. 15분 충전 중 결과와 구분|
 |호환 기기 확대|AndroidX backend 및 다른 OS/펌웨어. 지원 feature와 실제 background callback을 별도 검증|
@@ -102,3 +103,7 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 - 루트 `THIRD_PARTY_NOTICES.md`와 APK의 `app/src/main/assets/licenses/THIRD_PARTY_NOTICES.md`를 일치시킨다.
 - 검증 빌드 후 `python3 scripts/package-release.py`로 APK·대응 소스 ZIP·SHA-256을 재생성한다. `artifacts/`의 APK/ZIP은 Git에 넣지 않는다. 새 clone에서는 직접 생성한다.
 - 초기 진단 파일명 `UWB-Pulse-diagnostic.apk`도 현재 APK의 호환 복사본이다. 최종 설치본은 `UWB-Pulse.apk`를 기준으로 안내한다.
+
+## 최신 스위치 방향 설치 확인
+
+2026-11-07 16:45 설치본은 가까움 ON·이탈 OFF. 시작 후 화면 OFF 실제 약 0.90m 수신으로 ON 초기 동기화 및 HTTP 200 확인. 단위 테스트 72개. 실제 이동 이탈 OFF 재시험은 미실시(순수 엔진/매핑 회귀 확인). 스위치 꺼짐이 차량 잠금 조건이며 이전 켜짐 조건 안내를 현재 정책으로 쓰지 않는다.
