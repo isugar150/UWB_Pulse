@@ -6,6 +6,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import dev.uwbpulse.monitor.domain.DistancePolicy
 import dev.uwbpulse.monitor.domain.MonitorEventType
 import dev.uwbpulse.monitor.domain.Backend
+import dev.uwbpulse.monitor.domain.LastObservation
+import dev.uwbpulse.monitor.domain.RescanPolicy
+import dev.uwbpulse.monitor.domain.TrackingRate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +25,9 @@ data class MonitorPreferences(
     val resumeAfterBoot: Boolean = true,
     val backend: Backend = Backend.PLATFORM,
     val awayTagAliases: Set<String> = emptySet(),
+    val trackingRate: TrackingRate = TrackingRate.NORMAL,
+    val rescanMaxMillis: Long = RescanPolicy.DEFAULT_MAX_MILLIS,
+    val last: LastObservation = LastObservation(),
 )
 class MonitorSettings(private val context: Context) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -35,6 +41,10 @@ class MonitorSettings(private val context: Context) {
     private val afterBoot = booleanPreferencesKey("resume_after_boot")
     private val backend = stringPreferencesKey("ranging_backend")
     private val away = stringSetPreferencesKey("away_tag_aliases")
+    private val rate = stringPreferencesKey("tracking_rate")
+    private val rescan = longPreferencesKey("rescan_max_millis")
+    private val lastMeters = doublePreferencesKey("last_meters")
+    private val lastSeen = longPreferencesKey("last_seen_epoch")
     private fun decode(values: Preferences): MonitorPreferences =
         MonitorPreferences(
             runCatching {
@@ -47,7 +57,9 @@ class MonitorSettings(private val context: Context) {
             MonitorEventType.entries.filter { values[booleanPreferencesKey("notify_${it.name}")] != false }.toSet(),
             values[tasker] ?: false, values[webhook] ?: false, values[tagId] ?: false,
             values[monitoring] ?: false,values[afterBoot] ?: true,
-            runCatching { Backend.valueOf(values[backend].orEmpty()) }.getOrDefault(if (android.os.Build.VERSION.SDK_INT >= 36) Backend.PLATFORM else Backend.JETPACK),values[away] ?: emptySet())
+            runCatching { Backend.valueOf(values[backend].orEmpty()) }.getOrDefault(if (android.os.Build.VERSION.SDK_INT >= 36) Backend.PLATFORM else Backend.JETPACK),values[away] ?: emptySet(),
+            TrackingRate.parse(values[rate]),RescanPolicy.coerce(values[rescan] ?: RescanPolicy.DEFAULT_MAX_MILLIS),
+            LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]))
     val state = context.monitorPreferences.data.map(::decode).stateIn(scope,SharingStarted.Eagerly,MonitorPreferences())
     suspend fun persisted() = decode(context.monitorPreferences.data.first())
     suspend fun setThreshold(value: Double) = context.monitorPreferences.edit {
@@ -65,5 +77,10 @@ class MonitorSettings(private val context: Context) {
     suspend fun monitoring(enabled: Boolean) = context.monitorPreferences.edit { it[monitoring] = enabled }
     suspend fun resumeAfterBoot(enabled: Boolean) = context.monitorPreferences.edit { it[afterBoot] = enabled }
     suspend fun backend(value: Backend) = context.monitorPreferences.edit { it[backend] = value.name }
+    suspend fun trackingRate(value: TrackingRate) = context.monitorPreferences.edit { it[rate] = value.name }
+    suspend fun rescanMaxMillis(value: Long) = context.monitorPreferences.edit { it[rescan] = RescanPolicy.coerce(value) }
+    suspend fun lastObservation(meters: Double, atEpochMillis: Long) = context.monitorPreferences.edit {
+        if (meters.isFinite() && meters >= 0) { it[lastMeters] = meters; it[lastSeen] = atEpochMillis }
+    }
     suspend fun away(alias: String,value: Boolean) = context.monitorPreferences.edit { it[away] = if (value) (it[away] ?: emptySet()) + alias else (it[away] ?: emptySet()) - alias }
 }

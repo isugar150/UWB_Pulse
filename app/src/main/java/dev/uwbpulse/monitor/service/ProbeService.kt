@@ -73,15 +73,18 @@ class ProbeService : Service() {
     private suspend fun monitor(cloudId: String,backend: Backend) {
         val initial = app.settings.persisted()
         val alias = MonitorEvent.tagAlias(packageName,cloudId)
-        val engine = DistanceEventEngine(initial.policy,initialAway=alias in initial.awayTagAliases)
-        val evidence = ReceptionEvidence()
+        // The ranging interval is part of the encrypted tag configuration, so it is fixed for this service run.
+        val rate = initial.trackingRate
+        val engine = DistanceEventEngine(initial.policy,rate.maxGapMillis,initialAway=alias in initial.awayTagAliases)
+        val evidence = ReceptionEvidence(rate.staleAfterMillis)
         val settingsJob = scope.launch { app.settings.state.collect { engine.configure(it.policy) } }
+        var latest = LastObservation()
         var retries = 0
         var hasAuthenticated = false
         var outageReported = false
         val reportedErrors = mutableSetOf<String>()
         store.update { ProbeState(running=true,stage="연결 준비",detail="소유자 상호 인증 및 암호화 UWB 설정") }
-        store.record("MONITOR_START","backend=$backend; interactive=${power.isInteractive}; batteryExempt=${power.isIgnoringBatteryOptimizations(packageName)}")
+        store.record("MONITOR_START","backend=$backend; rate=$rate; rescanMaxMs=${initial.rescanMaxMillis}; interactive=${power.isInteractive}; batteryExempt=${power.isIgnoringBatteryOptimizations(packageName)}")
         try {
             check(packageManager.hasSystemFeature("android.hardware.uwb")) { "NO_UWB_HARDWARE" }
             while (currentCoroutineContext().isActive) {
@@ -116,16 +119,30 @@ class ProbeService : Service() {
                         }
                         var lastLog = 0L
                         var lastNotification = 0L
-                        UwbProbe(this@ProbeService,store::record).range(backend) { transport.activate(it) }.collect { measurement ->
+                        var lastUi = 0L
+                        var lastSaved = 0L
+                        UwbProbe(this@ProbeService,store::record).range(backend,rate) { transport.activate(it) }.collect { measurement ->
                             val now = measurement.elapsedMillis
                             if (!evidence.accept(measurement.meters,now,store.activityVisible,power.isInteractive)) return@collect
                             retries = 0; outageReported = false
-                            engine.sample(measurement.meters,now)?.let { event ->
+                            val event = engine.sample(measurement.meters,now)
+                            event?.let {
                                 app.settings.away(alias,engine.away)
-                                app.events.publish(event,cloudId,measurement.meters,engine.policy.threshold)
+                                app.events.publish(it,cloudId,measurement.meters,engine.policy.threshold)
                             }
-                            store.update { it.copy(stage=if (engine.away) "이탈 감지됨" else "실제 UWB 수신",detail=if (engine.away) "복귀 거리 안으로 진입하면 다시 감지합니다." else "실시간 거리 모니터링 중",
-                                measurement=measurement,reports=evidence.count,backgroundReports=evidence.backgroundCount,screenOffReports=evidence.screenOffCount,lastReportAgeMillis=0) }
+                            val seenAt = System.currentTimeMillis()
+                            latest = LastObservation(measurement.meters,seenAt)
+                            val stage = if (engine.away) "이탈 감지됨" else "실제 UWB 수신"
+                            // With the screen off or the app hidden nobody watches the number: refresh the UI state at most once a second.
+                            if (store.activityVisible || event != null || stage != store.state.value.stage || now - lastUi >= HIDDEN_UI_MILLIS) {
+                                lastUi = now
+                                store.update { it.copy(stage=stage,detail=if (engine.away) "복귀 거리 안으로 진입하면 다시 감지합니다." else "실시간 거리 모니터링 중",
+                                    measurement=measurement,lastReportAgeMillis=0) }
+                            }
+                            if (event != null || now - lastSaved >= LAST_STATE_MILLIS) {
+                                lastSaved = now
+                                scope.launch { app.settings.lastObservation(measurement.meters,seenAt) }
+                            }
                             if (now - lastLog >= 5_000) {
                                 lastLog = now
                                 store.record("UWB_REPORT","meters=${measurement.meters}; confidence=${measurement.confidence}; activityVisible=${store.activityVisible}; interactive=${power.isInteractive}; total=${evidence.count}; background=${evidence.backgroundCount}; screenOff=${evidence.screenOffCount}")
@@ -156,7 +173,7 @@ class ProbeService : Service() {
                 val retryable = failure != null && !failure.matches(Regex("GATT_.*_STATUS_(5|8|15|137)")) &&
                     (failure.startsWith("GATT_") || failure.startsWith("UWB_") || failure.startsWith("BLE_SCAN_FAILED_") || failure == "BLUETOOTH_DISABLED" || failure == "BLE_SCANNER_UNAVAILABLE" || failure == "OWNER_TAG_NOT_FOUND" || failure == "NO_UWB_REPORTS_20S")
                 if (!retryable) break
-                val backoff = longArrayOf(2_000,5_000,15_000,60_000)[retries.coerceAtMost(3)]
+                val backoff = RescanPolicy.delayMillis(retries,app.settings.persisted().rescanMaxMillis)
                 retries = (retries + 1).coerceAtMost(4)
                 store.update { it.copy(stage="재연결 대기",detail="${backoff / 1000}초 후 내 태그 다시 검색 · 자동 복구 대기",measurement=null) }
                 updateNotification("연결 복구 대기 · ${backoff / 1000}초 후 재시도")
@@ -171,6 +188,8 @@ class ProbeService : Service() {
             store.update { it.copy(stage="모니터링 오류",detail=safe(e)) }
         } finally {
             settingsJob.cancel()
+            // Keep only the last observed state: one small write when tracking ends, not a per-callback history.
+            latest.meters?.let { meters -> withContext(NonCancellable) { runCatching { app.settings.lastObservation(meters,latest.atEpochMillis ?: System.currentTimeMillis()) } } }
             val cancelled = !currentCoroutineContext().isActive
             store.update { it.copy(running=false,measurement=null,stage=if (cancelled) "중지됨" else it.stage,
                 detail=if (cancelled) "모니터링이 중지됐습니다." else it.detail) }
@@ -199,6 +218,8 @@ class ProbeService : Service() {
         const val STOP = "dev.uwbpulse.monitor.STOP"
         const val RESUME = "dev.uwbpulse.monitor.RESUME"
         const val CHANNEL = "uwb_probe"
+        private const val HIDDEN_UI_MILLIS = 1_000L
+        private const val LAST_STATE_MILLIS = 60_000L
         fun ensureNotificationChannel(context: android.content.Context) {
             val channel = NotificationChannel(CHANNEL,"추적 중 알림",NotificationManager.IMPORTANCE_LOW)
             channel.description = "모니터링 서비스 상태 표시. 이 채널을 꺼도 추적은 유지됩니다."

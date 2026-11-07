@@ -16,8 +16,9 @@ class SmartTagSessionConfig(
     init { require(sessionId != 0); require(peerAddress.size == 2); require(preamble in 9..12) }
     val channel = 9
     val sessionKey = ByteArray(8) // Legacy static STS as observed by uTag, NOT Samsung owner credentials.
-    fun payload(localAddress: ByteArray): ByteArray {
+    fun payload(localAddress: ByteArray, rangingIntervalMillis: Int = 240): ByteArray {
         require(localAddress.size == 2)
+        require(rangingIntervalMillis in 50..2_000)
         val bytes = ByteArray(35)
         fun bits(index: Int, value: Int, length: Int) {
             repeat(length) { bit ->
@@ -39,7 +40,7 @@ class SmartTagSessionConfig(
         localAddress.copyInto(bytes, 11)
         bytes[13] = channel.toByte()
         ByteBuffer.wrap(bytes, 14, 2).putShort(2000) // Tag encoding differs from FiRa RSTU 2400.
-        ByteBuffer.wrap(bytes, 16, 2).putShort(240)
+        ByteBuffer.wrap(bytes, 16, 2).putShort(rangingIntervalMillis.toShort()) // ranging interval ms; 240 matches NORMAL
         bytes[18] = 3; bytes[19] = preamble.toByte(); bytes[20] = 1; bytes[21] = 5
         bytes[30] = 6 // slots per ranging round
         return bytes

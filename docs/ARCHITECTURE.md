@@ -23,6 +23,7 @@
 |`data/ProbeStore.kt`|현재 UI StateFlow, 화면 가시성, 최대 300줄 저널·보고서 내보내기|
 |`domain/ProbeModels.kt`|측정·상태 모델, 유효/신선한 수신 및 화면별 카운터|
 |`domain/DistanceEventEngine.kt`|Android에 의존하지 않는 이탈·복귀 상태 머신|
+|`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
 |`domain/ResumePolicy.kt`|BOOT / 업데이트 / 프로세스 재시작의 저장 ON 복원 조건|
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
@@ -38,17 +39,17 @@
 5. 로컬 UWB 세션의 설정을 태그에 암호화 전송하고 실제 콜백을 기다린다. 플랫폼 결과 technology=UWB를 확인한다.
 6. 유효한 측정은 수신 증거, UI, 순수 거리 엔진으로 전달한다. UI의 ON/OFF는 서비스의 실제 실행 상태와 저장된 사용자 의사를 구분한다.
 7. 상태 전환 시 태그별 이탈 latch를 저장하고 이벤트를 게시한다. 이벤트 dispatcher가 켜진 출력으로만 전송한다.
-8. 일시적 오류는 소유자 광고부터 다시 검색한다. 2/5/15/60초 대기 후 최대 60초 간격을 유지한다. 인증·권한 등 영구 오류는 무한 재시도로 숨기지 않는다.
+8. 일시적 오류는 소유자 광고부터 다시 검색한다. 2/5/15/60초로 늘리며 설정한 재탐색 최대 간격(기본 60초, 10초~5분)에서 멈춘다. 갱신 주기는 세션 시작 때 한 번 읽어 OOB 설정에 넣으므로 서비스 실행 중에는 바뀌지 않는다. 인증·권한 등 영구 오류는 무한 재시도로 숨기지 않는다.
 9. finally에서 태그 UWB 중지를 암호화 전송하고 로컬 세션·GATT를 해제한다. 명시적 중지는 저장 ON도 false로 만든다.
 
-서비스의 첫 측정 watchdog은 20초다. 3초 넘게 유효 측정이 없으면 거리 표시를 지우며, 20초 넘는 stale 수신은 회복 경로로 들어간다. 콜백은 화면에 계속 반영하지만 저널의 거리 요약은 약 5초 간격, FGS 알림 갱신은 약 10초 간격이다.
+서비스의 첫 측정 watchdog은 20초다. 3초(절전 600ms에서도 3초) 넘게 유효 측정이 없으면 거리 표시를 지우며, 20초 넘는 stale 수신은 회복 경로로 들어간다. 앱이 보이면 콜백마다 UI 상태를 갱신하고, 화면 OFF·비표시에서는 상태가 바뀔 때를 빼고 초당 1회만 갱신한다. 저널의 거리 요약은 약 5초 간격, FGS 알림 갱신은 약 10초 간격, 마지막 상태 저장은 1분 간격·이벤트·중지 시다. 거리 이벤트 판정은 모든 유효 콜백에 적용한다.
 
 ## 거리·이벤트 계약
 
 - 입력: 유한한 음수 아닌 실제 UWB 거리와 monotonic `elapsedMillis`.
 - `meters > threshold`가 `dwellMillis` 이상 이어질 때 `TAG_DISTANCE_EXCEEDED` 한 번 발생.
 - 이미 이탈한 상태에서는 `meters <= returnDistance`일 때 `TAG_RETURNED` 한 번 발생.
-- 측정 간격이 1.5초를 초과하면 진행 중 이탈 debounce를 새로 계산한다. 이전 시각 이하 콜백은 제외한다.
+- 측정 간격이 `TrackingRate.maxGapMillis`(기본 1.5초, 절전 600ms는 1.8초)를 초과하면 진행 중 이탈 debounce를 새로 계산한다. 이전 시각 이하 콜백은 제외한다.
 - 연결 소실은 debounce를 지우지만 이탈 latch를 유지한다. 재접속·서비스 복원으로 동일 이탈을 반복하지 않는다.
 - `TAG_DISCONNECTED`와 `UWB_MONITORING_ERROR`는 거리 이탈과 별개다. 거리를 모르면 JSON `distanceMeters`는 null이다.
 - JSON 공통 필드: `id`, `event`, `distanceMeters`, `thresholdMeters`, `timestamp`, 선택적 `tagId`(앱별 해시 별칭). 원본 클라우드 ID는 출력하지 않는다.
@@ -61,7 +62,7 @@
 |---|---|
 |`files/account.vault`|삼성 토큰·태그 정보·소유자 키·선택 ID. `uwbpulse.account.v1` Keystore 키로 암호화|
 |`files/webhook.vault`|Webhook URL/Bearer. 별도 `uwbpulse.webhook.v1` 키|
-|DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases|
+|DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases, tracking_rate, rescan_max_millis, last_meters / last_seen_epoch(마지막 상태 한 건)|
 |DataStore `probe`|초기 진단 화면의 선택 BLE 주소. 서비스의 소유 태그 식별 기준으로 사용하지 않음|
 |`files/monitor-events.json`|최근 100개 비식별 이벤트. 시각과 거리는 포함|
 |`files/probe-journal.txt`|최근 300줄 상태 저널. 키·토큰·원본 식별자를 기록하지 않음|

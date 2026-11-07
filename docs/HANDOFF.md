@@ -1,6 +1,6 @@
 # 다음 개발자를 위한 인계
 
-기준: **2026-11-07 KST / UWB Pulse 0.4.0 (versionCode 5)**.
+기준: **2026-11-07 KST / UWB Pulse 0.4.0 (versionCode 5)** + 갱신 주기·재탐색·마지막 상태 설정(버전 미변경, 콜백 간격은 기기 검증, 배터리 효과는 미측정).
 이 문서는 다음 에이전트가 대화 기록이나 `/tmp`의 조사 파일 없이 현재 소스에서 작업하기 위한 시작점이다.
 
 ## 현재 상태
@@ -15,7 +15,7 @@
 |실제 거리|Android 플랫폼 Ranging UWB 경로에서 HIGH 신뢰도 수신·사용자 이동 확인|
 |백그라운드|앱 비표시 수신 및 화면 OFF 약 15분 / 3,549 콜백 확인|
 |거리 이벤트|최종 버전에서 2.46m 이탈 / 0.46m 복귀 확인. 당시 시험 임계값 1.5m|
-|영속 설정|모니터링 ON/OFF, 태그, backend, 임계거리·복귀거리·지속시간, 자동화 설정 저장|
+|영속 설정|모니터링 ON/OFF, 태그, backend, 임계거리·복귀거리·지속시간, 자동화 설정, UWB 갱신 주기, 재탐색 최대 간격, 마지막 상태 저장|
 |부팅 복원|실제 재부팅 후 첫 잠금만 해제. 앱을 열기 전 655 콜백, 저장된 임계값 5m 복원|
 |추적 알림|시스템 채널을 숨겨도 FGS와 실제 수신 지속. 재부팅 후 숨김 유지|
 |Tasker / Webhook|전송 구현 있음. 외부 수신 환경이 없어 전체 실행은 미검증|
@@ -29,6 +29,8 @@
 - 첫 잠금 해제 후 credential-protected 계정 키를 사용할 수 있을 때 서비스가 시작한다. 앱 화면을 자동으로 띄우는 기능은 필요하지 않다.
 - 설정의 ‘추적 중 알림 표시’는 OS의 해당 채널 화면을 연다. FGS 유효 알림은 유지하고 상태표시줄/알림 서랍에서의 표시를 사용자가 제어한다. OS의 ‘실행 중인 앱’ 표시는 남을 수 있다.
 - 사용자 제공 아이콘을 그대로 적용했다. 원본 경로에 의존하지 않고 `app/src/main/res/drawable-nodpi/app_icon.png`에 들어 있다.
+- **추적 주기(2026-11-07 사용자 요청)**: UWB 갱신 주기 빠름 120 / 기본 240 / 절전 600ms, 이탈 후 재탐색 최대 간격 10초~5분(기본 1분). **기본값은 기존 동작과 같게 유지**한다(240ms, 2→5→15→60초). 실제 콜백은 기본 240ms였다(500ms 아님; 15분 3,549콜백). 120/600ms의 콜백 간격은 기기에서 확인했지만(`test-results/tracking-rate-validation.txt`) 배터리 효과는 측정 전이므로 기본값을 바꾸지 않는다.
+- **히스토리 정리**: 추적 횟수 카운터는 화면·상태에서 제거하고 진단 저널(`UWB_REPORT`)에만 남긴다. 사용자에게는 마지막 상태(이탈/범위 안, 거리, 시각)만 영속·표시한다. 이벤트 기록 100개는 Tasker 검증용으로 유지한다.
 - 마지막 확인 시 휴대폰: 모니터링 ON, 자동 재개 ON, 플랫폼 backend, 5m / 4m / 3초, 추적 알림 채널 OFF. 이후 사용자가 바꿀 수 있으므로 다음 작업 때 현재 상태를 다시 확인한다.
 
 ## 빌드 시작
@@ -43,7 +45,7 @@
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-기준 결과: 24개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
+기준 결과: 31개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
 
 ## 실기기 수정·확인 절차
 
@@ -74,6 +76,9 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 |화면 개선|`MainActivity.kt`, `ProbeViewModel.kt`. 현재 단일 Activity의 Compose 화면. 거리 처리와 무선 세션은 서비스에 유지|
 |외부 자동화 검증|Tasker 설치 기기 또는 사용자가 지정한 HTTPS 수신 서버 필요. 서버 도착 시각·중복 이벤트 처리 확인|
 |회복 경로 실측|태그 단절·재진입, Bluetooth/UWB OFF/ON, 권한 회수, 실제 프로세스 재생성·앱 업데이트 시험|
+|갱신 주기 배터리 측정|콜백 간격(120/240/600ms)은 확인됨. 비충전에서 같은 조건으로 수 시간씩 폰·태그 배터리 소모를 비교해야 절전 효과를 주장할 수 있다. 시험 후 기본 240ms로 복원|
+|중지 직후 재시작 지연|중지 후 곧바로 시작하면 `GATT_..._147`/`OWNER_TAG_NOT_FOUND`로 첫 수신까지 21~73초. 원인 조사 필요. 첫 실패가 `UWB_MONITORING_ERROR` 이벤트를 외부 자동화로 내보내므로, 차량 자동화에는 일시적 재연결 실패를 이벤트로 내보낼지 정책 결정 필요|
+|SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md) 참고. 가상 스위치 수동 REST 호출로 SmartThings 자동화가 도는지 먼저 확인|
 |배터리·장기 안정성|비충전·기본 최적화·깊은 절전·수 시간 시험. 15분 충전 중 결과와 구분|
 |호환 기기 확대|AndroidX backend 및 다른 OS/펌웨어. 지원 feature와 실제 background callback을 별도 검증|
 |다중 태그|계정에 여러 태그를 보관할 수 있으나 추적 서비스는 선택한 한 태그만 관리|
@@ -85,6 +90,7 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 ## 문서·배포 갱신
 
 - 구조 변경은 `ARCHITECTURE.md`, 사용자 기능은 `README.md`, 관측 결과는 `DEVICE_TESTS.md`, 현재 상태는 이 문서에 반영한다.
+- 자동화 연동 검토는 `AUTOMATION_REVIEW.md`에 있다.
 - 프로토콜 출처는 `FEASIBILITY.md`와 `THIRD_PARTY_NOTICES.md`에 있다. `/tmp` 참조 checkout·디컴파일 결과는 재현에 필수인 소스가 아니며 배포하지 않는다.
 - 루트 `THIRD_PARTY_NOTICES.md`와 APK의 `app/src/main/assets/licenses/THIRD_PARTY_NOTICES.md`를 일치시킨다.
 - 검증 빌드 후 `python3 scripts/package-release.py`로 APK·대응 소스 ZIP·SHA-256을 재생성한다. `artifacts/`의 APK/ZIP은 Git에 넣지 않는다. 새 clone에서는 직접 생성한다.

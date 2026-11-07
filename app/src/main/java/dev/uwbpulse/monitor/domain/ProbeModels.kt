@@ -12,13 +12,12 @@ data class ProbeState(
     val stage: String = "준비",
     val detail: String = "내 태그를 선택하고 모니터링을 시작하세요.",
     val measurement: Measurement? = null,
-    val reports: Long = 0,
-    val backgroundReports: Long = 0,
-    val screenOffReports: Long = 0,
     val lastReportAgeMillis: Long? = null,
 )
+/** Last distance the service saw and when; written sparingly so tracking does not keep waking storage. */
+data class LastObservation(val meters: Double? = null, val atEpochMillis: Long? = null)
 
-/** Pure reception evidence, never treats an old reading as a current distance. */
+/** Pure reception evidence, never treats an old reading as a current distance. Counters are journal-only developer evidence. */
 class ReceptionEvidence(private val staleAfterMillis: Long = 3_000) {
     private var previous: Long? = null
     var count = 0L; private set

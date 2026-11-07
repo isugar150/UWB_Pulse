@@ -19,6 +19,7 @@ import androidx.core.uwb.UwbDevice
 import androidx.core.uwb.UwbManager
 import dev.uwbpulse.monitor.domain.Backend
 import dev.uwbpulse.monitor.domain.Measurement
+import dev.uwbpulse.monitor.domain.TrackingRate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -27,17 +28,25 @@ import kotlinx.coroutines.flow.flow
 
 class UwbProbe(private val context: Context, private val record: (String, String) -> Unit) {
     /** configureTag requires a real authenticated, encrypted OOB implementation. */
-    fun range(backend: Backend, configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> =
+    fun range(backend: Backend, requestedRate: TrackingRate, configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> =
         if (backend == Backend.PLATFORM) {
-            if (Build.VERSION.SDK_INT >= 36) platformRange(configureTag)
+            if (Build.VERSION.SDK_INT >= 36) platformRange(requestedRate, configureTag)
             else error("PLATFORM_REQUIRES_API_36")
-        } else jetpackRange(configureTag)
+        } else jetpackRange(requestedRate, configureTag)
 
-    private fun jetpackRange(configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> = flow {
+    /** A non-default rate is used only when the device lists it; the tag interval always follows the phone's effective rate. */
+    private fun effectiveRate(requested: TrackingRate, supported: Collection<Int>): TrackingRate {
+        val effective = if (requested == TrackingRate.NORMAL || requested.platformRate in supported) requested else TrackingRate.NORMAL
+        record("UWB_RATE", "requested=$requested; effective=$effective; intervalMs=${effective.intervalMillis}; supported=${supported.sorted()}")
+        return effective
+    }
+
+    private fun jetpackRange(requestedRate: TrackingRate, configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> = flow {
         val manager = UwbManager.createInstance(context)
         check(manager.isAvailable()) { "UWB_DISABLED_OR_UNAVAILABLE" }
         val session = manager.controleeSessionScope()
         record("JETPACK_CAPABILITIES", "background=${session.rangingCapabilities.isBackgroundRangingSupported}")
+        val rate = effectiveRate(requestedRate, session.rangingCapabilities.supportedRangingUpdateRates)
         val config = SmartTagSessionConfig.create()
         val parameters = RangingParameters(
             uwbConfigType = RangingParameters.CONFIG_UNICAST_DS_TWR,
@@ -47,7 +56,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
             subSessionKeyInfo = null,
             complexChannel = androidx.core.uwb.UwbComplexChannel(config.channel, config.preamble),
             peerDevices = listOf(UwbDevice.createForAddress(config.peerAddress)),
-            updateRateType = RangingParameters.RANGING_UPDATE_RATE_AUTOMATIC,
+            updateRateType = rate.platformRate, // 1/2/3 == AUTOMATIC/INFREQUENT/FREQUENT
         )
         var activated = false
         session.prepareSession(parameters).collect { result ->
@@ -57,7 +66,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
                         activated = true
                         record("UWB_LOCAL_OPENED", "Jetpack; encrypted peer OOB required")
                         // Initialized device is the local address supplied by AndroidX.
-                        configureTag(config.payload(result.device.address.address))
+                        configureTag(config.payload(result.device.address.address, rate.intervalMillis))
                     }
                 }
                 is RangingResult.RangingResultPosition -> {
@@ -73,7 +82,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
     }
 
     @RequiresApi(36)
-    private fun platformRange(configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> = callbackFlow {
+    private fun platformRange(requestedRate: TrackingRate, configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> = callbackFlow {
         val manager = checkNotNull(context.getSystemService(RangingManager::class.java)) { "RANGING_SERVICE_ABSENT" }
         val availability = withTimeout(5_000) {
             suspendCancellableCoroutine<RangingCapabilities> { continuation ->
@@ -89,6 +98,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
         }
         record("PLATFORM_CAPABILITIES", "uwbAvailability=${availability.technologyAvailability[RangingManager.UWB]}")
         check(availability.technologyAvailability[RangingManager.UWB] == RangingCapabilities.ENABLED) { "UWB_DISABLED_OR_UNAVAILABLE" }
+        val rate = effectiveRate(requestedRate, availability.uwbCapabilities?.supportedRangingUpdateRates.orEmpty())
         val config = SmartTagSessionConfig.create()
         val local = UwbAddress.createRandomShortAddress()
         val params = UwbRangingParams.Builder(config.sessionId, UwbRangingParams.CONFIG_UNICAST_DS_TWR,
@@ -96,7 +106,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
             .setComplexChannel(UwbComplexChannel.Builder().setChannel(config.channel).setPreambleIndex(config.preamble).build())
             .setSessionKeyInfo(config.sessionKey)
             .setSlotDuration(UwbRangingParams.DURATION_2_MS)
-            .setRangingUpdateRate(RawRangingDevice.UPDATE_RATE_NORMAL).build()
+            .setRangingUpdateRate(rate.platformRate).build() // NORMAL == RawRangingDevice.UPDATE_RATE_NORMAL
         val rawDevice = RawRangingDevice.Builder().setRangingDevice(RangingDevice.Builder().build()).setUwbRangingParams(params).build()
         val raw = RawResponderRangingConfig.Builder().setRawRangingDevice(rawDevice).build()
         val preference = RangingPreference.Builder(RangingPreference.DEVICE_ROLE_RESPONDER, raw)
@@ -107,7 +117,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
             override fun onOpened() {
                 record("UWB_LOCAL_OPENED", "Platform RAW UWB-only; encrypted peer OOB required")
                 launch {
-                    try { configureTag(config.payload(local.addressBytes)) }
+                    try { configureTag(config.payload(local.addressBytes, rate.intervalMillis)) }
                     catch (e: CancellationException) { throw e }
                     catch (e: Exception) { close(e) }
                 }

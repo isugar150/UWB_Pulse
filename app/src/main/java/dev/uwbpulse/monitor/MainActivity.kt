@@ -28,9 +28,13 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.uwbpulse.monitor.automation.MonitorEvent
 import dev.uwbpulse.monitor.domain.*
 import dev.uwbpulse.monitor.service.ProbeService
 import dev.uwbpulse.monitor.ui.ProbeViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -116,7 +120,7 @@ class MainActivity : ComponentActivity() {
                         Text(state.measurement?.let { String.format(Locale.ROOT,"%.2f m",it.meters) } ?: "— m",fontSize=58.sp,fontWeight=FontWeight.SemiBold)
                         Text(state.detail,style=MaterialTheme.typography.bodyMedium)
                         state.measurement?.confidence?.let { Text("측정 신뢰도: ${when(it) { 2 -> "높음";1 -> "보통";else -> "낮음" }}",style=MaterialTheme.typography.bodySmall) }
-                        if (state.running) Text("화면 OFF 수신 ${state.screenOffReports}회 · 앱 비표시 수신 ${state.backgroundReports}회",style=MaterialTheme.typography.bodySmall)
+                        if (!state.running) lastStateText(prefs.last,selected,prefs.awayTagAliases)?.let { Text(it,style=MaterialTheme.typography.bodySmall) }
                         state.lastReportAgeMillis?.takeIf { it > 3_000 }?.let { Text("마지막 수신 ${it / 1000}초 전",color=MaterialTheme.colorScheme.error) }
                     }
                 }
@@ -151,6 +155,21 @@ class MainActivity : ComponentActivity() {
                 Slider(value=prefs.policy.returnDistance.toFloat(),onValueChange=vm::returnDistance,valueRange=0f..(prefs.policy.threshold.toFloat()-0.5f),steps=((prefs.policy.threshold-0.5)*2).toInt().minus(1).coerceAtLeast(0))
                 Text("이탈 지속 시간  ${prefs.policy.dwellMillis / 1000.0}초")
                 Slider(value=(prefs.policy.dwellMillis / 1000f),onValueChange=vm::dwell,valueRange=1f..10f,steps=17)
+                HorizontalDivider()
+                Text("추적 주기",style=MaterialTheme.typography.titleMedium)
+                Text("UWB 갱신 주기",style=MaterialTheme.typography.bodyMedium)
+                Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                    TrackingRate.entries.forEach { rate ->
+                        FilterChip(selected=prefs.trackingRate==rate,onClick={vm.trackingRate(rate)},enabled=!state.running,label={Text(rateLabel(rate))})
+                    }
+                }
+                Text("기본 240ms는 차량 접근·이탈 자동화를 위한 기존 동작입니다. 절전은 폰과 태그의 배터리를 아끼는 대신 반응이 늦어집니다. 태그 설정에 포함되므로 모니터링을 중지한 상태에서 바꾸고 다음 시작부터 적용됩니다. 120ms·600ms는 한 기기에서 콜백 간격만 확인했고 배터리 절감 효과는 아직 측정하지 않았습니다.",style=MaterialTheme.typography.bodySmall)
+                val rescanChoices = RescanPolicy.choicesMillis
+                val rescanIndex = rescanChoices.indexOfFirst { it >= prefs.rescanMaxMillis }.let { if (it < 0) rescanChoices.lastIndex else it }
+                Text("이탈 후 태그 재탐색 간격  ${durationLabel(rescanChoices[rescanIndex])}",style=MaterialTheme.typography.bodyMedium)
+                Slider(value=rescanIndex.toFloat(),onValueChange={ vm.rescanMaxMillis(rescanChoices[it.toInt().coerceIn(0,rescanChoices.lastIndex)]) },
+                    valueRange=0f..rescanChoices.lastIndex.toFloat(),steps=rescanChoices.size - 2)
+                Text("연결이 끊기면 2·5·15·60초로 간격을 늘려 가며 태그를 다시 찾습니다. 이 값은 그 최대 간격이며 기본은 1분입니다. 길수록 배터리를 아끼지만 복귀 후 다시 잡히기까지 오래 걸릴 수 있습니다. 바로 적용됩니다.",style=MaterialTheme.typography.bodySmall)
                 HorizontalDivider()
                 Text("이벤트 알림",style=MaterialTheme.typography.titleMedium)
                 MonitorEventType.entries.forEach { type -> Toggle(label(type),type in prefs.notifications) { vm.notification(type,it) } }
@@ -217,6 +236,19 @@ class MainActivity : ComponentActivity() {
             .putExtra(Settings.EXTRA_APP_PACKAGE,packageName).putExtra(Settings.EXTRA_CHANNEL_ID,ProbeService.CHANNEL)
         else Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,packageName)
         startActivity(intent)
+    }
+    private fun rateLabel(rate: TrackingRate) = when(rate) {
+        TrackingRate.FAST -> "빠름 ${rate.intervalMillis}ms"
+        TrackingRate.NORMAL -> "기본 ${rate.intervalMillis}ms"
+        TrackingRate.SAVER -> "절전 ${rate.intervalMillis}ms"
+    }
+    private fun durationLabel(millis: Long) = if (millis >= 60_000) "${millis / 60_000}분" else "${millis / 1000}초"
+    private fun lastStateText(last: LastObservation,tag: String?,awayAliases: Set<String>): String? {
+        val meters = last.meters ?: return null
+        val at = last.atEpochMillis ?: return null
+        val away = tag?.let { MonitorEvent.tagAlias(packageName,it) in awayAliases } == true
+        val time = Instant.ofEpochMilli(at).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("M/d HH:mm:ss"))
+        return String.format(Locale.ROOT,"마지막 상태 · %s · %.2f m · %s",if (away) "이탈" else "범위 안",meters,time)
     }
     private fun label(type: MonitorEventType) = when(type) {
         MonitorEventType.TAG_DISTANCE_EXCEEDED -> "임계거리 이탈"

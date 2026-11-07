@@ -1,0 +1,70 @@
+UWB Pulse tracking-rate validation (single device, single tag, USB-connected)
+Date: 2026-11-07 (Asia/Seoul). Device: Samsung SM-F971N, Android 17 / API 37. Backend: PLATFORM. Tag within about 1.2 m, stationary.
+Source: on-device probe-journal.txt, reviewed; contains no keys, tokens, addresses or event IDs. Window length > 5 s because the journal logs a summary line every >= 5 s.
+Scope: callback interval only. Battery use of the phone or the tag was NOT measured. Not a long-duration or unplugged test.
+
+## Baseline: previous 0.4.0 build, fixed 240 ms
+09:59:26 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:31 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:36 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:41 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:46 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:51 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+09:59:56 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+overall: 147 callbacks / 35.3s = 4.17/s = 240 ms/callback
+
+## New build, rate=SAVER (600 ms)
+MONITOR_START backend=PLATFORM; rate=SAVER; rescanMaxMs=60000; interactive=true; batteryExempt=true
+MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147
+TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+UWB_RATE requested=SAVER; effective=SAVER; intervalMs=600; supported=[1, 2, 3]
+UWB_STARTED technology=0
+OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+10:01:39 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:01:45 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:01:50 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:01:55 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:01 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:06 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:12 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:17 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:22 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:28 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:33 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:39 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:44 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+10:02:49 window=5.40s callbacks=9 -> 600 ms/callback, confidence=2
+overall: 126 callbacks / 75.6s = 1.67/s = 600 ms/callback
+
+## New build, rate=FAST (120 ms)
+MONITOR_START backend=PLATFORM; rate=FAST; rescanMaxMs=60000; interactive=true; batteryExempt=true
+MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147
+TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+UWB_RATE requested=FAST; effective=FAST; intervalMs=120; supported=[1, 2, 3]
+UWB_STARTED technology=0
+OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+10:04:15 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:20 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:25 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:30 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:35 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:40 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+10:04:46 window=5.04s callbacks=42 -> 120 ms/callback, confidence=2
+overall: 294 callbacks / 35.3s = 8.33/s = 120 ms/callback
+
+## New build, rate=NORMAL (240 ms, default restored)
+MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
+MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147
+TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+UWB_STARTED technology=0
+OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+10:06:58 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+10:07:03 window=5.04s callbacks=21 -> 240 ms/callback, confidence=2
+overall: 42 callbacks / 10.1s = 4.17/s = 240 ms/callback
+
+Notes:
+- Each start right after a stop first logged GATT_CONNECTION_STATUS_147 and/or OWNER_TAG_NOT_FOUND, then recovered through the retry ladder. Start to first report took 21 s (SAVER), 42 s (FAST) and 73 s (NORMAL). These failures occur before authentication and before the rate is applied; the cause was not investigated and not compared with the previous build.
+- Each of those first failures also published a UWB_MONITORING_ERROR event (once per failure type per service run).

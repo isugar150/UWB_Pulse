@@ -8,6 +8,7 @@ import dev.uwbpulse.monitor.MonitorApplication
 import dev.uwbpulse.monitor.data.BleDiscovery
 import dev.uwbpulse.monitor.domain.Backend
 import dev.uwbpulse.monitor.domain.TagCandidate
+import dev.uwbpulse.monitor.domain.TrackingRate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -65,6 +66,8 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     fun threshold(value: Float) = viewModelScope.launch { settings.setThreshold(value.toDouble()) }
     fun returnDistance(value: Float) = viewModelScope.launch { settings.setReturnDistance(kotlin.math.round(value * 2.0) / 2.0) }
     fun dwell(value: Float) = viewModelScope.launch { settings.setDwell((kotlin.math.round(value * 2) * 500).toLong()) }
+    fun trackingRate(value: TrackingRate) = viewModelScope.launch { settings.trackingRate(value) }
+    fun rescanMaxMillis(value: Long) = viewModelScope.launch { settings.rescanMaxMillis(value) }
     fun notification(type: dev.uwbpulse.monitor.domain.MonitorEventType, enabled: Boolean) = viewModelScope.launch { settings.notify(type,enabled) }
     fun tasker(enabled: Boolean) = viewModelScope.launch { settings.tasker(enabled) }
     fun webhook(enabled: Boolean) = viewModelScope.launch { settings.webhook(enabled) }

@@ -47,11 +47,10 @@ class ProbeStore(private val context: Context) {
     fun export(): File {
         val folder = File(context.cacheDir, "reports").apply { mkdirs() }
         return File(folder, "smarttag-probe.txt").apply {
-            val snapshot = state.value
             writeText("SmartTag UWB PoC — device evidence, not certification\n" +
                 "Current build: owner mutual authentication and encrypted UWB OOB.\n" +
                 "Phase 1/2 require actual device evidence. Historical logs can precede the latest APP_START.\n" +
-                "reports=${snapshot.reports}; background=${snapshot.backgroundReports}; screenOff=${snapshot.screenOffReports}\n\n" +
+                "Reception counters are in the UWB_REPORT journal lines.\n\n" +
                 synchronized(lines) { lines.joinToString("\n") })
         }
     }

@@ -33,6 +33,8 @@
 |09:29:57.508|저장 설정 복원|MONITOR_RESTORE manual=false, backend=PLATFORM, threshold=5.0, dwell=3000|
 |09:30:02~09:32:~|재부팅 후 실제 수신|자동 소유자 인증·암호화 OOB 성공. 앱 비표시 상태에서 실제 UWB 수신 지속, 앱을 다시 열기 전 background 콜백 655회|
 |09:32:~|화면 재확인|자동 재개 증거 확보 후 앱을 열어 실제 약 0.22m, 임계값 5m / 복귀 4m 확인. 알림 채널 OFF도 재부팅 후 유지|
+|10:00~10:07 (갱신 주기 추가 빌드)|UWB 갱신 주기 120/240/600ms|앱 UI로 정상 중지(암호화 stop ACK) 후 `adb install -r`, 설정에서 절전→빠름→기본 순으로 바꿔 각각 시작. `UWB_RATE requested=effective`, 태그가 interval을 받아들여 실제 콜백 수신. 콜백 간격 **600ms(1.67/s) / 120ms(8.33/s) / 240ms(4.17/s)**, 모두 신뢰도 HIGH, 수신 중 오류 없음. 기본값은 이전 0.4.0 빌드와 같은 21콜백/5초. 끝나고 기본 240ms·모니터링 ON으로 복원. [상세](../test-results/tracking-rate-validation.txt)|
+|10:03|마지막 상태 저장·표시|중지 후 메인 카드에 `마지막 상태 · 범위 안 · 1.17 m · 시각` 표시 확인|
 
 현재 휴대폰은 모니터링 ON, 자동 재개 ON, 임계거리 5m, 복귀 4m, 지속 3초이며 추적 알림 채널은 숨김 상태다. 이탈·복귀 알림 채널은 별도 설정이다.
 
@@ -48,7 +50,7 @@ Android의 Foreground Service에는 유효한 알림이 필요하다. 앱의 ‘
 JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-- BUILD SUCCESSFUL, 단위 테스트 **24개 통과**, 실패·오류 0.
+- BUILD SUCCESSFUL, 단위 테스트 **31개 통과**, 실패·오류 0. (2026-11-07 갱신 주기·재탐색 설정 추가분 7개 포함.) 위 10:00~10:07 시험은 이 변경 빌드로 수행했다. 설치본과 현재 소스의 차이는 설정 화면 안내 문구 한 줄뿐이다.
 - 암호화 고정 벡터, 유효 거리/신선도, 디바운스·히스테리시스·중복 방지, 10m 상한, Webhook 정책, 자동 재개 정책을 검사했다.
 - Lint 오류 0, 경고 1: 사용자 원본 아이콘에 별도 monochrome layer가 없다. 컬러 원본은 그대로 유지했다.
 - APK debug 서명 검증 결과와 SHA-256은 `test-results/apk-signature.txt`, `artifacts/SHA256SUMS.txt`에 보관한다.
@@ -73,7 +75,11 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 |---|---|
 |Tasker 수신·프로필 실행|공식 SDK 플러그인 구현, 시험 휴대폰에 Tasker 미설치로 외부 수신 미검증|
 |HTTPS Webhook 서버 도착|암호화 자격 증명·영속 큐·재시도 구현, 수신 URL 미제공으로 외부 전달 미검증|
-|삼성 Modes and Routines 직접 거리 조건|공식 등록 SDK 미확보. 앱 자체의 직접 루틴 제어를 주장하지 않음|
+|삼성 Modes and Routines 직접 거리 조건|공식 등록 SDK 미확보. 앱 자체의 직접 루틴 제어를 주장하지 않음. 조사 결과는 [AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md)|
+|SmartThings 자동화 트리거|문서 조사만 수행, 계정 실험 없음|
+|UWB 갱신 주기 빠름 120ms / 절전 600ms의 배터리 효과|콜백 간격은 확인했다(위). **폰·태그의 배터리 소모 변화는 측정하지 않았다.** 비충전·장시간·다른 기기/태그는 미검증|
+|이탈 후 재탐색 간격 10초~5분|계산 규칙을 단위 테스트함. 기본 1분 경로에서 재시도 사다리 동작만 관측. 다른 값으로의 실제 끊김·복귀 시험은 미실시|
+|중지 직후 재시작의 지연과 오류 이벤트|중지 직후 시작하면 `GATT_CONNECTION_STATUS_147` 또는 `OWNER_TAG_NOT_FOUND` 후 복구되어 첫 수신까지 21~73초 걸렸다. 원인 미조사, 이전 빌드와 비교하지 않음. 첫 실패마다 `UWB_MONITORING_ERROR` 이벤트가 발행됨|
 |AndroidX UWB backend|비교 구현 존재, 이번 실측은 플랫폼 backend|
 |비충전·깊은 절전·30분 이상·배터리 소모|추가 측정 필요|
 |권한 회수·Bluetooth/UWB OFF·장거리 단절 후 재접속|회복 경로 구현, 실제 최종 기기 반복 검증 미실시|
