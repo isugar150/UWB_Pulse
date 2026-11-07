@@ -25,3 +25,21 @@ Scope: only the short transient case (A) was exercised. NOT yet verified: TAG_DI
 + 28.4s OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
 + 28.9s first UWB_REPORT
 => failure journaled as OUTAGE_NOT_PUBLISHED; external events published: 0; recovered without any event.
+
+## Build with code of commit 61a5bc9 (review fixes), installed 13:53, phone in use, tag at about 0.3-0.8 m
+- Update install while a session was running: after the package replace the app resumed with MONITOR_RESTORE manual=false (saved ON state kept).
+- Journal after the update: 326-328 lines (300 kept at start + appended), every line has a timestamp and elapsed, elapsed is non-decreasing, file ends with a newline.
+- Run started 13:53:59: one transient OWNER_TAG_NOT_FOUND at +15 s -> OUTAGE_NOT_PUBLISHED, authenticated and UWB started at +25 s; published UWB_MONITORING_ERROR/TAG_DISCONNECTED events: 0.
+- Callback interval at NORMAL: 240 ms over 7 windows (min/avg/max 240/240/240).
+- Owner advertisement matching still works with the per-address cache: ownerSignatureMatched=true on every run.
+- Stop at 13:55:28 (encrypted stop acknowledged), main card showed the last state: range in, 0.80 m, time of the last report.
+- Restart right after the stop: first report 13.9 s after MONITOR_START, no failures, events published: 0.
+- Settings: the reception-counter line is gone from the main card; the rescan slider changed 1 min -> 2 min and was restored to 1 min.
+- NOT verified: TAG_AUTHENTICATION_FAILED retry path, logout / tag-change clearing of the last state, journal compaction at 600 lines, any test that needs the tag to be moved.
+
+## Same build, screen off (KEYCODE_SLEEP 13:58:12, woken after 13:59:27), app not visible, tag stationary at about 0.8 m
+- 16 journal windows with interactive=false, no errors, no OUTAGE_NOT_PUBLISHED, no published events.
+- Reception stayed up: 306 callbacks in 75.6 s = 4.05/s against 4.17/s nominal at 240 ms (97%). screenOff counter rose from 8 to 314; confidence HIGH in every window.
+- Windows with fewer than 21 callbacks per 5 s: 13:58:32 (20), 13:58:37 (20), 13:58:42 (19), 13:58:47 (16) - a few dropped ranging rounds shortly after the screen turned off, no stall.
+- This confirms every callback is still processed with the 1 s hidden UI refresh. The UI state itself is not visible in the journal.
+
