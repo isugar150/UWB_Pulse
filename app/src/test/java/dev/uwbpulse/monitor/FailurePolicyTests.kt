@@ -75,8 +75,31 @@ class FailurePolicyTests {
         listOf("OWNER_TAG_NOT_FOUND", "GATT_CONNECTION_STATUS_147", "GATT_DISCONNECTED_19", "UWB_REPORTS_STALE_20S",
             "UWB_DISABLED_OR_UNAVAILABLE", "BLE_SCAN_FAILED_2", "BLUETOOTH_DISABLED", "BLE_SCANNER_UNAVAILABLE", "NO_UWB_REPORTS_20S")
             .forEach { assertTrue(it, FailurePolicy.isRetryable(it)) }
-        listOf("GATT_CONNECTION_STATUS_5", "GATT_CONNECTION_STATUS_8", "GATT_CONNECTION_STATUS_15", "GATT_CONNECTION_STATUS_137",
+        listOf("GATT_CONNECTION_STATUS_5", "GATT_CONNECTION_STATUS_15", "GATT_CONNECTION_STATUS_137",
             "SAMSUNG_LOGIN_REQUIRED", "NO_UWB_HARDWARE", "SecurityException")
+            .forEach { assertFalse(it, FailurePolicy.isRetryable(it)) }
+    }
+    @Test fun onlyAnActivationRefusalCountsAsTheTagNotStartingUwb() {
+        listOf("GATT_WRITE_STATUS_133", "GATT_WRITE_STATUS_5", "GATT_BUSY_RETRIES_EXHAUSTED", "UWB_STOPPED_0", "UWB_OPEN_FAILED_1", "UWB_CLOSED_2")
+            .forEach { assertTrue(it, FailurePolicy.isUwbRefused(it)) }
+        // No reports can simply mean a closed door or a blocked tag; a lost link is not a refusal either.
+        listOf("NO_UWB_REPORTS_20S", "UWB_REPORTS_STALE_20S", "OWNER_TAG_NOT_FOUND", "GATT_CONNECTION_STATUS_147", "GATT_DISCONNECTED_8", "TAG_NONCE_TIMEOUT")
+            .forEach { assertFalse(it, FailurePolicy.isUwbRefused(it)) }
+    }
+    @Test fun aRefusingTagIsRetriedRarely() {
+        assertEquals(60_000L, FailurePolicy.backoffAfterRefusals(60_000, 1))
+        assertEquals(FailurePolicy.UWB_REFUSED_BACKOFF_MILLIS, FailurePolicy.backoffAfterRefusals(60_000, FailurePolicy.UWB_REFUSALS_BEFORE_NOTICE))
+        assertEquals(600_000L, FailurePolicy.backoffAfterRefusals(600_000, 5)) // never shorter than the user's own limit
+    }
+    @Test fun supervisionTimeoutIsLinkLossButAnAttStatusEightStaysPermanent() {
+        // Connection-state status 8 is the link supervision timeout (tag went out of reach mid-operation, e.g. a closing car door).
+        assertTrue(FailurePolicy.isRetryable("GATT_CONNECTION_STATUS_8"))
+        assertTrue(FailurePolicy.isLinkLoss("GATT_CONNECTION_STATUS_8"))
+        val gate = OutageGate()
+        assertEquals(none, gate.failed("GATT_CONNECTION_STATUS_8", hadSession = true, now = 0))
+        assertEquals(Decision(disconnected = true, error = false), gate.failed("GATT_CONNECTION_STATUS_8", hadSession = true, now = grace))
+        // The same number from an ATT operation is "insufficient authorization": still permanent.
+        listOf("GATT_WRITE_STATUS_8", "GATT_DESCRIPTOR_STATUS_8", "GATT_MTU_STATUS_8", "GATT_DISCOVERY_STATUS_8")
             .forEach { assertFalse(it, FailurePolicy.isRetryable(it)) }
     }
 }

@@ -13,6 +13,7 @@ import dev.uwbpulse.monitor.MainActivity
 import dev.uwbpulse.monitor.MonitorApplication
 import dev.uwbpulse.monitor.data.auth.SecretVault
 import dev.uwbpulse.monitor.domain.MonitorEventType
+import dev.uwbpulse.monitor.domain.SwitchPulse
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,6 +81,8 @@ class EventDispatcher(private val app: MonitorApplication) {
         val event = MonitorEvent(UUID.randomUUID().toString(),type,alias,meters,threshold,OffsetDateTime.now().toString())
         check(pending.trySend(Dispatch.Event(event)).isSuccess) { "EVENT_QUEUE_CLOSED" }
     }
+    /** The user walked away without a distance event (lost tag): the switch goes off, as a pulse when that setting is on. */
+    fun departed() = syncSmartThings(SwitchPulse.departureState(app.settings.state.value.pulseOnDeparture))
     fun syncSmartThings(state: String) {
         check(pending.trySend(Dispatch.SwitchState(state,System.currentTimeMillis())).isSuccess) { "EVENT_QUEUE_CLOSED" }
     }
@@ -102,7 +105,8 @@ class EventDispatcher(private val app: MonitorApplication) {
                 WorkManager.getInstance(app).enqueueUniqueWork("uwbpulse-event-${event.id}",ExistingWorkPolicy.KEEP,request)
             }
             if (preferences.smartThingsEnabled) dev.uwbpulse.monitor.domain.SmartThingsSwitch.stateFor(type)?.let {
-                SmartThingsWork.sendState(app,it,createdAtEpochMillis=OffsetDateTime.parse(event.timestamp).toInstant().toEpochMilli())
+                val state = if (it == "off") SwitchPulse.departureState(preferences.pulseOnDeparture) else it
+                SmartThingsWork.sendState(app,state,createdAtEpochMillis=OffsetDateTime.parse(event.timestamp).toInstant().toEpochMilli())
             }
     }
     private fun notifyEvent(event: MonitorEvent) {

@@ -3,7 +3,8 @@ package dev.uwbpulse.monitor.domain
 /**
  * UWB ranging round interval. The intervals are the Android Ranging unicast values
  * (FREQUENT 120 ms, NORMAL 240 ms, INFREQUENT 600 ms) and are also written into the tag's OOB configuration.
- * NORMAL is the behaviour before this setting existed and stays the default.
+ * SAVER is the default: the tag's UWB radio is its main battery cost, and a car-lock decision does not need 4 rounds a
+ * second. NORMAL is the behaviour before this setting existed and stays selectable.
  */
 enum class TrackingRate(val intervalMillis: Int, val platformRate: Int) {
     FAST(120, 3),
@@ -17,7 +18,8 @@ enum class TrackingRate(val intervalMillis: Int, val platformRate: Int) {
     val staleAfterMillis: Long get() = maxOf(3_000L, intervalMillis * 5L)
 
     companion object {
-        fun parse(name: String?): TrackingRate = entries.firstOrNull { it.name == name } ?: NORMAL
+        val DEFAULT = SAVER
+        fun parse(name: String?): TrackingRate = entries.firstOrNull { it.name == name } ?: DEFAULT
     }
 }
 

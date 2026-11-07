@@ -25,11 +25,21 @@ data class MonitorPreferences(
     val resumeAfterBoot: Boolean = true,
     val backend: Backend = Backend.PLATFORM,
     val awayTagAliases: Set<String> = emptySet(),
-    val trackingRate: TrackingRate = TrackingRate.NORMAL,
+    val trackingRate: TrackingRate = TrackingRate.DEFAULT,
     val rescanMaxMillis: Long = RescanPolicy.DEFAULT_MAX_MILLIS,
     val last: LastObservation = LastObservation(),
     val smartThingsEnabled: Boolean = false,
-)
+    val offOnLinkLoss: Boolean = true,
+    val pulseOnDeparture: Boolean = true,
+    val carMode: Boolean = false,
+    val carAddress: String = "",
+    val carName: String = "",
+    val carPhase: String = "",
+    val carPhaseAt: Long = 0,
+) {
+    /** Car-Bluetooth tracking needs both the switch and a chosen device; otherwise the service tracks continuously as before. */
+    val carDevice: BondedDevice? get() = if (carMode && android.bluetooth.BluetoothAdapter.checkBluetoothAddress(carAddress)) BondedDevice(carName,carAddress) else null
+}
 class MonitorSettings(private val context: Context) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val threshold = doublePreferencesKey("threshold")
@@ -47,6 +57,13 @@ class MonitorSettings(private val context: Context) {
     private val lastMeters = doublePreferencesKey("last_meters")
     private val lastSeen = longPreferencesKey("last_seen_epoch")
     private val smartThings = booleanPreferencesKey("smartthings_switch")
+    private val offOnLinkLoss = booleanPreferencesKey("smartthings_off_on_link_loss")
+    private val pulse = booleanPreferencesKey("smartthings_pulse_on_departure")
+    private val carMode = booleanPreferencesKey("car_mode")
+    private val carAddress = stringPreferencesKey("car_address")
+    private val carName = stringPreferencesKey("car_name")
+    private val carPhase = stringPreferencesKey("car_phase")
+    private val carPhaseAt = longPreferencesKey("car_phase_at")
     private fun decode(values: Preferences): MonitorPreferences =
         MonitorPreferences(
             runCatching {
@@ -61,7 +78,9 @@ class MonitorSettings(private val context: Context) {
             values[monitoring] ?: false,values[afterBoot] ?: true,
             runCatching { Backend.valueOf(values[backend].orEmpty()) }.getOrDefault(if (android.os.Build.VERSION.SDK_INT >= 36) Backend.PLATFORM else Backend.JETPACK),values[away] ?: emptySet(),
             TrackingRate.parse(values[rate]),RescanPolicy.coerce(values[rescan] ?: RescanPolicy.DEFAULT_MAX_MILLIS),
-            LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]),values[smartThings] ?: false)
+            LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]),values[smartThings] ?: false,values[offOnLinkLoss] ?: true,values[pulse] ?: true,
+            values[carMode] ?: false,values[carAddress].orEmpty(),values[carName].orEmpty(),
+            values[carPhase].orEmpty(),values[carPhaseAt] ?: 0)
     val state = context.monitorPreferences.data.map(::decode).stateIn(scope,SharingStarted.Eagerly,MonitorPreferences())
     suspend fun persisted() = decode(context.monitorPreferences.data.first())
     suspend fun setThreshold(value: Double) = context.monitorPreferences.edit {
@@ -80,6 +99,14 @@ class MonitorSettings(private val context: Context) {
     suspend fun resumeAfterBoot(enabled: Boolean) = context.monitorPreferences.edit { it[afterBoot] = enabled }
     suspend fun backend(value: Backend) = context.monitorPreferences.edit { it[backend] = value.name }
     suspend fun smartThings(enabled: Boolean) = context.monitorPreferences.edit { it[smartThings] = enabled }
+    suspend fun offOnLinkLoss(enabled: Boolean) = context.monitorPreferences.edit { it[offOnLinkLoss] = enabled }
+    suspend fun pulseOnDeparture(enabled: Boolean) = context.monitorPreferences.edit { it[pulse] = enabled }
+    /** The saved phase belongs to one car and one mode: changing either forgets it. */
+    suspend fun carMode(enabled: Boolean) = context.monitorPreferences.edit { it[carMode] = enabled; it.remove(carPhase); it.remove(carPhaseAt) }
+    suspend fun car(device: BondedDevice) = context.monitorPreferences.edit { it[carAddress] = device.address; it[carName] = device.name; it.remove(carPhase); it.remove(carPhaseAt) }
+    suspend fun carPhase(name: String, atEpochMillis: Long) = context.monitorPreferences.edit {
+        if (name.isBlank()) { it.remove(carPhase); it.remove(carPhaseAt) } else { it[carPhase] = name; it[carPhaseAt] = atEpochMillis }
+    }
     suspend fun trackingRate(value: TrackingRate) = context.monitorPreferences.edit { it[rate] = value.name }
     suspend fun rescanMaxMillis(value: Long) = context.monitorPreferences.edit { it[rescan] = RescanPolicy.coerce(value) }
     suspend fun lastObservation(meters: Double, atEpochMillis: Long) = context.monitorPreferences.edit {

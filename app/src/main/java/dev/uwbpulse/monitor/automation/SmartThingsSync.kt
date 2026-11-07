@@ -8,6 +8,7 @@ import dev.uwbpulse.monitor.domain.SmartThingsSwitch
 import dev.uwbpulse.monitor.domain.SwitchRequest
 import dev.uwbpulse.monitor.domain.SwitchDeliveryPolicy
 import dev.uwbpulse.monitor.domain.LatestSwitchDelivery
+import dev.uwbpulse.monitor.domain.SwitchPulse
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -164,12 +165,14 @@ class SmartThingsSwitchWorker(context: Context, params: WorkerParameters) : Coro
         }
         if (runAttemptCount >= 5) { app.store.record("ST_SWITCH_FAILED", "retry limit reached; state=$state"); return@withContext Result.failure() }
         try {
-            val status = SmartThingsWork.delivery.deliver(request, current = {
+            suspend fun deliver(step: String) = SmartThingsWork.delivery.deliver(request, current = {
                 val config = app.smartThings.read()
                 config.pendingSwitch?.takeIf { config.deviceId == it.targetDeviceId }
             }, now = System::currentTimeMillis) { guard ->
-                SmartThingsClient.sendState(app.smartThings, app.account, state, guard)
-            } ?: run { app.store.record("ST_SWITCH_DROPPED","expired or superseded; state=$state"); return@withContext Result.success() }
+                SmartThingsClient.sendState(app.smartThings, app.account, step, guard)
+            }
+            val status = (if (state == SwitchPulse.STATE) SwitchPulse.run(::deliver) else deliver(state))
+                ?: run { app.store.record("ST_SWITCH_DROPPED","expired or superseded; state=$state"); return@withContext Result.success() }
             app.store.record("ST_SWITCH_RESULT", "state=$state; httpStatus=$status; attempt=${runAttemptCount + 1}")
             when { status in 200..299 -> Result.success(); status == 429 || status in 500..599 -> Result.retry(); else -> Result.failure() }
         } catch (e: CancellationException) { throw e }
@@ -208,7 +211,7 @@ object SmartThingsWork {
     suspend fun sendState(context: Context, state: String, test: Boolean = false, createdAtEpochMillis: Long = System.currentTimeMillis()) = withContext(Dispatchers.IO) { enqueue.withLock {
         val app = context.applicationContext as MonitorApplication
         val desired = SwitchRequest(UUID.randomUUID().toString(),state,createdAtEpochMillis,app.smartThings.read().deviceId,test)
-        require(state == "on" || state == "off")
+        require(state == "on" || state == "off" || state == SwitchPulse.STATE)
         require(SmartThingsSwitch.isDeviceId(desired.targetDeviceId)) { "SMARTTHINGS_DEVICE_ID_INVALID" }
         if (!SwitchDeliveryPolicy.isFresh(desired,System.currentTimeMillis())) return@withLock
         app.smartThings.update { it.copy(pendingSwitch=desired) }

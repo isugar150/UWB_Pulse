@@ -109,6 +109,14 @@ class GattTransport(private val context: Context, private val record: (String, S
         encryptedWrite(PARAMETERS,payload)
         record("OOB_ENCRYPTED_ACKNOWLEDGED","UWB activation and session parameters accepted by ATT; awaiting actual ranging reports")
     }
+    /**
+     * Once real ranging runs the BLE link only has to stay alive. Wider connection intervals mean fewer radio wake-ups on the tag;
+     * authentication and the STOP write stay well inside their timeouts. Requested after the first real distance, not before.
+     */
+    fun lowPower() {
+        val accepted = runCatching { gatt?.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }.getOrNull() == true
+        record("GATT_LOW_POWER","connection priority requested; accepted=$accepted")
+    }
     suspend fun deactivate() {
         if (!activated || disconnected.isCompleted) return
         commands.withLock {

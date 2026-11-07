@@ -35,6 +35,8 @@
             </intent-filter>
         </activity>
         <service android:name=".service.ProbeService" android:exported="false" android:foregroundServiceType="connectedDevice" />
+        <!-- adb-only developer commands: the DUMP permission is held by the shell, not by other apps. -->
+        <receiver android:name=".debug.DebugCommandReceiver" android:exported="true" android:permission="android.permission.DUMP" />
         <receiver android:name=".service.BootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

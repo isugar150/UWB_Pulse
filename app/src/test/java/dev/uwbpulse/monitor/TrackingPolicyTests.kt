@@ -6,9 +6,15 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TrackingPolicyTests {
-    @Test fun defaultRateKeepsThePreviousBehaviour() {
-        assertEquals(TrackingRate.NORMAL, TrackingRate.parse(null))
-        assertEquals(TrackingRate.NORMAL, TrackingRate.parse("unknown"))
+    @Test fun unsetRateIsTheSaverAndAStoredChoiceIsKept() {
+        assertEquals(TrackingRate.SAVER, TrackingRate.DEFAULT)
+        assertEquals(TrackingRate.SAVER, TrackingRate.parse(null))
+        assertEquals(TrackingRate.SAVER, TrackingRate.parse("unknown"))
+        assertEquals(TrackingRate.NORMAL, TrackingRate.parse("NORMAL")) // an earlier explicit choice is not overridden
+        assertEquals(TrackingRate.FAST, TrackingRate.parse("FAST"))
+        assertEquals(600, TrackingRate.DEFAULT.intervalMillis)
+    }
+    @Test fun normalRateKeepsThePreviousBehaviour() {
         assertEquals(240, TrackingRate.NORMAL.intervalMillis)
         assertEquals(1_500L, TrackingRate.NORMAL.maxGapMillis)
         assertEquals(3_000L, TrackingRate.NORMAL.staleAfterMillis)

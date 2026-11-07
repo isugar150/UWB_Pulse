@@ -29,6 +29,18 @@ class SamsungAccountRepository(context: Context) {
     val selectedId = MutableStateFlow(saved.optString("selectedTag").ifBlank { null })
     val status = MutableStateFlow(if (saved.has("accessToken")) "삼성 계정 연결됨" else "삼성 계정 로그인 필요")
     val busy = MutableStateFlow(false)
+    /** Journal sink for field names only (never values). Set by the application. */
+    @Volatile var diagnostic: ((String, String) -> Unit)? = null
+    /** Which fields the cloud tag record carries, to learn whether a battery level is readable. Names only: no value leaves this function. */
+    private fun fieldNames(device: JSONObject): String {
+        val keys = device.keys().asSequence().toList().sorted()
+        val capabilities = (device.optJSONArray("components") ?: JSONArray()).let { list ->
+            (0 until list.length()).flatMap { i -> (list.optJSONObject(i)?.optJSONArray("capabilities") ?: JSONArray()).let { caps ->
+                (0 until caps.length()).mapNotNull { c -> caps.optJSONObject(c)?.optString("id")?.takeIf { it.isNotBlank() } } } }
+        }.distinct().sorted()
+        val batteryKey = device.toString().contains("battery",ignoreCase = true)
+        return "keys=$keys; capabilities=$capabilities; mentionsBattery=$batteryKey"
+    }
     private fun readTags(): List<OwnedTag> = (saved.optJSONArray("tags") ?: JSONArray()).let { list ->
         (0 until list.length()).map { i -> val tag = list.getJSONObject(i)
             OwnedTag(tag.getString("id"),tag.optString("name","SmartTag"),tag.optBoolean("uwb"),tag.optString("key").isNotBlank()) }
@@ -85,6 +97,7 @@ class SamsungAccountRepository(context: Context) {
             val ble = device.optJSONObject("bleD2D") ?: continue
             val key = ble.optString("encryptionKey")
             val metadata = ble.optJSONObject("metadata")
+            diagnostic?.invoke("TAG_CLOUD_FIELDS",fieldNames(device))
             val tag = JSONObject().put("id",id).put("name",device.optString("label").ifBlank { device.optString("name","SmartTag") })
                 .put("uwb",components.contains("tag.uwbActivation")).put("key",key)
                 .put("privacyIv",metadata?.optString("privacyIdInitialVector").orEmpty())

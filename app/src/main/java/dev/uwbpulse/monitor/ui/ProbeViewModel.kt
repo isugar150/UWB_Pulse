@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dev.uwbpulse.monitor.MonitorApplication
 import dev.uwbpulse.monitor.data.BleDiscovery
+import dev.uwbpulse.monitor.data.BondedDevice
+import dev.uwbpulse.monitor.data.CarBluetooth
 import dev.uwbpulse.monitor.domain.Backend
 import dev.uwbpulse.monitor.domain.TagCandidate
 import dev.uwbpulse.monitor.domain.SmartThingsSwitch
@@ -109,6 +111,21 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
         settings.smartThings(enabled); SmartThingsWork.syncKeepAlive(getApplication(),enabled)
         if (!enabled) SmartThingsWork.cancelPending(getApplication())
     }
+    fun testPulse() = viewModelScope.launch {
+        val view = smartThings.value
+        if ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId)) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return@launch }
+        SmartThingsWork.sendState(getApplication(),dev.uwbpulse.monitor.domain.SwitchPulse.STATE,test=true)
+        error.value = "켰다 끄는 시험 신호를 보냈습니다. 결과는 진단 로그의 ST_SWITCH_RESULT state=pulse에서 확인하세요."
+    }
+    fun offOnLinkLoss(enabled: Boolean) = viewModelScope.launch { settings.offOnLinkLoss(enabled) }
+    fun pulseOnDeparture(enabled: Boolean) = viewModelScope.launch { settings.pulseOnDeparture(enabled) }
+    val bondedDevices = MutableStateFlow<List<BondedDevice>>(emptyList())
+    fun refreshBonded() { bondedDevices.value = CarBluetooth(getApplication()) { _, _ -> }.bonded() }
+    fun carMode(enabled: Boolean) = viewModelScope.launch {
+        if (enabled && settings.persisted().carAddress.isBlank()) { error.value = "먼저 차량 블루투스 기기를 선택하세요."; return@launch }
+        settings.carMode(enabled)
+    }
+    fun chooseCar(device: BondedDevice) = viewModelScope.launch { settings.car(device) }
     fun testSmartThings(on: Boolean) = viewModelScope.launch {
         val view = smartThings.value
         if ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId)) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return@launch }
