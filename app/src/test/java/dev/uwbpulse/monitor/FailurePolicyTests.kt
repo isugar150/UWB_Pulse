@@ -46,9 +46,30 @@ class FailurePolicyTests {
     }
     @Test fun permanentFailuresArePublishedImmediately() {
         val gate = OutageGate()
-        assertEquals(Decision(disconnected = true, error = true), gate.failed("SAMSUNG_LOGIN_REQUIRED", hadSession = true, now = 0))
+        assertEquals(Decision(disconnected = true, error = true, retry = false), gate.failed("SAMSUNG_LOGIN_REQUIRED", hadSession = true, now = 0))
         val authFailure = OutageGate()
-        assertEquals(Decision(disconnected = false, error = true), authFailure.failed("GATT_CONNECTION_STATUS_137", hadSession = false, now = 0))
+        assertEquals(Decision(disconnected = false, error = true, retry = false), authFailure.failed("GATT_CONNECTION_STATUS_137", hadSession = false, now = 0))
+    }
+    @Test fun ownerProofFailureIsRetriedAFewTimesThenBecomesPermanent() {
+        val gate = OutageGate()
+        repeat(FailurePolicy.MAX_AUTH_RETRIES) { i ->
+            assertEquals("attempt $i", none, gate.failed(FailurePolicy.AUTH_FAILED, hadSession = false, now = i * 1_000L))
+        }
+        assertEquals(Decision(disconnected = false, error = true, retry = false), gate.failed(FailurePolicy.AUTH_FAILED, hadSession = false, now = 10_000))
+        // A recovered link starts a fresh budget.
+        gate.recovered()
+        assertTrue(gate.failed(FailurePolicy.AUTH_FAILED, hadSession = false, now = 20_000).retry)
+    }
+    @Test fun onlyRealLinkDropsCountAsLinkLoss() {
+        listOf("OWNER_TAG_NOT_FOUND", "GATT_CONNECTION_STATUS_147", "GATT_DISCONNECTED_19", "GATT_WRITE_STATUS_132", "GATT_OPERATION_TIMEOUT",
+            "GATT_CONNECT_OR_DISCOVERY_TIMEOUT", "UWB_REPORTS_STALE_20S", "NO_UWB_REPORTS_20S")
+            .forEach { assertTrue(it, FailurePolicy.isLinkLoss(it)) }
+        listOf("GATT_MTU_TOO_SMALL_FOR_ENCRYPTED_UWB", "GATT_DISCOVERY_REJECTED", "GATT_OPERATION_NOT_QUEUED", "UWB_DISABLED_OR_UNAVAILABLE", "BLUETOOTH_DISABLED")
+            .forEach { assertFalse(it, FailurePolicy.isLinkLoss(it)) }
+        // A persistent non-link GATT problem is reported after the grace period even though it never authenticated.
+        val gate = OutageGate()
+        assertEquals(none, gate.failed("GATT_MTU_TOO_SMALL_FOR_ENCRYPTED_UWB", hadSession = false, now = 0))
+        assertTrue(gate.failed("GATT_MTU_TOO_SMALL_FOR_ENCRYPTED_UWB", hadSession = false, now = grace).error)
     }
     @Test fun retryClassificationIsUnchanged() {
         listOf("OWNER_TAG_NOT_FOUND", "GATT_CONNECTION_STATUS_147", "GATT_DISCONNECTED_19", "UWB_REPORTS_STALE_20S",

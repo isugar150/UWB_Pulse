@@ -82,5 +82,6 @@ class MonitorSettings(private val context: Context) {
     suspend fun lastObservation(meters: Double, atEpochMillis: Long) = context.monitorPreferences.edit {
         if (meters.isFinite() && meters >= 0) { it[lastMeters] = meters; it[lastSeen] = atEpochMillis }
     }
+    suspend fun clearLastObservation() = context.monitorPreferences.edit { it.remove(lastMeters); it.remove(lastSeen) }
     suspend fun away(alias: String,value: Boolean) = context.monitorPreferences.edit { it[away] = if (value) (it[away] ?: emptySet()) + alias else (it[away] ?: emptySet()) - alias }
 }

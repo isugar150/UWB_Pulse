@@ -17,14 +17,18 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     val account = (application as MonitorApplication).account
     val settings = (application as MonitorApplication).settings
     val events = (application as MonitorApplication).events.events
-    val webhookUrl = MutableStateFlow((application as MonitorApplication).events.webhook().url)
+    val webhookUrl = MutableStateFlow("")
     val state = store.state
     val log = store.log
     val candidates = MutableStateFlow<List<TagCandidate>>(emptyList())
     val scanning = MutableStateFlow(false)
     val error = MutableStateFlow<String?>(null)
     val backend = MutableStateFlow(if (Build.VERSION.SDK_INT >= 36) Backend.PLATFORM else Backend.JETPACK)
-    init { viewModelScope.launch { backend.value = settings.persisted().backend } }
+    init {
+        viewModelScope.launch { backend.value = settings.persisted().backend }
+        // The vault is decrypted through Android Keystore: keep that off the main thread.
+        viewModelScope.launch(Dispatchers.IO) { webhookUrl.value = (application as MonitorApplication).events.webhook().url }
+    }
     val selected = store.selectedAddress.stateIn(viewModelScope, SharingStarted.Eagerly, null)
     private var scanJob: Job? = null
     fun select(candidate: TagCandidate) { viewModelScope.launch { store.selectAddress(candidate.address) } }
@@ -62,7 +66,10 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
         try { account.refresh() }
         catch (e: Exception) { error.value = dev.uwbpulse.monitor.data.auth.SamsungAccountRepository.safeError(e) }
     }
-    fun selectOwnedTag(id: String) = viewModelScope.launch { account.selectTag(id) }
+    fun selectOwnedTag(id: String) = viewModelScope.launch {
+        if (account.selectedId.value != id) settings.clearLastObservation() // the last distance belongs to the previous tag
+        account.selectTag(id)
+    }
     fun threshold(value: Float) = viewModelScope.launch { settings.setThreshold(value.toDouble()) }
     fun returnDistance(value: Float) = viewModelScope.launch { settings.setReturnDistance(kotlin.math.round(value * 2.0) / 2.0) }
     fun dwell(value: Float) = viewModelScope.launch { settings.setDwell((kotlin.math.round(value * 2) * 500).toLong()) }
@@ -76,7 +83,7 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
         try { (getApplication<MonitorApplication>()).events.saveWebhook(url,token,clearToken); webhookUrl.value = url.trim(); error.value = "Webhook 설정을 암호화해 저장했습니다." }
         catch (e: Exception) { error.value = dev.uwbpulse.monitor.data.auth.SamsungAccountRepository.safeError(e) }
     }
-    fun logout() = viewModelScope.launch { settings.monitoring(false);account.logout() }
+    fun logout() = viewModelScope.launch { settings.monitoring(false);settings.clearLastObservation();account.logout() }
     fun resumeAfterBoot(enabled: Boolean) = viewModelScope.launch { settings.resumeAfterBoot(enabled) }
     fun chooseBackend(value: Backend) = viewModelScope.launch { backend.value=value;settings.backend(value) }
 }

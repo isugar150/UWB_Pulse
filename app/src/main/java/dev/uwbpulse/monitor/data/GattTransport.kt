@@ -131,10 +131,7 @@ class GattTransport(private val context: Context, private val record: (String, S
         val descriptor = checkNotNull(characteristic.getDescriptor(CCCD)) { "TAG_AUTH_CCCD_ABSENT" }
         operation("descriptor",uuid) {
             if (Build.VERSION.SDK_INT >= 33) client.writeDescriptor(descriptor,BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) == BluetoothStatusCodes.SUCCESS
-            else {
-                @Suppress("DEPRECATION") descriptor.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                @Suppress("DEPRECATION") client.writeDescriptor(descriptor)
-            }
+            else writeDescriptorLegacy(client,descriptor,BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
         }
     }
     private fun characteristic(service: UUID, uuid: UUID) = checkNotNull(gatt?.getService(service)?.getCharacteristic(uuid)) { "TAG_CHARACTERISTIC_ABSENT" }
@@ -147,12 +144,20 @@ class GattTransport(private val context: Context, private val record: (String, S
                 val result = client.writeCharacteristic(characteristic,bytes,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
                 if (result == BluetoothStatusCodes.ERROR_GATT_WRITE_REQUEST_BUSY) error("GATT_WRITE_STATUS_132")
                 result == BluetoothStatusCodes.SUCCESS
-            } else {
-                @Suppress("DEPRECATION") characteristic.value = bytes
-                characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                @Suppress("DEPRECATION") client.writeCharacteristic(characteristic)
-            }
+            } else writeCharacteristicLegacy(client,characteristic,bytes)
         }
+    }
+    // API 31/32 only: the value-less overloads are deprecated from API 33.
+    @Suppress("DEPRECATION")
+    private fun writeDescriptorLegacy(client: BluetoothGatt, descriptor: BluetoothGattDescriptor, value: ByteArray): Boolean {
+        descriptor.value = value
+        return client.writeDescriptor(descriptor)
+    }
+    @Suppress("DEPRECATION")
+    private fun writeCharacteristicLegacy(client: BluetoothGatt, characteristic: BluetoothGattCharacteristic, bytes: ByteArray): Boolean {
+        characteristic.value = bytes
+        characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        return client.writeCharacteristic(characteristic)
     }
     private suspend fun operation(kind: String, uuid: UUID?, enqueue: () -> Boolean): ByteArray = serial.withLock {
         for (attempt in 0..3) {

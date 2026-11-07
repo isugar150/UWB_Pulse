@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                 val rescanChoices = RescanPolicy.choicesMillis
                 val rescanIndex = rescanChoices.indexOfFirst { it >= prefs.rescanMaxMillis }.let { if (it < 0) rescanChoices.lastIndex else it }
                 Text("이탈 후 태그 재탐색 간격  ${durationLabel(rescanChoices[rescanIndex])}",style=MaterialTheme.typography.bodyMedium)
-                Slider(value=rescanIndex.toFloat(),onValueChange={ vm.rescanMaxMillis(rescanChoices[it.toInt().coerceIn(0,rescanChoices.lastIndex)]) },
+                Slider(value=rescanIndex.toFloat(),onValueChange={ val index = it.toInt().coerceIn(0,rescanChoices.lastIndex); if (index != rescanIndex) vm.rescanMaxMillis(rescanChoices[index]) },
                     valueRange=0f..rescanChoices.lastIndex.toFloat(),steps=rescanChoices.size - 2)
                 Text("연결이 끊기면 2·5·15·60초로 간격을 늘려 가며 태그를 다시 찾습니다. 이 값은 그 최대 간격이며 기본은 1분입니다. 길수록 배터리를 아끼지만 복귀 후 다시 잡히기까지 오래 걸릴 수 있습니다. 바로 적용됩니다.",style=MaterialTheme.typography.bodySmall)
                 HorizontalDivider()

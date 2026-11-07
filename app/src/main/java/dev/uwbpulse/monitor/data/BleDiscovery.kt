@@ -22,6 +22,7 @@ class BleDiscovery(private val context: Context, private val record: (String, St
         check(adapter?.isEnabled == true) { "BLUETOOTH_DISABLED" }
         val scanner = checkNotNull(adapter.bluetoothLeScanner) { "BLE_SCANNER_UNAVAILABLE" }
         val candidates = linkedMapOf<String, TagCandidate>()
+        val owners = HashMap<String, Pair<ByteArray, String?>>() // advertisement bytes -> owner, so a repeated advertisement is verified once
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 val address = result.device.address
@@ -29,7 +30,10 @@ class BleDiscovery(private val context: Context, private val record: (String, St
                 val serviceData = result.scanRecord?.getServiceData(ParcelUuid(SERVICE))
                 // uTag decodeServiceData: low nibble of byte 12, bit 2. Not a model/owner proof.
                 val uwb = serviceData?.takeIf { it.size >= 13 }?.let { (it[12].toInt() and 4) != 0 }
-                val ownerId = serviceData?.let(matchOwner)
+                val ownerId = serviceData?.let { data ->
+                    val cached = owners[address]?.takeIf { it.first.contentEquals(data) }
+                    if (cached != null) cached.second else matchOwner(data).also { owners[address] = data.copyOf() to it }
+                }
                 val candidate = TagCandidate(address, "SmartTag 계열 후보 ${candidates.keys.indexOf(address).takeIf { it >= 0 }?.plus(1) ?: (candidates.size + 1)}", result.isConnectable, uwb,ownerId)
                 if (candidates[address] != candidate) record("BLE_CANDIDATE", "connectable=${candidate.connectable}; advertisedUwb=$uwb; serviceDataBytes=${serviceData?.size ?: 0}; ownerSignatureMatched=${ownerId != null}")
                 candidates[address] = candidate

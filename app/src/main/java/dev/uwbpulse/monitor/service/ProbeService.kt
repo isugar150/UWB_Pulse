@@ -89,6 +89,7 @@ class ProbeService : Service() {
             while (currentCoroutineContext().isActive) {
                 val transport = GattTransport(this,store::record)
                 var failure: String? = null
+                var retry = false
                 try {
                     val address = addressFor(cloudId)
                     coroutineScope {
@@ -159,6 +160,7 @@ class ProbeService : Service() {
                     store.record("MONITOR_CONNECTION_ERROR",failure)
                     // Transient reconnect failures stay in the journal and UI; only a lasting or user-actionable outage reaches automation.
                     val publish = outage.failed(failure,hasAuthenticated,SystemClock.elapsedRealtime())
+                    retry = publish.retry
                     if (publish.disconnected) app.events.publish(MonitorEventType.TAG_DISCONNECTED,cloudId,null,engine.policy.threshold)
                     if (publish.error) app.events.publish(MonitorEventType.UWB_MONITORING_ERROR,cloudId,null,engine.policy.threshold)
                     if (!publish.disconnected && !publish.error) store.record("OUTAGE_NOT_PUBLISHED","code=$failure; graceMs=${FailurePolicy.GRACE_MILLIS}")
@@ -169,9 +171,8 @@ class ProbeService : Service() {
                     }
                     transport.close()
                 }
-                val retryable = failure != null && FailurePolicy.isRetryable(failure)
-                if (!retryable) break
-                val backoff = RescanPolicy.delayMillis(retries,app.settings.persisted().rescanMaxMillis)
+                if (!retry) break
+                val backoff = RescanPolicy.delayMillis(retries,app.settings.state.value.rescanMaxMillis)
                 retries = (retries + 1).coerceAtMost(4)
                 store.update { it.copy(stage="재연결 대기",detail="${backoff / 1000}초 후 내 태그 다시 검색 · 자동 복구 대기",measurement=null) }
                 updateNotification("연결 복구 대기 · ${backoff / 1000}초 후 재시도")

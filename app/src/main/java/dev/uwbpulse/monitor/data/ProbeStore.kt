@@ -28,9 +28,13 @@ class ProbeStore(private val context: Context) {
     private val mutableLog = MutableStateFlow<List<String>>(emptyList())
     val log = mutableLog.asStateFlow()
     private val journal = File(context.filesDir, "probe-journal.txt")
+    private var fileLines = 0
     init {
         synchronized(lines) {
-            if (journal.exists()) journal.readLines().takeLast(300).forEach(lines::addLast)
+            if (journal.exists()) journal.readLines().takeLast(MAX_LINES).forEach(lines::addLast)
+            fileLines = lines.size
+            // Normalise once so later records can be appended instead of rewriting the whole file.
+            if (lines.isNotEmpty()) journal.writeText(lines.joinToString("\n", postfix = "\n"))
         }
         record("APP_START", "${Build.MANUFACTURER} ${Build.MODEL}; Android ${Build.VERSION.RELEASE}; API ${Build.VERSION.SDK_INT}; build ${Build.DISPLAY}; mode=OWNER_AUTHENTICATED_UWB")
     }
@@ -39,9 +43,11 @@ class ProbeStore(private val context: Context) {
         val line = "${OffsetDateTime.now()} elapsed=${android.os.SystemClock.elapsedRealtime()} $code $detail"
         synchronized(lines) {
             lines.addLast(line)
-            while (lines.size > 300) lines.removeFirst()
+            while (lines.size > MAX_LINES) lines.removeFirst()
             mutableLog.value = lines.toList()
-            journal.writeText(lines.joinToString("\n"))
+            // Append one line; compact the file only when it has grown to twice the retained size.
+            if (++fileLines > 2 * MAX_LINES) { journal.writeText(lines.joinToString("\n", postfix = "\n")); fileLines = lines.size }
+            else journal.appendText(line + "\n")
         }
     }
     fun export(): File {
@@ -54,4 +60,5 @@ class ProbeStore(private val context: Context) {
                 synchronized(lines) { lines.joinToString("\n") })
         }
     }
+    private companion object { const val MAX_LINES = 300 }
 }
