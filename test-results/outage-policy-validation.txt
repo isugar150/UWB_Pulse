@@ -1,0 +1,27 @@
+UWB Pulse outage-policy validation (single device, single tag, USB-connected, phone in normal use)
+Date: 2026-11-07 (Asia/Seoul). Device: Samsung SM-F971N, Android 17 / API 37. Build: commit 0d8af20.
+Source: on-device probe-journal.txt, reviewed; event IDs removed. Offsets are seconds since MONITOR_START.
+Scope: only the short transient case (A) was exercised. NOT yet verified: TAG_DISCONNECTED after an outage of 120 s or more, and a tag that stays out of reach for a whole run.
+
+## Previous build (0.4.0 + update rate, before the outage policy), user-driven run, tag out of reach
+12:45:33 MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+12:47:26 MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+12:49:20 MONITOR_CONNECTION_ERROR TAG_AUTHENTICATION_FAILED
+12:49:20 UWB_MONITORING_ERROR distanceMeters=unknown; thresholdMeters=5.0
+12:49:20 MONITOR_STOP UWB/GATT released; distance engine receives no disconnect samples
+12:52:56 MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
+12:53:21 MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
+12:53:21 UWB_MONITORING_ERROR distanceMeters=unknown; thresholdMeters=5.0
+12:53:32 MONITOR_CANCELLED user or OS stopped service
+12:53:32 MONITOR_STOP UWB/GATT released; distance engine receives no disconnect samples
+=> OWNER_TAG_NOT_FOUND produced a UWB_MONITORING_ERROR event (12:53:21).
+
+## New build, A: start with a transient failure (tag found on the second scan)
++  0.0s MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
++ 15.0s MONITOR_CONNECTION_ERROR OWNER_TAG_NOT_FOUND
++ 15.0s OUTAGE_NOT_PUBLISHED code=OWNER_TAG_NOT_FOUND; graceMs=120000
++ 28.0s TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
++ 28.0s UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
++ 28.4s OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
++ 28.9s first UWB_REPORT
+=> failure journaled as OUTAGE_NOT_PUBLISHED; external events published: 0; recovered without any event.

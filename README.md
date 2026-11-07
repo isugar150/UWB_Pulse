@@ -95,7 +95,7 @@ Foreground Service에는 유효한 알림이 필요하므로 서비스 알림 �
 
 설정에서 Tasker 이벤트 플러그인을 켠 뒤 Tasker → 프로필 → 이벤트 → 플러그인 → **UWB Pulse 이벤트**를 선택합니다. ALL 또는 개별 이벤트로 필터링할 수 있습니다. `%uwb_event`, `%uwb_distance`, `%uwb_threshold`, `%uwb_timestamp`, `%uwb_tag` 변수를 제공합니다. 거리를 모르면 distance는 빈 문자열입니다.
 
-공식 Tasker Plugin Library 0.4.10의 이벤트 프로토콜을 사용합니다. 이벤트 전달은 Tasker 패키지로 제한하며 계정 토큰·소유자 키·원본 클라우드 태그 ID를 보내지 않습니다. 삼성 Modes and Routines의 사용자 정의 거리 조건 등록용 공식 SDK는 확보하지 못했습니다. SmartThings 루틴과 삼성 Modes and Routines를 직접 트리거할 수 있는지에 대한 검토는 [자동화 연동 검토](docs/AUTOMATION_REVIEW.md)에 있습니다. 직접 루틴 제어 API를 구현했다고 주장하지 않습니다.
+공식 Tasker Plugin Library 0.4.10의 이벤트 프로토콜을 사용합니다. 이벤트 전달은 Tasker 패키지로 제한하며 계정 토큰·소유자 키·원본 클라우드 태그 ID를 보내지 않습니다. 삼성 Modes and Routines의 사용자 정의 거리 조건 등록용 공식 SDK는 확보하지 못했습니다. SmartThings 루틴과 삼성 Modes and Routines를 직접 트리거할 수 있는지에 대한 검토는 [자동화 연동 검토](docs/AUTOMATION_REVIEW.md)에 있습니다. 직접 루틴 제어 API를 구현했다고 주장하지 않습니다. 다만 루틴에는 ‘알림을 받으면’(앱·키워드 지정) 조건이 있어, UWB Pulse의 이벤트 알림(제목 `TAG_DISTANCE_EXCEEDED` / `TAG_RETURNED` 등)을 조건으로 다른 루틴을 실행할 가능성이 있습니다. 모드 및 루틴의 알림 접근을 켜야 하며 **종단 간 동작은 아직 검증하지 않았습니다.**
 
 ### HTTPS Webhook (선택)
 

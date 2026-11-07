@@ -20,7 +20,7 @@
 |`data/SmartTagSessionConfig.kt`|35바이트 OOB 설정과 실제 세션 주소/ID 생성|
 |`data/UwbProbe.kt`|플랫폼 Ranging / AndroidX UWB 세션을 Flow로 제공, 실제 UWB 결과만 통과|
 |`data/MonitorSettings.kt`|거리·알림·자동화·재개 정책 및 태그별 이탈 latch 영속화|
-|`data/ProbeStore.kt`|현재 UI StateFlow, 화면 가시성, 최대 300줄 저널·보고서 내보내기|
+|`data/ProbeStore.kt`|현재 UI StateFlow, 화면 가시성, 최근 300줄 저널(추가 쓰기, 600줄에서 정리)·보고서 내보내기|
 |`domain/ProbeModels.kt`|측정·상태 모델, 유효/신선한 수신 및 화면별 카운터|
 |`domain/DistanceEventEngine.kt`|Android에 의존하지 않는 이탈·복귀 상태 머신|
 |`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
@@ -57,6 +57,8 @@
   - `TAG_DISCONNECTED`: 이번 실행에서 태그 인증을 마친 적이 있고 outage가 120초 이상 이어질 때. 복구 불가 실패는 즉시.
   - `UWB_MONITORING_ERROR`: 사용자가 조치할 실패(Bluetooth/UWB OFF 등)가 120초 이상 이어질 때, 복구 불가 실패는 즉시. 태그가 범위 밖이거나 링크가 끊긴 경우(`OWNER_TAG_NOT_FOUND`, `GATT_*`, UWB 수신 중단)는 오류 이벤트를 내지 않는다.
   - 억제된 실패는 저널의 `OUTAGE_NOT_PUBLISHED`로 확인한다.
+  - 링크 손실로 보는 것은 태그 미발견, 연결·쓰기·탐색 상태 오류, 연결 해제, UWB 수신 중단뿐이다. MTU 부족·탐색 거부 같은 다른 GATT 실패는 사용자 조치 대상으로 보아 120초 뒤 오류 이벤트를 낸다.
+  - `TAG_AUTHENTICATION_FAILED`는 연속 3번까지 재시도한다. 4번째 연속 실패는 복구 불가로 즉시 발행하고 서비스가 멈춘다. 다음 유효 측정에서 횟수를 초기화한다.
 - JSON 공통 필드: `id`, `event`, `distanceMeters`, `thresholdMeters`, `timestamp`, 선택적 `tagId`(앱별 해시 별칭). 원본 클라우드 ID는 출력하지 않는다.
 - Tasker: `%uwb_event`, `%uwb_distance`, `%uwb_threshold`, `%uwb_timestamp`, `%uwb_tag`. distance를 모르면 빈 문자열.
 - Webhook: HTTPS, redirect 금지, 연결/읽기 각각 5초 제한, 최대 3회, 네트워크/429/5xx 재시도. 이벤트 ID와 `Idempotency-Key`를 사용하며 수신 서버의 중복 처리도 필요하다.
@@ -70,7 +72,7 @@
 |DataStore `monitor_settings`|정책, 알림, 자동화 opt-in, monitoring_enabled, resume_after_boot, backend, away_tag_aliases, tracking_rate, rescan_max_millis, last_meters / last_seen_epoch(마지막 상태 한 건)|
 |DataStore `probe`|초기 진단 화면의 선택 BLE 주소. 서비스의 소유 태그 식별 기준으로 사용하지 않음|
 |`files/monitor-events.json`|최근 100개 비식별 이벤트. 시각과 거리는 포함|
-|`files/probe-journal.txt`|최근 300줄 상태 저널. 키·토큰·원본 식별자를 기록하지 않음|
+|`files/probe-journal.txt`|최근 300줄 상태 저널(줄을 덧붙이다 600줄이 되면 300줄로 정리). 키·토큰·원본 식별자를 기록하지 않음|
 |cache reports|사용자 요청 시 FileProvider로 공유하는 보고서|
 |WorkManager DB|선택한 Webhook의 영속 전송 작업. 실제 전달 시점은 OS/네트워크에 의존|
 

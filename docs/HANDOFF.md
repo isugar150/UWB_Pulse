@@ -46,7 +46,7 @@
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-기준 결과: 37개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
+기준 결과: 39개 통과, Lint 오류 0 / 경고 1(사용자 컬러 아이콘의 monochrome layer 권고). APK는 `app/build/outputs/apk/debug/app-debug.apk`에 생성된다. minSdk 31은 설치 하한이며, 모든 지원 버전에서 백그라운드 동작을 실측한 것은 아니다. 현재 성공 기기는 SM-F971N / Android 17 API 37이고 기본 backend는 API 36 이상에서 플랫폼이다.
 
 ## 실기기 수정·확인 절차
 
@@ -68,7 +68,7 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 - 추적 알림을 숨긴 시험에서는 `uwb_probe` importance=0과 실제 수신 지속을 함께 확인한다. 앱이 직접 채널을 재활성화하면 안 된다.
 - 거리 이벤트는 실제 태그 이동으로 이탈·복귀 각각 한 번 발생하는지 확인한다. 단절만으로 이탈이 나와서는 안 된다. 시험 임계값을 바꿨다면 사용자 기본값으로 복원한다.
 
-원본 기기 저널은 최대 300줄이라 새 수신으로 오래된 증거가 사라진다. 중요한 구간은 바로 저장한다. `elapsed`는 재부팅하면 초기화되며 세션 수신 카운터 역시 새 세션 기준이다. Activity를 여는 `APP_START`만으로 부팅 자동 시작을 주장하지 않는다.
+원본 기기 저널은 최근 300줄(디스크에는 최대 600줄까지 쌓였다가 정리)이라 새 수신으로 오래된 증거가 사라진다. 중요한 구간은 바로 저장한다. `elapsed`는 재부팅하면 초기화되며 세션 수신 카운터 역시 새 세션 기준이다. Activity를 여는 `APP_START`만으로 부팅 자동 시작을 주장하지 않는다.
 
 ## 다음 작업 후보와 주의점
 
@@ -79,8 +79,9 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 |회복 경로 실측|태그 단절·재진입, Bluetooth/UWB OFF/ON, 권한 회수, 실제 프로세스 재생성·앱 업데이트 시험|
 |갱신 주기 배터리 측정|콜백 간격(120/240/600ms)은 확인됨. 비충전에서 같은 조건으로 수 시간씩 폰·태그 배터리 소모를 비교해야 절전 효과를 주장할 수 있다. 시험 후 기본 240ms로 복원|
 |중지 직후 재시작 지연|중지 후 곧바로 시작하면 `GATT_..._147`/`OWNER_TAG_NOT_FOUND`로 첫 수신까지 21~73초. 원인 조사 필요(이전 빌드와 비교 안 함)|
-|일시적 재연결 이벤트 억제 검증|`FailurePolicy`/`OutageGate`를 구현하고 단위 테스트함(기기 미검증). 중지 후 재시작에서 저널에 `OUTAGE_NOT_PUBLISHED`만 남고 `UWB_MONITORING_ERROR`/`TAG_DISCONNECTED` 이벤트가 나가지 않는지, 태그를 일부러 멀리 둔 2분 뒤 `TAG_DISCONNECTED`가 한 번만 나가는지 확인|
-|SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md) 참고. 가상 스위치 수동 REST 호출로 SmartThings 자동화가 도는지 먼저 확인|
+|일시적 재연결 이벤트 억제 검증|단위 테스트 + 기기에서 짧은 일시 실패는 이벤트 0건으로 확인(`test-results/outage-policy-validation.txt`). 남은 확인: 태그를 일부러 멀리 둔 2분 뒤 `TAG_DISCONNECTED`가 한 번만 나가는지, 태그가 끝까지 범위 밖일 때 이벤트가 0건인지|
+|`TAG_AUTHENTICATION_FAILED` 재시도 검증|12:49:20 사용자 사용 중 한 번의 인증 실패로 서비스가 멈췄다. 이제 연속 3번까지 재시도하고 4번째에 멈춘다(프로토콜·인증 불변 조건은 그대로). 기기에서 실제로 재시도 후 복구하는지 미확인. 원인(`GATT_BUSY_RETRY` 직후 실패)은 미조사|
+|SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md) 참고. **가장 먼저**: 삼성 루틴의 ‘알림을 받으면’ 조건으로 앱 이벤트 알림이 루틴을 실행하는지 사용자 폰에서 시험(알림 접근 허용 필요, 루틴 생성은 사용자 동의 후). 그다음 가상 스위치 수동 REST 호출 시험|
 |배터리·장기 안정성|비충전·기본 최적화·깊은 절전·수 시간 시험. 15분 충전 중 결과와 구분|
 |호환 기기 확대|AndroidX backend 및 다른 OS/펌웨어. 지원 feature와 실제 background callback을 별도 검증|
 |다중 태그|계정에 여러 태그를 보관할 수 있으나 추적 서비스는 선택한 한 태그만 관리|
