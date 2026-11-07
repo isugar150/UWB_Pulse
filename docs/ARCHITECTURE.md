@@ -24,6 +24,7 @@
 |`domain/ProbeModels.kt`|측정·상태 모델, 유효/신선한 수신 및 화면별 카운터|
 |`domain/DistanceEventEngine.kt`|Android에 의존하지 않는 이탈·복귀 상태 머신|
 |`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
+|`domain/FailurePolicy.kt`|연결 실패 분류(재시도 가능·링크 손실)와 `OutageGate`: 일시적 재연결 실패를 외부 이벤트에서 제외|
 |`domain/ResumePolicy.kt`|BOOT / 업데이트 / 프로세스 재시작의 저장 ON 복원 조건|
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
@@ -52,6 +53,10 @@
 - 측정 간격이 `TrackingRate.maxGapMillis`(기본 1.5초, 절전 600ms는 1.8초)를 초과하면 진행 중 이탈 debounce를 새로 계산한다. 이전 시각 이하 콜백은 제외한다.
 - 연결 소실은 debounce를 지우지만 이탈 latch를 유지한다. 재접속·서비스 복원으로 동일 이탈을 반복하지 않는다.
 - `TAG_DISCONNECTED`와 `UWB_MONITORING_ERROR`는 거리 이탈과 별개다. 거리를 모르면 JSON `distanceMeters`는 null이다.
+- 연결 실패는 모두 저널·UI에 남기지만 외부 이벤트는 `OutageGate`가 정한다. outage는 첫 실패에서 시작해 다음 유효 측정에서 끝나며 이벤트는 outage당 최대 한 번이다. 복구 가능한 실패가 `FailurePolicy.GRACE_MILLIS`(120초) 미만이면 아무것도 내보내지 않는다.
+  - `TAG_DISCONNECTED`: 이번 실행에서 태그 인증을 마친 적이 있고 outage가 120초 이상 이어질 때. 복구 불가 실패는 즉시.
+  - `UWB_MONITORING_ERROR`: 사용자가 조치할 실패(Bluetooth/UWB OFF 등)가 120초 이상 이어질 때, 복구 불가 실패는 즉시. 태그가 범위 밖이거나 링크가 끊긴 경우(`OWNER_TAG_NOT_FOUND`, `GATT_*`, UWB 수신 중단)는 오류 이벤트를 내지 않는다.
+  - 억제된 실패는 저널의 `OUTAGE_NOT_PUBLISHED`로 확인한다.
 - JSON 공통 필드: `id`, `event`, `distanceMeters`, `thresholdMeters`, `timestamp`, 선택적 `tagId`(앱별 해시 별칭). 원본 클라우드 ID는 출력하지 않는다.
 - Tasker: `%uwb_event`, `%uwb_distance`, `%uwb_threshold`, `%uwb_timestamp`, `%uwb_tag`. distance를 모르면 빈 문자열.
 - Webhook: HTTPS, redirect 금지, 연결/읽기 각각 5초 제한, 최대 3회, 네트워크/429/5xx 재시도. 이벤트 ID와 `Idempotency-Key`를 사용하며 수신 서버의 중복 처리도 필요하다.

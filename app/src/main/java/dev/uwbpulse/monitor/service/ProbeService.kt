@@ -81,8 +81,7 @@ class ProbeService : Service() {
         var latest = LastObservation()
         var retries = 0
         var hasAuthenticated = false
-        var outageReported = false
-        val reportedErrors = mutableSetOf<String>()
+        val outage = OutageGate()
         store.update { ProbeState(running=true,stage="연결 준비",detail="소유자 상호 인증 및 암호화 UWB 설정") }
         store.record("MONITOR_START","backend=$backend; rate=$rate; rescanMaxMs=${initial.rescanMaxMillis}; interactive=${power.isInteractive}; batteryExempt=${power.isIgnoringBatteryOptimizations(packageName)}")
         try {
@@ -124,7 +123,7 @@ class ProbeService : Service() {
                         UwbProbe(this@ProbeService,store::record).range(backend,rate) { transport.activate(it) }.collect { measurement ->
                             val now = measurement.elapsedMillis
                             if (!evidence.accept(measurement.meters,now,store.activityVisible,power.isInteractive)) return@collect
-                            retries = 0; outageReported = false
+                            retries = 0; outage.recovered()
                             val event = engine.sample(measurement.meters,now)
                             event?.let {
                                 app.settings.away(alias,engine.away)
@@ -158,11 +157,11 @@ class ProbeService : Service() {
                     failure = safe(e)
                     engine.signalLost()
                     store.record("MONITOR_CONNECTION_ERROR",failure)
-                    if (hasAuthenticated && !outageReported) {
-                        outageReported = true
-                        app.events.publish(MonitorEventType.TAG_DISCONNECTED,cloudId,null,engine.policy.threshold)
-                    }
-                    if (reportedErrors.add(failure)) app.events.publish(MonitorEventType.UWB_MONITORING_ERROR,cloudId,null,engine.policy.threshold)
+                    // Transient reconnect failures stay in the journal and UI; only a lasting or user-actionable outage reaches automation.
+                    val publish = outage.failed(failure,hasAuthenticated,SystemClock.elapsedRealtime())
+                    if (publish.disconnected) app.events.publish(MonitorEventType.TAG_DISCONNECTED,cloudId,null,engine.policy.threshold)
+                    if (publish.error) app.events.publish(MonitorEventType.UWB_MONITORING_ERROR,cloudId,null,engine.policy.threshold)
+                    if (!publish.disconnected && !publish.error) store.record("OUTAGE_NOT_PUBLISHED","code=$failure; graceMs=${FailurePolicy.GRACE_MILLIS}")
                     store.update { it.copy(measurement=null,stage="연결 중단",detail=failure) }
                 } finally {
                     withContext(NonCancellable) {
@@ -170,8 +169,7 @@ class ProbeService : Service() {
                     }
                     transport.close()
                 }
-                val retryable = failure != null && !failure.matches(Regex("GATT_.*_STATUS_(5|8|15|137)")) &&
-                    (failure.startsWith("GATT_") || failure.startsWith("UWB_") || failure.startsWith("BLE_SCAN_FAILED_") || failure == "BLUETOOTH_DISABLED" || failure == "BLE_SCANNER_UNAVAILABLE" || failure == "OWNER_TAG_NOT_FOUND" || failure == "NO_UWB_REPORTS_20S")
+                val retryable = failure != null && FailurePolicy.isRetryable(failure)
                 if (!retryable) break
                 val backoff = RescanPolicy.delayMillis(retries,app.settings.persisted().rescanMaxMillis)
                 retries = (retries + 1).coerceAtMost(4)

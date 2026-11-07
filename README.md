@@ -89,6 +89,8 @@ Foreground Service에는 유효한 알림이 필요하므로 서비스 알림 �
 
 시각은 ISO 8601이며 거리 신호를 모르는 이벤트에는 `distanceMeters: null`을 사용합니다. 수신 중단은 이탈과 별개입니다.
 
+`TAG_DISCONNECTED`와 `UWB_MONITORING_ERROR`는 **일시적 재연결 실패로는 발행하지 않습니다.** 재연결이 2분 넘게 이어질 때만 내보내며(`TAG_DISCONNECTED`는 한 번 연결됐던 태그에 한해), 태그가 범위 밖이어서 못 찾는 상태는 오류 이벤트를 내지 않습니다. 권한·로그인 같은 복구 불가 오류는 바로 발행합니다. 같은 outage에서는 각 이벤트를 한 번만 보냅니다. 이 규칙은 단위 테스트로만 검증했고 실기기에서는 아직 확인하지 않았습니다.
+
 ### Tasker
 
 설정에서 Tasker 이벤트 플러그인을 켠 뒤 Tasker → 프로필 → 이벤트 → 플러그인 → **UWB Pulse 이벤트**를 선택합니다. ALL 또는 개별 이벤트로 필터링할 수 있습니다. `%uwb_event`, `%uwb_distance`, `%uwb_threshold`, `%uwb_timestamp`, `%uwb_tag` 변수를 제공합니다. 거리를 모르면 distance는 빈 문자열입니다.

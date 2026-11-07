@@ -50,7 +50,7 @@ Android의 Foreground Service에는 유효한 알림이 필요하다. 앱의 ‘
 JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-- BUILD SUCCESSFUL, 단위 테스트 **31개 통과**, 실패·오류 0. (2026-11-07 갱신 주기·재탐색 설정 추가분 7개 포함.) 위 10:00~10:07 시험은 이 변경 빌드로 수행했다. 설치본과 현재 소스의 차이는 설정 화면 안내 문구 한 줄뿐이다.
+- BUILD SUCCESSFUL, 단위 테스트 **37개 통과**, 실패·오류 0. (2026-11-07 갱신 주기·재탐색 설정 7개, 재연결 이벤트 정책 6개 추가분 포함.) 위 10:00~10:07 시험은 커밋 `0ccfeeb`의 갱신 주기 빌드로 수행했다(설정 안내 문구 한 줄만 다름). 이후 추가된 재연결 이벤트 정책은 폰에 설치하지 않았다.
 - 암호화 고정 벡터, 유효 거리/신선도, 디바운스·히스테리시스·중복 방지, 10m 상한, Webhook 정책, 자동 재개 정책을 검사했다.
 - Lint 오류 0, 경고 1: 사용자 원본 아이콘에 별도 monochrome layer가 없다. 컬러 원본은 그대로 유지했다.
 - APK debug 서명 검증 결과와 SHA-256은 `test-results/apk-signature.txt`, `artifacts/SHA256SUMS.txt`에 보관한다.
@@ -79,7 +79,8 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 |SmartThings 자동화 트리거|문서 조사만 수행, 계정 실험 없음|
 |UWB 갱신 주기 빠름 120ms / 절전 600ms의 배터리 효과|콜백 간격은 확인했다(위). **폰·태그의 배터리 소모 변화는 측정하지 않았다.** 비충전·장시간·다른 기기/태그는 미검증|
 |이탈 후 재탐색 간격 10초~5분|계산 규칙을 단위 테스트함. 기본 1분 경로에서 재시도 사다리 동작만 관측. 다른 값으로의 실제 끊김·복귀 시험은 미실시|
-|중지 직후 재시작의 지연과 오류 이벤트|중지 직후 시작하면 `GATT_CONNECTION_STATUS_147` 또는 `OWNER_TAG_NOT_FOUND` 후 복구되어 첫 수신까지 21~73초 걸렸다. 원인 미조사, 이전 빌드와 비교하지 않음. 첫 실패마다 `UWB_MONITORING_ERROR` 이벤트가 발행됨|
+|중지 직후 재시작의 지연|중지 직후 시작하면 `GATT_CONNECTION_STATUS_147` 또는 `OWNER_TAG_NOT_FOUND` 후 복구되어 첫 수신까지 21~73초 걸렸다. 원인 미조사, 이전 빌드와 비교하지 않음. 당시 빌드는 첫 실패마다 `UWB_MONITORING_ERROR` 이벤트를 발행했다|
+|일시적 재연결 실패의 이벤트 억제|`FailurePolicy`/`OutageGate` 단위 테스트만 수행. 기기에서 억제·2분 후 `TAG_DISCONNECTED` 발행은 미확인|
 |AndroidX UWB backend|비교 구현 존재, 이번 실측은 플랫폼 backend|
 |비충전·깊은 절전·30분 이상·배터리 소모|추가 측정 필요|
 |권한 회수·Bluetooth/UWB OFF·장거리 단절 후 재접속|회복 경로 구현, 실제 최종 기기 반복 검증 미실시|
