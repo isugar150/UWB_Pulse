@@ -23,6 +23,8 @@ class ReceptionEvidence(private val staleAfterMillis: Long = 3_000) {
     var count = 0L; private set
     var backgroundCount = 0L; private set
     var screenOffCount = 0L; private set
+    /** A new radio session gets its own first-report deadline; keep only the run's diagnostic counters. */
+    fun beginSession() { previous = null }
     fun accept(value: Double, now: Long, foreground: Boolean, interactive: Boolean): Boolean {
         if (!value.isFinite() || value < 0 || (previous != null && now < previous!!)) return false
         previous = now

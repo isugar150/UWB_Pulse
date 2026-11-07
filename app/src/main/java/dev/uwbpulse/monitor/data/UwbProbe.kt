@@ -20,6 +20,7 @@ import androidx.core.uwb.UwbManager
 import dev.uwbpulse.monitor.domain.Backend
 import dev.uwbpulse.monitor.domain.Measurement
 import dev.uwbpulse.monitor.domain.TrackingRate
+import dev.uwbpulse.monitor.domain.connectionTimeout
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -84,7 +85,7 @@ class UwbProbe(private val context: Context, private val record: (String, String
     @RequiresApi(36)
     private fun platformRange(requestedRate: TrackingRate, configureTag: suspend (ByteArray) -> Unit): Flow<Measurement> = callbackFlow {
         val manager = checkNotNull(context.getSystemService(RangingManager::class.java)) { "RANGING_SERVICE_ABSENT" }
-        val availability = withTimeout(5_000) {
+        val availability = connectionTimeout(5_000, "UWB_CAPABILITIES_TIMEOUT") {
             suspendCancellableCoroutine<RangingCapabilities> { continuation ->
                 lateinit var callback: RangingManager.RangingCapabilitiesCallback
                 callback = RangingManager.RangingCapabilitiesCallback { capabilities ->

@@ -88,8 +88,33 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) ./gradlew :app:assembleDebug :app:test
 |이탈 후 재탐색 간격 10초~5분|계산 규칙을 단위 테스트함. 기본 1분 경로에서 재시도 사다리 동작만 관측. 다른 값으로의 실제 끊김·복귀 시험은 미실시|
 |중지 직후 재시작의 지연|중지 직후 시작하면 `GATT_CONNECTION_STATUS_147` 또는 `OWNER_TAG_NOT_FOUND` 후 복구되어 첫 수신까지 21~73초 걸렸다. 원인 미조사, 이전 빌드와 비교하지 않음. 당시 빌드는 첫 실패마다 `UWB_MONITORING_ERROR` 이벤트를 발행했다|
 |일시적 재연결 실패의 이벤트 억제|**확인:** 시작 직후 첫 실패 1회(`OWNER_TAG_NOT_FOUND`, 13:33:39 시작 +15초)가 저널의 `OUTAGE_NOT_PUBLISHED`로만 남고 외부 이벤트는 0건, +28초에 인증·UWB 복구. 이전 빌드는 같은 실패에 `UWB_MONITORING_ERROR`를 발행했다(12:53:21). **이동 시험(14:02~14:11):** 범위 밖 outage 14:05:02 시작, 5건의 실패 중 4건은 억제, 14:07:27(145초 뒤)에 `TAG_DISCONNECTED` 1회, `UWB_MONITORING_ERROR` 0건, 이후 실패(14:08:42)도 중복 발행 없음. **미확인:** 한 번도 연결된 적 없는 태그가 실행 내내 범위 밖인 경우|
-|인증 실패 시 모니터링 자동 종료|12:49:20(설치본 `0d8af20`) 태그 재접속 직후 `GATT_BUSY_RETRY` 한 번 뒤 `TAG_AUTHENTICATION_FAILED`가 나 복구 불가로 분류돼 서비스가 스스로 종료됐다. 이후 소스에서 연속 3번까지 재시도하도록 고쳤으나 **기기에는 아직 설치하지 않았다.** 원인 미조사, 단발성인지 반복되는지 미확인|
+|인증 실패 시 모니터링 자동 종료|12:49:20(설치본 `0d8af20`) 태그 재접속 직후 `GATT_BUSY_RETRY` 한 번 뒤 `TAG_AUTHENTICATION_FAILED`가 나 복구 불가로 분류돼 서비스가 스스로 종료됐다. 이후 연속 3번까지 재시도하도록 고친 빌드를 설치했다. 해당 인증 검증 실패를 이번 시험에서 강제로 재현하지는 않았다. 원인 미조사, 단발성인지 반복되는지 미확인|
 |AndroidX UWB backend|비교 구현 존재, 이번 실측은 플랫폼 backend|
 |비충전·깊은 절전·30분 이상·배터리 소모|추가 측정 필요|
-|권한 회수·Bluetooth/UWB OFF·장거리 단절 후 재접속|회복 경로 구현, 실제 최종 기기 반복 검증 미실시|
+|권한 회수·Bluetooth/UWB OFF·장거리 단절 후 재접속|Bluetooth 및 UWB OFF/ON은 아래 안정성 검토 빌드에서 각각 1회 자동 복구 확인. 권한 회수·장기 반복은 미검증|
 |다른 휴대폰·태그 펌웨어|미검증|
+
+
+## 안정성 검토 수정 빌드 (2026-11-07, 16:01 이후)
+
+버전은 0.4.0 / versionCode 5 유지. 같은 서명으로 덮어쓰기 설치했다. 정상 중지 때 암호화 stop ACK를 확인했으며 계정·태그 등록·선택·사용자 거리 설정·알림 채널을 유지했다. 시험 시작 시 설정은 1.5m / 복귀 1.0m / 3초, NORMAL 240ms, 재검색 최대 60초, 추적 알림 OFF, SmartThings ON이었다. USB 충전·배터리 최적화 예외 조건이다.
+
+|시험|이번 관측|
+|---|---|
+|단위 회귀|68개 통과(기존 47 + 신규 21), 실패 0. 재연결 freshness 초기화, nonce/proof timeout 재시도, 기능 조회 timeout과 호출자 취소 구분, 만료 30초 경계·교체·토큰 갱신 중 만료·취소된 HTTP 직렬화·키 스냅샷 병렬 조회 포함|
+|Android 계측|별도 합성 데이터 vault로 Keystore 저장/재생성·토큰 업데이트 중 요청 보존·대기 제거·만료 전송 차단 3개 통과. 사용자 vault를 읽거나 수집하지 않으며 네트워크 전송 없음|
+|수정 빌드 실제 거리|16:02:40 시작 → 16:02:47 HIGH UWB 수신. 플랫폼·240ms 유지|
+|Bluetooth OFF/ON|16:03:06 OFF, 8초 후 ON. `GATT_DISCONNECTED_22`/`BLUETOOTH_DISABLED` 억제, 첫 연결의 `UWB_STOPPED_0`도 재시도. 16:04:07 앱 비표시·화면 OFF에서 HIGH 수신 재개. 오류/단절 이벤트 0건|
+|장기 숨김 재검색|16:04:00 BALANCED 검색 시작 → 2.8초 뒤 소유 광고 발견 → 인증·실제 수신. 소비 전력 절감은 측정하지 않음|
+|UWB OFF/ON|16:04:57 OFF, 8초 후 ON. 16:05:15 앱 비표시·화면 OFF HIGH 수신 재개(약 18.2초). `UWB_STOPPED_0`은 외부 이벤트 없이 복구|
+|프로세스 종료 복구|SIGKILL 뒤 16:05:54 START_STICKY 저장 ON 복원. Activity를 열지 않음. 첫 `UWB_STOPPED_0` 재시도 후 16:06:23 HIGH 수신 재개. 오류/단절 이벤트 0건|
+|수정된 SmartThings 전송|이후 사용 중 실제 이탈·복귀에서 ON/OFF 각각 HTTP 200 관측. 시험 버튼을 누르거나 별도 자동화를 만들지 않음. 30초 만료·401·서버 지연은 실제 서버에서 강제로 만들지 않고 회귀 테스트로 확인|
+|화면 OFF·백그라운드|연속 80.6초 구간에 screenOff 콜백 +335, 4.15/s(기본 명목 4.17/s). HIGH 수신 유지. 비충전·깊은 절전 검증은 아님|
+|최종 APK 갱신|16:12:46 암호화 정상 중지 → 최종 APK 덮어쓰기 → 16:13:15 재개 → 16:13:34 HIGH 수신. UI의 30초 만료 안내·최신 라이선스 asset 포함|
+|실제 재부팅 복원|16:14:55 첫 잠금 해제 후 `AUTO_RESUME_REQUEST reason=BOOT` → `MONITOR_RESTORE manual=false`. 저장된 임계값 5m 복원. 초기 GATT 147 두 번은 외부 이벤트 없이 재시도, 16:15:48 HIGH 수신 재개. 앱을 열기 전 16:19:00까지 실제 background 콜백 798개, Activity 표시 기록 없음. 채널 importance=0 유지|
+
+검토된 증거: `test-results/review-stability-validation.txt`, `instrumentation-review.txt`, `unit-tests.xml`, `build-validation.txt`, `lint.txt`, `apk-signature.txt`.
+
+남은 실측: 폰·태그의 비충전 수 시간 소비 전력, 깊은 절전, Tasker 실수신, 외부 Webhook 서버, 실제 SmartThings 401/지연/만료 및 차량 자동화, 다른 기기/AndroidX backend. 단위/계측 테스트의 가짜 전송을 실제 서버 전달 증거로 해석하지 않는다.
+
+최종 상태: 모니터링 ON·부팅 자동 재개 ON(기본), 플랫폼·240ms·재검색 최대 60초, 이탈 5m / 복귀 4.5m / 3초, 추적 채널 OFF, SmartThings ON. 재부팅 때 저장된 거리 5m/4.5m를 확인한 뒤 사용자가 그대로 유지하도록 확정했다. Bluetooth·UWB 모두 ON. 시험용 계측 APK는 제거하고 사용자 앱과 데이터는 유지했다.

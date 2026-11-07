@@ -23,6 +23,7 @@ class ProbeService : Service() {
     private val store get() = app.store
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var job: Job? = null
+    private var notificationText: String? = null
     private val power by lazy { getSystemService(PowerManager::class.java) }
     override fun onBind(intent: Intent?) = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -36,6 +37,7 @@ class ProbeService : Service() {
         try {
             ensureNotificationChannel(this)
             startForeground(1,notification("내 태그 연결 중"),ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+            notificationText = "내 태그 연결 중"
         } catch (e: Exception) {
             store.record("FGS_START_FAILED",e.javaClass.simpleName)
             store.update { ProbeState(stage="시작 실패",detail="서비스 권한과 근처 기기 설정을 확인하세요.") }
@@ -61,11 +63,12 @@ class ProbeService : Service() {
         }
         return START_STICKY // Re-read desired state on system recreation; never resume a user-stopped session.
     }
-    private suspend fun addressFor(cloudId: String): String {
+    private suspend fun addressFor(cloudId: String, attempt: Int): String {
         store.update { it.copy(stage="내 태그 검색",detail="소유자 광고 서명을 확인하고 있습니다.",measurement=null) }
         return try {
             withTimeout(15_000) {
-                BleDiscovery(this@ProbeService,store::record,app.account::matchAdvertisement).scan()
+                BleDiscovery(this@ProbeService,store::record,app.account::matchAdvertisement)
+                    .scan(RescanPolicy.balancedScan(attempt,store.activityVisible))
                     .map { candidates -> candidates.firstOrNull { it.cloudTagId == cloudId && it.connectable }?.address }
                     .filterNotNull().first()
             }
@@ -93,13 +96,14 @@ class ProbeService : Service() {
                 var failure: String? = null
                 var retry = false
                 try {
-                    val address = addressFor(cloudId)
+                    val address = addressFor(cloudId,retries)
                     coroutineScope {
                         launch { val status = transport.disconnected.await(); error("GATT_DISCONNECTED_$status") }
                         transport.connect(address)
                         store.update { it.copy(stage="소유자 인증",detail="태그의 암호학적 응답 확인 중") }
                         app.account.credentials(cloudId).use { transport.authenticate(it.masterSecret) }
                         hasAuthenticated = true
+                        evidence.beginSession()
                         store.update { it.copy(stage="UWB 연결 중",detail="암호화 세션 설정 · 실제 거리 수신 대기") }
                         val reportsBefore = evidence.count
                         launch {
@@ -201,8 +205,10 @@ class ProbeService : Service() {
     }
     private fun safe(error: Exception) = error.message?.takeIf { it.matches(Regex("[A-Z0-9_]+")) } ?: error.javaClass.simpleName
     private fun updateNotification(text: String) {
+        if (text == notificationText) return
         if (Build.VERSION.SDK_INT < 33 || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             getSystemService(NotificationManager::class.java).notify(1,notification(text))
+            notificationText = text
         }
     }
     private fun notification(text: String): Notification {
@@ -210,7 +216,7 @@ class ProbeService : Service() {
         val stop = PendingIntent.getService(this,1,Intent(this,ProbeService::class.java).setAction(STOP),PendingIntent.FLAG_IMMUTABLE)
         return NotificationCompat.Builder(this,CHANNEL).setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentTitle("UWB Pulse 모니터링").setContentText(text).setContentIntent(open)
-            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setOngoing(true).addAction(0,"중지",stop).build()
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setOngoing(true).setOnlyAlertOnce(true).addAction(0,"중지",stop).build()
     }
     override fun onDestroy() { job?.cancel(); scope.cancel(); super.onDestroy() }
     companion object {

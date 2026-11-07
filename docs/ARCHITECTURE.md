@@ -13,6 +13,7 @@
 |`data/auth/SamsungLogin.kt`|삼성 로그인 포맷, PKCE/state, 암호화 로그인 응답 처리|
 |`data/auth/SamsungHttp.kt`|HTTPS/host 검증, 응답 크기·시간 제한, 삼성 API 요청|
 |`data/auth/SamsungAccountRepository.kt`|토큰 갱신, 기존 소유 태그·키 조회/캐시, 태그 선택, 광고 매핑|
+|`data/auth/OwnerCredentialCache.kt`|불변 소유자 키 스냅샷. BLE/서비스의 키 조회가 계정 네트워크 잠금을 기다리지 않도록 분리|
 |`data/auth/SecretVault.kt`|namespace별 Keystore AES-GCM 암호화 파일|
 |`data/BleDiscovery.kt`|FD5A 검색, connectable/UWB capability 확인, 소유자 광고 매핑|
 |`data/SmartTagCrypto.kt`|KDF, nonce proof, 광고 서명 검증, 카운터 포함 명령 암호화|
@@ -26,6 +27,8 @@
 |`domain/TrackingPolicy.kt`|UWB 갱신 주기(120/240/600ms)와 거기서 파생되는 공백·신선도 한계, 재탐색 대기 규칙|
 |`domain/FailurePolicy.kt`|연결 실패 분류(재시도 가능·링크 손실)와 `OutageGate`: 일시적 재연결 실패를 외부 이벤트에서 제외|
 |`domain/ResumePolicy.kt`|BOOT / 업데이트 / 프로세스 재시작의 저장 ON 복원 조건|
+|`domain/ConnectionTimeout.kt`|개별 연결 시간 초과만 오류로 변환하고 호출자 취소는 그대로 전달|
+|`domain/SwitchDelivery.kt`|SmartThings 요청 30초 만료·최신 요청·전송 직렬화와 취소 확인|
 |`service/ProbeService.kt`|한 태그의 검색→인증→UWB→이벤트 전체 수명주기, 재시도, FGS|
 |`service/BootReceiver.kt`|BOOT_COMPLETED / MY_PACKAGE_REPLACED에서 저장 의사 확인 후 재개|
 |`automation/MonitorEvents.kt`|최근 100개 이벤트, 별도 채널 알림, WorkManager HTTPS Webhook|
@@ -46,6 +49,14 @@
 9. finally에서 태그 UWB 중지를 암호화 전송하고 로컬 세션·GATT를 해제한다. 명시적 중지는 저장 ON도 false로 만든다.
 
 서비스의 첫 측정 watchdog은 20초다. 3초(절전 600ms에서도 3초) 넘게 유효 측정이 없으면 거리 표시를 지우며, 20초 넘는 stale 수신은 회복 경로로 들어간다. 앱이 보이면 콜백마다 UI 상태를 갱신하고, 화면 OFF·비표시에서는 상태가 바뀔 때를 빼고 초당 1회만 갱신한다. 저널의 거리 요약은 약 5초 간격, FGS 알림 갱신은 약 10초 간격, 마지막 상태 저장은 1분 간격·이벤트·중지 시다. 거리 이벤트 판정은 모든 유효 콜백에 적용한다.
+
+새 무선 세션은 수신 freshness 시각을 초기화하고 자체 첫 측정 20초를 갖는다(누적 진단 카운터는 유지). 이전 세션의 오래된 수신 때문에 새 세션이 1초 만에 종료되지 않는다. nonce/proof 응답 시간 초과는 링크 손실로 재시도하며 proof 검증 실패의 연속 3회 제한과 구분한다. 플랫폼 기능 조회의 5초 초과는 `UWB_CAPABILITIES_TIMEOUT` 재시도로 분류한다. 사용자/OS 취소는 재시도로 바꾸지 않는다.
+
+초기 3번의 검색과 화면에 보이는 검색은 LOW_LATENCY를 유지한다. 숨겨진 상태에서 3번 이상 실패한 재검색은 BALANCED로 낮춘다. 15초 검색 창·사용자의 재탐색 최대 간격·기본 UWB 240ms는 유지한다. FGS 알림은 내용이 달라질 때만 다시 게시한다. 이 변경의 실제 소비 전력과 BALANCED 장기 재진입 지연은 별도 측정 대상이다.
+
+계정 로그인·갱신·로그아웃은 IO 스레드의 공통 잠금으로 직렬화하고, 광고 검증/인증용 키는 독립 불변 스냅샷에서 읽는다. 토큰 갱신 네트워크 지연이 메인 스레드의 키 조회를 막지 않는다.
+
+이벤트 dispatcher는 단일 Channel 소비자로 발행 순서를 유지한다. SmartThings는 최신 `SwitchRequest`(발생 시각·대상·시험 여부 포함)를 기존 암호화 vault에 보관하고 WorkManager에는 요청 ID만 넣는다. 전송 직렬화 잠금은 취소된 작업의 동기 HTTP가 실제 반환할 때까지 유지한다. 30초 이상/미래 시각/교체·비활성화·대상 변경 요청은 폐기하며, 401 갱신 후와 연결 설정 후 body 전송 직전에 재검사한다. 만료는 `ST_SWITCH_DROPPED`에 남긴다. 기기에 도착하기 전에 이미 서버에 전송된 동작의 취소나 서버 내부 처리 순서는 보장하지 않는다.
 
 ## 거리·이벤트 계약
 

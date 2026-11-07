@@ -1,0 +1,6 @@
+2026-11-07 KST / Samsung SM-F971N / Android 17 API 37 / USB connected
+Command: adb shell am instrument -w -r dev.uwbpulse.monitor.test/androidx.test.runner.AndroidJUnitRunner
+SwitchVaultDeviceTests.clearingPendingRequestKeepsConfiguration: PASS
+SwitchVaultDeviceTests.pendingRequestSurvivesEncryptedStoreRecreationAndTokenUpdates: PASS
+SwitchVaultDeviceTests.expiredRestoredRequestNeverCallsTransport: PASS
+OK (3 tests), 0.091 seconds. Synthetic data in a separate temporary vault; test vault and its own Keystore alias cleaned afterward. No account/user SmartThings vault read or exported. No network transport called.

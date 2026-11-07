@@ -176,6 +176,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 3. **그러면**: 실행할 동작(예: 차량 문 잠금 루틴).
 4. **처음에는 알림 보내기 같은 무해한 동작으로 시험**하고, 잘 되는 것을 본 다음에 실제 동작으로 바꾸세요.
 
+이벤트는 발생 후 **30초부터 폐기**합니다. 인터넷이 늦게 복구돼도 오래된 차량 자동화 신호를 보내지 않습니다. 새 상태가 이전 대기를 교체하며 전송을 직렬화합니다. 이미 서버로 보낸 동작은 취소할 수 없습니다.
+
 전송 결과는 앱의 **진단 보고서**(또는 로그)에 `ST_SWITCH_RESULT ... httpStatus=200`으로 남습니다. 200이 아니면 [문제가 생기면](#6-문제가-생기면)을 보세요. 자세한 설명과 확인 기록은 [SmartThings 연결 안내](docs/SMARTTHINGS_SETUP.md)에 있습니다.
 
 ### 방법 B. Tasker
@@ -236,7 +238,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - 실제로 멀어졌다 돌아왔을 때 이탈·복귀 이벤트가 각각 한 번씩 발생
 - 갱신 주기 120/240/600 ms가 실제 콜백 간격으로 반영됨
 - 일시적인 재연결 실패가 외부 이벤트로 나가지 않음
-- SmartThings 가상 스위치: 앱이 서버 없이 직접 호출해 **이탈 시 켜짐, 복귀 시 꺼짐**(이벤트 후 0.1~0.2초에 전송, HTTP 200), 인터넷이 끊긴 동안 보낸 신호가 연결 복구 뒤 전송됨
+- Bluetooth/UWB OFF·ON 및 프로세스 종료 후 앱을 열지 않아도 실제 거리 수신 재개(각 1회)
+- SmartThings 가상 스위치: 앱이 서버 없이 직접 호출해 **이탈 시 켜짐, 복귀 시 꺼짐**(이벤트 후 0.1~0.2초에 전송, HTTP 200), 이전 빌드에서 오프라인 신호의 복구 후 전송 확인. 현재 빌드는 30초 만료 적용
 
 **아직 확인하지 못함**
 
@@ -250,11 +253,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 시작은 [인계 문서](docs/HANDOFF.md) → [구조 안내](docs/ARCHITECTURE.md) → [실기기 시험 기록](docs/DEVICE_TESTS.md) 순서를 권합니다. AI 에이전트용 작업 기준은 [AGENTS.md](AGENTS.md), 원래 요구사항은 [요구사항](docs/REQUIREMENTS.ko.md), 알림·루틴·SmartThings 조사는 [자동화 연동 검토](docs/AUTOMATION_REVIEW.md), 기술 분석은 [FEASIBILITY](docs/FEASIBILITY.md)에 있습니다.
 
-빌드와 검증(단위 테스트 47개, Lint 오류 0 / 경고 1):
+빌드와 검증(단위 테스트 68개, 기기 계측 테스트 3개, Lint 오류 0 / 경고 1):
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
+
+기기 계측 테스트는 추적을 정상 중지한 뒤 `./gradlew :app:connectedDebugAndroidTest`로 실행합니다. 별도 합성 데이터 저장소만 사용하며, 시험 뒤 원래 모니터링 ON/OFF로 복원하세요.
 
 - 요구 환경: JDK 25, Android SDK Platform 37, Build Tools 36.0.0. `minSdk 31`, `compileSdk`·`targetSdk` 37. 의존성 버전은 [상세 동작 안내](docs/REFERENCE.md#버전과-권한)에 있습니다.
 - 구조: `domain`(순수 이벤트 엔진), `data`(계정·암호화·무선·설정), `service`(세션 수명주기), `ui`(Compose), `automation`(알림·Tasker·웹훅·SmartThings).

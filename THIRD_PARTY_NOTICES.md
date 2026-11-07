@@ -29,7 +29,7 @@ The owner authentication, SHA-256 KDF and AES-CBC command framing in `SmartTagCr
 
 ## Android / Kotlin dependencies
 
-AndroidX libraries and Gradle are Apache-2.0; Kotlin is Apache-2.0. Their transitive dependencies retain their original licenses and embedded notices. Android SDK/platform components are provided by the user's installed SDK. The Gradle wrapper's Apache-2.0 license is included in `licenses/Apache-2.0.txt`.
+AndroidX libraries and Gradle are Apache-2.0; Kotlin is Apache-2.0. Device tests additionally use AndroidX Test Runner 1.7.0 and AndroidX Test JUnit 1.3.0 (Apache-2.0); these are test-only dependencies and are not bundled in the application APK. Their transitive dependencies retain their original licenses and embedded notices. Android SDK/platform components are provided by the user's installed SDK. The Gradle wrapper's Apache-2.0 license is included in `licenses/Apache-2.0.txt`.
 
 ## User artwork
 

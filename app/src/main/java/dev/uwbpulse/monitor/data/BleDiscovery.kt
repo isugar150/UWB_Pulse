@@ -17,7 +17,7 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class BleDiscovery(private val context: Context, private val record: (String, String) -> Unit,
     private val matchOwner: (ByteArray) -> String? = { null }) {
-    fun scan() = callbackFlow {
+    fun scan(balanced: Boolean = false) = callbackFlow {
         val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter
         check(adapter?.isEnabled == true) { "BLUETOOTH_DISABLED" }
         val scanner = checkNotNull(adapter.bluetoothLeScanner) { "BLE_SCANNER_UNAVAILABLE" }
@@ -46,7 +46,9 @@ class BleDiscovery(private val context: Context, private val record: (String, St
         }
         val filter = ScanFilter.Builder().setServiceUuid(ParcelUuid(SERVICE)).build()
         try {
-            scanner.startScan(listOf(filter), ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build(), callback)
+            val mode = if (balanced) ScanSettings.SCAN_MODE_BALANCED else ScanSettings.SCAN_MODE_LOW_LATENCY
+            record("BLE_SCAN_MODE", if (balanced) "BALANCED" else "LOW_LATENCY")
+            scanner.startScan(listOf(filter), ScanSettings.Builder().setScanMode(mode).build(), callback)
             awaitClose { runCatching { scanner.stopScan(callback) } }
         } catch (e: Exception) {
             runCatching { scanner.stopScan(callback) }

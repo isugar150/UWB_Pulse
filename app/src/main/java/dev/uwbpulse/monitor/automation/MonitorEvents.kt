@@ -14,10 +14,9 @@ import dev.uwbpulse.monitor.MonitorApplication
 import dev.uwbpulse.monitor.data.auth.SecretVault
 import dev.uwbpulse.monitor.domain.MonitorEventType
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -45,11 +44,20 @@ data class WebhookConfiguration(val url: String = "", val token: String = "") {
 }
 class EventDispatcher(private val app: MonitorApplication) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val serial = Mutex()
+    private val pending = Channel<MonitorEvent>(Channel.UNLIMITED)
     private val file = File(app.filesDir,"monitor-events.json")
     private val webhookVault = SecretVault(app,"webhook")
     private val mutable = MutableStateFlow(loadEvents())
     val events = mutable.asStateFlow()
+    init {
+        scope.launch {
+            for (event in pending) {
+                try { dispatch(event) }
+                catch (e: CancellationException) { throw e }
+                catch (e: Exception) { app.store.record("EVENT_DISPATCH_ERROR",e.javaClass.simpleName) }
+            }
+        }
+    }
     private fun loadEvents(): List<MonitorEvent> = runCatching {
         val array = JSONArray(file.readText())
         (0 until array.length()).map { i -> val item = array.getJSONObject(i)
@@ -59,13 +67,16 @@ class EventDispatcher(private val app: MonitorApplication) {
     fun publish(type: MonitorEventType, cloudId: String, meters: Double?, threshold: Double) {
         val alias = MonitorEvent.tagAlias(app.packageName,cloudId)
         val event = MonitorEvent(UUID.randomUUID().toString(),type,alias,meters,threshold,OffsetDateTime.now().toString())
-        scope.launch { serial.withLock {
+        check(pending.trySend(event).isSuccess) { "EVENT_QUEUE_CLOSED" }
+    }
+    private suspend fun dispatch(event: MonitorEvent) {
+            val type = event.type
             mutable.value = (mutable.value + event).takeLast(100)
             val atomic = android.util.AtomicFile(file)
             val stream = atomic.startWrite()
             try { stream.write(JSONArray(mutable.value.map { it.json() }).toString().toByteArray()); atomic.finishWrite(stream) }
             catch (e: Exception) { atomic.failWrite(stream); app.store.record("EVENT_PERSIST_ERROR",e.javaClass.simpleName) }
-            app.store.record(type.name,"distanceMeters=${meters ?: "unknown"}; thresholdMeters=$threshold; eventId=${event.id}")
+            app.store.record(type.name,"distanceMeters=${event.meters ?: "unknown"}; thresholdMeters=${event.threshold}; eventId=${event.id}")
             val preferences = app.settings.state.value
             if (type in preferences.notifications) notifyEvent(event)
             if (preferences.taskerEnabled) runCatching { TaskerEvents.send(app,event) }.onFailure { app.store.record("TASKER_DISPATCH_ERROR",it.javaClass.simpleName) }
@@ -76,8 +87,9 @@ class EventDispatcher(private val app: MonitorApplication) {
                     .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,30,TimeUnit.SECONDS).build()
                 WorkManager.getInstance(app).enqueueUniqueWork("uwbpulse-event-${event.id}",ExistingWorkPolicy.KEEP,request)
             }
-            if (preferences.smartThingsEnabled) dev.uwbpulse.monitor.domain.SmartThingsSwitch.stateFor(type)?.let { SmartThingsWork.sendState(app,it) }
-        } }
+            if (preferences.smartThingsEnabled) dev.uwbpulse.monitor.domain.SmartThingsSwitch.stateFor(type)?.let {
+                SmartThingsWork.sendState(app,it,createdAtEpochMillis=OffsetDateTime.parse(event.timestamp).toInstant().toEpochMilli())
+            }
     }
     private fun notifyEvent(event: MonitorEvent) {
         if (android.os.Build.VERSION.SDK_INT >= 33 && app.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return

@@ -1,4 +1,4 @@
-<home>/IdeaProjects/UWB_Pulse/app/src/main/res/mipmap-anydpi/ic_launcher.xml:2: Warning: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
+<workspace>/app/src/main/res/mipmap-anydpi/ic_launcher.xml:2: Warning: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
 ^
 

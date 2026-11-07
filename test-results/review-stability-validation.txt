@@ -1,0 +1,98 @@
+UWB Pulse stability review validation — 2026-11-07 KST
+Device: Samsung SM-F971N / Android 17 API 37; USB connected; battery optimisation exemption enabled.
+User settings retained: threshold 1.5 m, return 1.0 m, dwell 3 s, NORMAL 240 ms, rescan max 60 s; tracking notification channel OFF.
+Unit tests: 68 passed. Android instrumentation: 3 passed (synthetic separate vault only; no user secrets read/exported).
+Initial ranging: first HIGH UWB report at 16:02:47, about 7.3 s after MONITOR_START.
+Bluetooth OFF/ON: OFF about 16:03:06, ON after 8 s; automatic background recovery at 16:04:07 (HIGH, activityVisible=false, interactive=false).
+An initial UWB_STOPPED_0 occurred after reconnect; it retried without publishing an event. BALANCED scan at 16:04:00 found the owner advertisement after 2.8 s.
+No distance/disconnect/error automation published during this Bluetooth outage. No SmartThings test command was sent.
+
+Reviewed controlled journal excerpts:
+2026-11-07T16:02:08.260765+09:00 elapsed=23584794 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T16:02:40.059792+09:00 elapsed=23616593 MONITOR_RESTORE manual=true; backend=PLATFORM; threshold=1.5; dwell=3000
+2026-11-07T16:02:40.064090+09:00 elapsed=23616598 MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
+2026-11-07T16:02:40.068328+09:00 elapsed=23616602 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:02:46.385020+09:00 elapsed=23622919 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:02:46.408372+09:00 elapsed=23622942 UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+2026-11-07T16:02:46.444066+09:00 elapsed=23622978 UWB_STARTED technology=0
+2026-11-07T16:03:06.254315+09:00 elapsed=23642788 MONITOR_CONNECTION_ERROR GATT_DISCONNECTED_22
+2026-11-07T16:03:06.254742+09:00 elapsed=23642788 OUTAGE_NOT_PUBLISHED code=GATT_DISCONNECTED_22; graceMs=120000
+2026-11-07T16:03:08.271192+09:00 elapsed=23644805 MONITOR_CONNECTION_ERROR BLUETOOTH_DISABLED
+2026-11-07T16:03:08.271584+09:00 elapsed=23644805 OUTAGE_NOT_PUBLISHED code=BLUETOOTH_DISABLED; graceMs=120000
+2026-11-07T16:03:13.275011+09:00 elapsed=23649809 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:03:33.875803+09:00 elapsed=23670409 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:03:33.879299+09:00 elapsed=23670413 UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+2026-11-07T16:03:33.917035+09:00 elapsed=23670451 UWB_STARTED technology=0
+2026-11-07T16:03:44.163452+09:00 elapsed=23680697 MONITOR_CONNECTION_ERROR UWB_STOPPED_0
+2026-11-07T16:03:44.163876+09:00 elapsed=23680697 OUTAGE_NOT_PUBLISHED code=UWB_STOPPED_0; graceMs=120000
+2026-11-07T16:03:45.509860+09:00 elapsed=23682043 TAG_UWB_STOPPED encrypted stop acknowledged
+2026-11-07T16:04:00.520519+09:00 elapsed=23697054 BLE_SCAN_MODE BALANCED
+2026-11-07T16:04:06.969460+09:00 elapsed=23703503 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:04:06.970842+09:00 elapsed=23703504 UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+2026-11-07T16:04:06.997110+09:00 elapsed=23703531 UWB_STARTED technology=0
+2026-11-07T16:04:57.516369+09:00 elapsed=23754050 MONITOR_CONNECTION_ERROR UWB_STOPPED_0
+2026-11-07T16:04:57.516777+09:00 elapsed=23754050 OUTAGE_NOT_PUBLISHED code=UWB_STOPPED_0; graceMs=120000
+2026-11-07T16:04:59.322147+09:00 elapsed=23755856 TAG_UWB_STOPPED encrypted stop acknowledged
+2026-11-07T16:05:01.331416+09:00 elapsed=23757865 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:05:14.737939+09:00 elapsed=23771272 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:05:14.741819+09:00 elapsed=23771275 UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+2026-11-07T16:05:14.792559+09:00 elapsed=23771326 UWB_STARTED technology=0
+
+UWB OFF/ON: OFF at 16:04:57, ON after 8 s; HIGH UWB resumed 16:05:15 (18.2 s after outage), hidden and screen off; no outage automation.
+Process SIGKILL: START_STICKY restored at 16:05:54 without opening Activity; first attempt UWB_STOPPED_0 retried; HIGH UWB resumed at 16:06:23.
+Subsequent user movement produced real exceed/return and SmartThings HTTP 200 on/off via the new delivery code. No test switch command was used.
+Reviewed additional journal excerpts (event IDs removed):
+2026-11-07T16:04:57.516369+09:00 elapsed=23754050 MONITOR_CONNECTION_ERROR UWB_STOPPED_0
+2026-11-07T16:04:57.516777+09:00 elapsed=23754050 OUTAGE_NOT_PUBLISHED code=UWB_STOPPED_0; graceMs=120000
+2026-11-07T16:05:01.331416+09:00 elapsed=23757865 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:05:14.737939+09:00 elapsed=23771272 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:05:14.792559+09:00 elapsed=23771326 UWB_STARTED technology=0
+2026-11-07T16:05:54.200313+09:00 elapsed=23810734 APP_START samsung SM-F971N; Android 17; API 37; build CP2A.260605.016.F971NKSU3AZJ8; mode=OWNER_AUTHENTICATED_UWB
+2026-11-07T16:05:54.200484+09:00 elapsed=23810734 MONITOR_RESTORE manual=false; backend=PLATFORM; threshold=1.5; dwell=3000
+2026-11-07T16:05:54.205191+09:00 elapsed=23810739 MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
+2026-11-07T16:05:54.208999+09:00 elapsed=23810743 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:06:01.299580+09:00 elapsed=23817833 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:06:01.336395+09:00 elapsed=23817870 UWB_STARTED technology=0
+2026-11-07T16:06:11.584241+09:00 elapsed=23828118 MONITOR_CONNECTION_ERROR UWB_STOPPED_0
+2026-11-07T16:06:11.584679+09:00 elapsed=23828118 OUTAGE_NOT_PUBLISHED code=UWB_STOPPED_0; graceMs=120000
+2026-11-07T16:06:14.754785+09:00 elapsed=23831288 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:06:22.212389+09:00 elapsed=23838746 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:06:22.254451+09:00 elapsed=23838788 UWB_STARTED technology=0
+2026-11-07T16:10:34.455643+09:00 elapsed=24090989 TAG_DISTANCE_EXCEEDED distanceMeters=1.9500000476837158; thresholdMeters=1.5
+2026-11-07T16:10:35.070765+09:00 elapsed=24091604 ST_SWITCH_RESULT state=on; httpStatus=200; attempt=1
+2026-11-07T16:10:38.043749+09:00 elapsed=24094577 TAG_RETURNED distanceMeters=0.9100000262260437; thresholdMeters=1.5
+2026-11-07T16:10:38.338858+09:00 elapsed=24094872 ST_SWITCH_RESULT state=off; httpStatus=200; attempt=1
+
+Stable hidden/screen-OFF window: 80.6 s; screenOff callbacks +335; 4.15/s (nominal 4.17/s). USB-connected; not a battery-consumption measurement.
+2026-11-07T16:10:50.273605+09:00 elapsed=24106807 UWB_REPORT meters=1.1299999952316284; confidence=2; activityVisible=false; interactive=false; total=1111; background=1111; screenOff=142
+2026-11-07T16:12:10.914981+09:00 elapsed=24187449 UWB_REPORT meters=1.2100000381469727; confidence=2; activityVisible=false; interactive=false; total=1446; background=1446; screenOff=477
+
+Actual reboot test — final installed APK; no Activity opened before collecting this evidence.
+2026-11-07T16:14:55.479741+09:00 elapsed=50633 AUTO_RESUME_REQUEST reason=BOOT; saved monitoring state enabled
+2026-11-07T16:14:55.510494+09:00 elapsed=50664 MONITOR_RESTORE manual=false; backend=PLATFORM; threshold=5.0; dwell=3000
+2026-11-07T16:14:55.517116+09:00 elapsed=50670 MONITOR_START backend=PLATFORM; rate=NORMAL; rescanMaxMs=60000; interactive=true; batteryExempt=true
+2026-11-07T16:14:55.522367+09:00 elapsed=50676 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:14:58.498923+09:00 elapsed=53652 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-07T16:15:08.515181+09:00 elapsed=63668 MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T16:15:08.515865+09:00 elapsed=63669 OUTAGE_NOT_PUBLISHED code=GATT_CONNECTION_STATUS_147; graceMs=120000
+2026-11-07T16:15:10.523862+09:00 elapsed=65677 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:15:16.511202+09:00 elapsed=71664 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-07T16:15:26.521092+09:00 elapsed=81674 MONITOR_CONNECTION_ERROR GATT_CONNECTION_STATUS_147
+2026-11-07T16:15:26.522008+09:00 elapsed=81675 OUTAGE_NOT_PUBLISHED code=GATT_CONNECTION_STATUS_147; graceMs=120000
+2026-11-07T16:15:31.526946+09:00 elapsed=86680 BLE_SCAN_MODE LOW_LATENCY
+2026-11-07T16:15:40.541062+09:00 elapsed=95694 BLE_CANDIDATE connectable=true; advertisedUwb=true; serviceDataBytes=20; ownerSignatureMatched=true
+2026-11-07T16:15:46.675253+09:00 elapsed=101828 GATT_CONNECTED discovering auth and UWB services
+2026-11-07T16:15:46.731151+09:00 elapsed=101884 UWB_CHARACTERISTICS_FOUND owner authentication service present
+2026-11-07T16:15:46.849809+09:00 elapsed=102003 GATT_MTU_READY mtu=243
+2026-11-07T16:15:47.029310+09:00 elapsed=102183 TAG_AUTH_START owner mutual challenge-response
+2026-11-07T16:15:47.181411+09:00 elapsed=102335 TAG_AUTHENTICATED mutual owner proof verified; encrypted command channel ready
+2026-11-07T16:15:47.253956+09:00 elapsed=102407 PLATFORM_CAPABILITIES uwbAvailability=3
+2026-11-07T16:15:47.254213+09:00 elapsed=102407 UWB_RATE requested=NORMAL; effective=NORMAL; intervalMs=240; supported=[1, 2, 3]
+2026-11-07T16:15:47.307976+09:00 elapsed=102461 UWB_LOCAL_OPENED Platform RAW UWB-only; encrypted peer OOB required
+2026-11-07T16:15:47.310287+09:00 elapsed=102463 UWB_STARTED technology=0
+2026-11-07T16:15:47.741680+09:00 elapsed=102895 OOB_ENCRYPTED_ACKNOWLEDGED UWB activation and session parameters accepted by ATT; awaiting actual ranging reports
+2026-11-07T16:15:48.251762+09:00 elapsed=103405 UWB_REPORT meters=1.4500000476837158; confidence=2; activityVisible=false; interactive=true; total=1; background=1; screenOff=0
+2026-11-07T16:19:00.009431+09:00 elapsed=295163 UWB_REPORT meters=1.7000000476837158; confidence=2; activityVisible=false; interactive=true; total=798; background=798; screenOff=0
+Background UWB reports observed before opening Activity: 39 journal windows; last diagnostic counter 798.
+
+Final settings confirmed by user: keep threshold 5.0 m / return 4.5 m / dwell 3 s; monitoring ON; default resume-after-boot ON; PLATFORM; NORMAL 240 ms; rescan max 60 s; SmartThings ON. Bluetooth/UWB ON. Tracking channel importance=0 after reboot.

@@ -29,6 +29,9 @@ object RescanPolicy {
 
     fun coerce(value: Long): Long = value.coerceIn(5_000L, 600_000L)
 
+    /** Keep initial acquisition fast; reduce scan duty only during a sustained hidden reconnect. */
+    fun balancedScan(attempt: Int, activityVisible: Boolean) = attempt >= 3 && !activityVisible
+
     /** Waits 2, 5, 15, 60 s and then [maxMillis]; every step is capped by [maxMillis]. */
     fun delayMillis(attempt: Int, maxMillis: Long): Long {
         val cap = coerce(maxMillis)

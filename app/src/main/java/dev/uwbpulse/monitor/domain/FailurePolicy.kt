@@ -15,7 +15,8 @@ object FailurePolicy {
 
     fun isRetryable(code: String): Boolean = !permanentGatt.matches(code) &&
         (code.startsWith("GATT_") || code.startsWith("UWB_") || code.startsWith("BLE_SCAN_FAILED_") ||
-            code == "BLUETOOTH_DISABLED" || code == "BLE_SCANNER_UNAVAILABLE" || code == "OWNER_TAG_NOT_FOUND" || code == "NO_UWB_REPORTS_20S")
+            code == "BLUETOOTH_DISABLED" || code == "BLE_SCANNER_UNAVAILABLE" || code == "OWNER_TAG_NOT_FOUND" || code == "NO_UWB_REPORTS_20S" ||
+            code == "TAG_NONCE_TIMEOUT" || code == "TAG_PROOF_TIMEOUT")
 
     /**
      * The tag is out of reach or the link dropped. That is a disconnect, never a monitoring error by itself.
@@ -24,7 +25,7 @@ object FailurePolicy {
     fun isLinkLoss(code: String): Boolean = code == "OWNER_TAG_NOT_FOUND" || linkStatus.matches(code) ||
         code.startsWith("GATT_DISCONNECTED_") || code == "GATT_CONNECT_OR_DISCOVERY_TIMEOUT" || code == "GATT_OPERATION_TIMEOUT" ||
         code == "NO_UWB_REPORTS_20S" || code == "UWB_REPORTS_STALE_20S" || code == "UWB_PEER_DISCONNECTED" || code == "UWB_FLOW_ENDED" ||
-        code.startsWith("UWB_STOPPED_") || code.startsWith("UWB_CLOSED_")
+        code.startsWith("UWB_STOPPED_") || code.startsWith("UWB_CLOSED_") || code == "TAG_NONCE_TIMEOUT" || code == "TAG_PROOF_TIMEOUT"
 }
 
 /**

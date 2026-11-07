@@ -107,10 +107,11 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
         val view = smartThings.value
         if (enabled && ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId))) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return@launch }
         settings.smartThings(enabled); SmartThingsWork.syncKeepAlive(getApplication(),enabled)
+        if (!enabled) SmartThingsWork.cancelPending(getApplication())
     }
-    fun testSmartThings(on: Boolean) {
+    fun testSmartThings(on: Boolean) = viewModelScope.launch {
         val view = smartThings.value
-        if ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId)) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return }
+        if ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId)) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return@launch }
         SmartThingsWork.sendState(getApplication(),if (on) "on" else "off",test=true)
         error.value = "시험 신호를 보냈습니다. 결과는 진단 로그의 ST_SWITCH_RESULT에서 확인하세요."
     }
