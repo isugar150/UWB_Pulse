@@ -178,6 +178,8 @@ class MainActivity : ComponentActivity() {
                 HorizontalDivider()
                 WebhookSettings(vm,prefs.webhookEnabled,prefs.includeTagId)
                 HorizontalDivider()
+                SmartThingsSettings(vm,prefs.smartThingsEnabled)
+                HorizontalDivider()
                 Text("배터리 및 진단",style=MaterialTheme.typography.titleMedium)
                 OutlinedButton(onClick={runCatching { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) }},modifier=Modifier.fillMaxWidth()) { Text("배터리 최적화 설정") }
                 Text("OS나 절전 정책으로 중단되면 앱에서 상태를 확인하세요. 화면 OFF 장기 시험 결과는 설치 안내에 기록합니다.",style=MaterialTheme.typography.bodySmall)
@@ -204,6 +206,33 @@ class MainActivity : ComponentActivity() {
     }
     @Composable private fun Toggle(title: String,value: Boolean,change: (Boolean)->Unit) {
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text(title,Modifier.weight(1f).padding(top=12.dp));Switch(value,change) }
+    }
+    @Composable private fun SmartThingsSettings(vm: ProbeViewModel,enabled: Boolean) {
+        val view by vm.smartThings.collectAsStateWithLifecycle()
+        var clientId by remember(view.clientId) { mutableStateOf(view.clientId) }
+        var secret by remember { mutableStateOf("") }
+        var deviceId by remember(view.deviceId) { mutableStateOf(view.deviceId) }
+        var redirect by remember(view.redirectUri) { mutableStateOf(view.redirectUri) }
+        var code by remember { mutableStateOf("") }
+        Text("SmartThings 가상 스위치",style=MaterialTheme.typography.titleMedium)
+        Text(when { view.connected -> "OAuth 앱 연결됨 (선택 사항)"; view.samsungLogin -> "삼성 계정 로그인으로 사용 가능 · 별도 연결 불필요"; else -> "삼성 계정 로그인이 필요합니다" },style=MaterialTheme.typography.bodySmall)
+        OutlinedTextField(value=clientId,onValueChange={clientId=it},label={Text("OAuth 클라이언트 ID")},singleLine=true,modifier=Modifier.fillMaxWidth())
+        OutlinedTextField(value=secret,onValueChange={secret=it},label={Text("클라이언트 비밀 (비워두면 기존 값 유지)")},visualTransformation=PasswordVisualTransformation(),singleLine=true,modifier=Modifier.fillMaxWidth())
+        OutlinedTextField(value=deviceId,onValueChange={deviceId=it},label={Text("가상 스위치 기기 ID")},singleLine=true,modifier=Modifier.fillMaxWidth())
+        OutlinedTextField(value=redirect,onValueChange={redirect=it},label={Text("리디렉션 주소 (OAuth 앱과 같게)")},singleLine=true,modifier=Modifier.fillMaxWidth())
+        OutlinedTextField(value=code,onValueChange={code=it},label={Text("승인 코드 (연결할 때 한 번만 붙여넣기)")},visualTransformation=PasswordVisualTransformation(),singleLine=true,modifier=Modifier.fillMaxWidth())
+        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick={vm.saveSmartThings(clientId,secret,deviceId,redirect,code);secret="";code=""}) { Text("저장 및 연결") }
+            OutlinedButton(onClick={ if (clientId.isNotBlank()) runCatching { startActivity(Intent(Intent.ACTION_VIEW,dev.uwbpulse.monitor.domain.SmartThingsSwitch.authorizationUrl(clientId.trim(),redirect.trim()).toUri())) } else vm.error.value="먼저 클라이언트 ID를 입력하세요." }) { Text("승인 페이지 열기") }
+        }
+        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick={vm.testSmartThings(true)}) { Text("스위치 켜기 시험") }
+            OutlinedButton(onClick={vm.testSmartThings(false)}) { Text("스위치 끄기 시험") }
+            TextButton(onClick={vm.disconnectSmartThings()}) { Text("연결 해제") }
+        }
+        OutlinedButton(onClick={vm.probeSmartThingsLogin()},modifier=Modifier.fillMaxWidth()) { Text("삼성 로그인 토큰으로 연결 시험 (읽기·쓰기)") }
+        Toggle("이탈 시 스위치 켜기 · 복귀 시 끄기",enabled) { vm.smartThingsEnabled(it) }
+        Text("기기 ID만 저장하면 앱에 저장된 삼성 계정 로그인으로 SmartThings 서버에 직접 신호를 보냅니다. OAuth 항목은 비워 두어도 됩니다. 시험 버튼은 실제 이탈 없이 스위치만 바꾸며, 연결된 SmartThings 자동화가 있으면 그것이 실행됩니다. 비밀과 토큰은 Keystore로 암호화해 저장하고 로그에 남기지 않습니다.",style=MaterialTheme.typography.bodySmall)
     }
     @Composable private fun WebhookSettings(vm: ProbeViewModel,enabled: Boolean,includeTag: Boolean) {
         val savedUrl by vm.webhookUrl.collectAsStateWithLifecycle()

@@ -63,11 +63,7 @@ class SamsungAccountRepository(context: Context) {
         fun getDevices() = SamsungHttp.request("https://client.smartthings.com/devices/",token=token)
         val result = try { getDevices() } catch (e: IllegalStateException) {
             if (e.message != "SAMSUNG_HTTP_401") throw e
-            val base = SamsungHttp.verifyAuthUrl(saved.getString("authBase"))
-            val response = SamsungHttp.request("$base/auth/oauth2/token","POST",mapOf("grant_type" to "refresh_token", "client_id" to SamsungLogin.IOT_CLIENT,"refresh_token" to saved.getString("refreshToken")))
-            token = response.getString("access_token")
-            saved.put("accessToken",token).put("refreshToken",response.optString("refresh_token",saved.getString("refreshToken")))
-            vault.write(saved)
+            token = refreshAccessToken()
             getDevices()
         }
         val items = result.optJSONArray("items") ?: error("DEVICE_LIST_FORMAT_UNSUPPORTED")
@@ -100,6 +96,21 @@ class SamsungAccountRepository(context: Context) {
         check(mutableTags.value.any { it.id == id }) { "TAG_NOT_IN_ACCOUNT" }
         selectedId.value = id; saved.put("selectedTag",id); vault.write(saved)
     } }
+    private fun refreshAccessToken(): String {
+        val base = SamsungHttp.verifyAuthUrl(saved.getString("authBase"))
+        val response = SamsungHttp.request("$base/auth/oauth2/token","POST",mapOf("grant_type" to "refresh_token", "client_id" to SamsungLogin.IOT_CLIENT,"refresh_token" to saved.getString("refreshToken")))
+        val token = response.getString("access_token")
+        saved.put("accessToken",token).put("refreshToken",response.optString("refresh_token",saved.getString("refreshToken")))
+        vault.write(saved)
+        return token
+    }
+    fun loggedIn(): Boolean = saved.optString("accessToken").isNotBlank()
+    /** The logged-in Samsung account's access token, optionally renewed first. Never log or display it. */
+    @Synchronized fun accessToken(renew: Boolean = false): String {
+        val current = saved.optString("accessToken")
+        check(current.isNotBlank()) { "SAMSUNG_LOGIN_REQUIRED" }
+        return if (renew) refreshAccessToken() else current
+    }
     @Synchronized fun credentials(id: String): TagCredentials {
         val array = saved.optJSONArray("tags") ?: error("TAG_KEY_NOT_AVAILABLE")
         val tag = (0 until array.length()).map(array::getJSONObject).firstOrNull { it.optString("id") == id } ?: error("TAG_NOT_IN_ACCOUNT")

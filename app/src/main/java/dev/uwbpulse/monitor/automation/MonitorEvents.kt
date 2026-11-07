@@ -76,6 +76,7 @@ class EventDispatcher(private val app: MonitorApplication) {
                     .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,30,TimeUnit.SECONDS).build()
                 WorkManager.getInstance(app).enqueueUniqueWork("uwbpulse-event-${event.id}",ExistingWorkPolicy.KEEP,request)
             }
+            if (preferences.smartThingsEnabled) dev.uwbpulse.monitor.domain.SmartThingsSwitch.stateFor(type)?.let { SmartThingsWork.sendState(app,it) }
         } }
     }
     private fun notifyEvent(event: MonitorEvent) {

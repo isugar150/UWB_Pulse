@@ -28,7 +28,7 @@ JDK 25, Android SDK Platform 37, Build Tools 36.0.0을 사용한다. daemon JVM 
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 39개, Lint 오류 0 / monochrome 아이콘 경고 1이다. 새 테스트를 추가하면 문서의 개수도 갱신한다.
+macOS에서 필요한 경우 `JAVA_HOME=$(/usr/libexec/java_home -v 25)`를 사용한다. 현재 기준 단위 테스트는 47개, Lint 오류 0 / monochrome 아이콘 경고 1이다. 새 테스트를 추가하면 문서의 개수도 갱신한다.
 
 실제 무선 검증은 별도다. `docs/HANDOFF.md`의 재현 절차를 따른다. 재부팅 검증 중에는 부팅 후 자동 재개 증거를 얻기 전에 앱 Activity를 열지 않는다. 실기기 시험을 하지 않았다면 그 사실을 명확히 기록한다.
 

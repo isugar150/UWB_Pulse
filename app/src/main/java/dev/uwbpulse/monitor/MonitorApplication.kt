@@ -11,4 +11,5 @@ class MonitorApplication : Application() {
     val account by lazy { SamsungAccountRepository(this) }
     val settings by lazy { MonitorSettings(this) }
     val events by lazy { EventDispatcher(this) }
+    val smartThings by lazy { dev.uwbpulse.monitor.automation.SmartThingsStore(this) }
 }

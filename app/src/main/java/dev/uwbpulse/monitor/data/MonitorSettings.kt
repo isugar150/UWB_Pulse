@@ -28,6 +28,7 @@ data class MonitorPreferences(
     val trackingRate: TrackingRate = TrackingRate.NORMAL,
     val rescanMaxMillis: Long = RescanPolicy.DEFAULT_MAX_MILLIS,
     val last: LastObservation = LastObservation(),
+    val smartThingsEnabled: Boolean = false,
 )
 class MonitorSettings(private val context: Context) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -45,6 +46,7 @@ class MonitorSettings(private val context: Context) {
     private val rescan = longPreferencesKey("rescan_max_millis")
     private val lastMeters = doublePreferencesKey("last_meters")
     private val lastSeen = longPreferencesKey("last_seen_epoch")
+    private val smartThings = booleanPreferencesKey("smartthings_switch")
     private fun decode(values: Preferences): MonitorPreferences =
         MonitorPreferences(
             runCatching {
@@ -59,7 +61,7 @@ class MonitorSettings(private val context: Context) {
             values[monitoring] ?: false,values[afterBoot] ?: true,
             runCatching { Backend.valueOf(values[backend].orEmpty()) }.getOrDefault(if (android.os.Build.VERSION.SDK_INT >= 36) Backend.PLATFORM else Backend.JETPACK),values[away] ?: emptySet(),
             TrackingRate.parse(values[rate]),RescanPolicy.coerce(values[rescan] ?: RescanPolicy.DEFAULT_MAX_MILLIS),
-            LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]))
+            LastObservation(values[lastMeters]?.takeIf { it.isFinite() && it >= 0 },values[lastSeen]),values[smartThings] ?: false)
     val state = context.monitorPreferences.data.map(::decode).stateIn(scope,SharingStarted.Eagerly,MonitorPreferences())
     suspend fun persisted() = decode(context.monitorPreferences.data.first())
     suspend fun setThreshold(value: Double) = context.monitorPreferences.edit {
@@ -77,6 +79,7 @@ class MonitorSettings(private val context: Context) {
     suspend fun monitoring(enabled: Boolean) = context.monitorPreferences.edit { it[monitoring] = enabled }
     suspend fun resumeAfterBoot(enabled: Boolean) = context.monitorPreferences.edit { it[afterBoot] = enabled }
     suspend fun backend(value: Backend) = context.monitorPreferences.edit { it[backend] = value.name }
+    suspend fun smartThings(enabled: Boolean) = context.monitorPreferences.edit { it[smartThings] = enabled }
     suspend fun trackingRate(value: TrackingRate) = context.monitorPreferences.edit { it[rate] = value.name }
     suspend fun rescanMaxMillis(value: Long) = context.monitorPreferences.edit { it[rescan] = RescanPolicy.coerce(value) }
     suspend fun lastObservation(meters: Double, atEpochMillis: Long) = context.monitorPreferences.edit {

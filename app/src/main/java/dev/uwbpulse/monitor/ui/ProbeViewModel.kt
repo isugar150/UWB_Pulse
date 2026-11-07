@@ -8,9 +8,15 @@ import dev.uwbpulse.monitor.MonitorApplication
 import dev.uwbpulse.monitor.data.BleDiscovery
 import dev.uwbpulse.monitor.domain.Backend
 import dev.uwbpulse.monitor.domain.TagCandidate
+import dev.uwbpulse.monitor.domain.SmartThingsSwitch
 import dev.uwbpulse.monitor.domain.TrackingRate
+import dev.uwbpulse.monitor.automation.SmartThingsClient
+import dev.uwbpulse.monitor.automation.SmartThingsWork
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+
+/** What the settings screen may show of the SmartThings secrets: never the secret, the tokens or the device ID value in logs. */
+data class SmartThingsView(val connected: Boolean = false, val samsungLogin: Boolean = false, val clientId: String = "", val deviceId: String = "", val redirectUri: String = SmartThingsSwitch.DEFAULT_REDIRECT)
 
 class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     val store = (application as MonitorApplication).store
@@ -18,6 +24,8 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     val settings = (application as MonitorApplication).settings
     val events = (application as MonitorApplication).events.events
     val webhookUrl = MutableStateFlow("")
+    val smartThings = MutableStateFlow(SmartThingsView())
+    private fun reloadSmartThings() { val c = (getApplication<MonitorApplication>()).smartThings.read(); smartThings.value = SmartThingsView(c.connected,(getApplication<MonitorApplication>()).account.loggedIn(),c.clientId,c.deviceId,c.redirectUri) }
     val state = store.state
     val log = store.log
     val candidates = MutableStateFlow<List<TagCandidate>>(emptyList())
@@ -27,7 +35,7 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch { backend.value = settings.persisted().backend }
         // The vault is decrypted through Android Keystore: keep that off the main thread.
-        viewModelScope.launch(Dispatchers.IO) { webhookUrl.value = (application as MonitorApplication).events.webhook().url }
+        viewModelScope.launch(Dispatchers.IO) { webhookUrl.value = (application as MonitorApplication).events.webhook().url; reloadSmartThings() }
     }
     val selected = store.selectedAddress.stateIn(viewModelScope, SharingStarted.Eagerly, null)
     private var scanJob: Job? = null
@@ -82,6 +90,44 @@ class ProbeViewModel(application: Application) : AndroidViewModel(application) {
     fun saveWebhook(url: String, token: String, clearToken: Boolean) = viewModelScope.launch {
         try { (getApplication<MonitorApplication>()).events.saveWebhook(url,token,clearToken); webhookUrl.value = url.trim(); error.value = "Webhook 설정을 암호화해 저장했습니다." }
         catch (e: Exception) { error.value = dev.uwbpulse.monitor.data.auth.SamsungAccountRepository.safeError(e) }
+    }
+    fun saveSmartThings(clientId: String,clientSecret: String,deviceId: String,redirectUri: String,code: String) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val store = (getApplication<MonitorApplication>()).smartThings
+            require(clientId.isNotBlank() || code.isBlank()) { "SMARTTHINGS_CLIENT_ID_REQUIRED" }
+            require(deviceId.isBlank() || SmartThingsSwitch.isDeviceId(deviceId.trim())) { "SMARTTHINGS_DEVICE_ID_INVALID" }
+            require(redirectUri.trim().startsWith("https://")) { "SMARTTHINGS_REDIRECT_HTTPS_REQUIRED" }
+            store.update { it.copy(clientId=clientId.trim(),clientSecret=clientSecret.ifBlank { it.clientSecret },deviceId=deviceId.trim(),redirectUri=redirectUri.trim()) }
+            if (code.isNotBlank()) SmartThingsClient.exchangeCode(store,code)
+            reloadSmartThings()
+            error.value = if (smartThings.value.connected) "SmartThings 설정을 암호화해 저장했습니다." else "저장했습니다. 승인 코드를 붙여 넣어 연결하세요."
+        } catch (e: Exception) { error.value = dev.uwbpulse.monitor.data.auth.SamsungAccountRepository.safeError(e) }
+    }
+    fun smartThingsEnabled(enabled: Boolean) = viewModelScope.launch {
+        val view = smartThings.value
+        if (enabled && ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId))) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return@launch }
+        settings.smartThings(enabled); SmartThingsWork.syncKeepAlive(getApplication(),enabled)
+    }
+    fun testSmartThings(on: Boolean) {
+        val view = smartThings.value
+        if ((!view.connected && !view.samsungLogin) || !SmartThingsSwitch.isDeviceId(view.deviceId)) { error.value = "삼성 계정 로그인과 가상 스위치 기기 ID가 필요합니다."; return }
+        SmartThingsWork.sendState(getApplication(),if (on) "on" else "off",test=true)
+        error.value = "시험 신호를 보냈습니다. 결과는 진단 로그의 ST_SWITCH_RESULT에서 확인하세요."
+    }
+    /** Statuses only: tells whether the stored Samsung login can talk to the SmartThings API without any extra credential. */
+    fun probeSmartThingsLogin() = viewModelScope.launch(Dispatchers.IO) {
+        val app = getApplication<MonitorApplication>()
+        try {
+            val result = dev.uwbpulse.monitor.automation.SmartThingsProbe.run(app.account,app.smartThings.read().deviceId)
+            app.store.record("ST_PROBE","readStatus=${result.readStatus}; writeStatus=${result.writeStatus}")
+            error.value = "로그인 토큰 시험: 읽기 ${result.readStatus} · 쓰기 ${result.writeStatus ?: "-"}"
+        } catch (e: Exception) {
+            val code = dev.uwbpulse.monitor.data.auth.SamsungAccountRepository.safeError(e)
+            app.store.record("ST_PROBE_ERROR",code); error.value = "로그인 토큰 시험 실패: $code"
+        }
+    }
+    fun disconnectSmartThings() = viewModelScope.launch(Dispatchers.IO) {
+        (getApplication<MonitorApplication>()).smartThings.clear(); settings.smartThings(false); SmartThingsWork.syncKeepAlive(getApplication(),false); reloadSmartThings()
     }
     fun logout() = viewModelScope.launch { settings.monitoring(false);settings.clearLastObservation();account.logout() }
     fun resumeAfterBoot(enabled: Boolean) = viewModelScope.launch { settings.resumeAfterBoot(enabled) }

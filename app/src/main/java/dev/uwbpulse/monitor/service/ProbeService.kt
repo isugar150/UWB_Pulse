@@ -13,6 +13,7 @@ import dev.uwbpulse.monitor.data.BleDiscovery
 import dev.uwbpulse.monitor.data.GattTransport
 import dev.uwbpulse.monitor.data.UwbProbe
 import dev.uwbpulse.monitor.automation.MonitorEvent
+import dev.uwbpulse.monitor.automation.SmartThingsWork
 import dev.uwbpulse.monitor.domain.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -72,6 +73,7 @@ class ProbeService : Service() {
     }
     private suspend fun monitor(cloudId: String,backend: Backend) {
         val initial = app.settings.persisted()
+        SmartThingsWork.syncKeepAlive(this,initial.smartThingsEnabled) // idempotent; keeps the SmartThings refresh token alive
         val alias = MonitorEvent.tagAlias(packageName,cloudId)
         // The ranging interval is part of the encrypted tag configuration, so it is fixed for this service run.
         val rate = initial.trackingRate
