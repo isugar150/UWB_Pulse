@@ -76,10 +76,10 @@ adb shell am start -W -n dev.uwbpulse.monitor/.MainActivity
 |---|---|
 |화면 개선|`MainActivity.kt`, `ProbeViewModel.kt`. 현재 단일 Activity의 Compose 화면. 거리 처리와 무선 세션은 서비스에 유지|
 |외부 자동화 검증|Tasker 설치 기기 또는 사용자가 지정한 HTTPS 수신 서버 필요. 서버 도착 시각·중복 이벤트 처리 확인|
-|회복 경로 실측|태그 단절·재진입, Bluetooth/UWB OFF/ON, 권한 회수, 실제 프로세스 재생성·앱 업데이트 시험|
+|회복 경로 실측|태그 단절·재진입, 최근 앱에서 닫기, SIGKILL 후 START_STICKY 복구, 앱 업데이트는 확인함. 남은 것: Bluetooth/UWB OFF/ON, 권한 회수, 설정의 강제 중지, 삼성 절전 기능, 비충전 장시간. SIGKILL 뒤 재개가 약 45초 걸리는 것은 태그에 남은 이전 세션 때문으로 보이며 단축 방법은 미조사|
 |갱신 주기 배터리 측정|콜백 간격(120/240/600ms)은 확인됨. 비충전에서 같은 조건으로 수 시간씩 폰·태그 배터리 소모를 비교해야 절전 효과를 주장할 수 있다. 시험 후 기본 240ms로 복원|
 |중지 직후 재시작 지연|중지 후 곧바로 시작하면 `GATT_..._147`/`OWNER_TAG_NOT_FOUND`로 첫 수신까지 21~73초. 원인 조사 필요(이전 빌드와 비교 안 함)|
-|일시적 재연결 이벤트 억제 검증|단위 테스트 + 기기에서 짧은 일시 실패는 이벤트 0건으로 확인(2회: `0d8af20`, `61a5bc9` 빌드)(`test-results/outage-policy-validation.txt`). 남은 확인: 태그를 일부러 멀리 둔 2분 뒤 `TAG_DISCONNECTED`가 한 번만 나가는지, 태그가 끝까지 범위 밖일 때 이벤트가 0건인지|
+|일시적 재연결 이벤트 억제 검증|단위 테스트와 기기 시험으로 확인: 짧은 일시 실패는 이벤트 0건, 이동 시험에서 2분 25초 뒤 `TAG_DISCONNECTED` 1회·`UWB_MONITORING_ERROR` 0건·복귀 시 자동 재연결(`test-results/outage-policy-validation.txt`). 남은 확인: 한 번도 연결된 적 없는 태그가 실행 내내 범위 밖인 경우|
 |`TAG_AUTHENTICATION_FAILED` 재시도 검증|12:49:20 사용자 사용 중 한 번의 인증 실패로 서비스가 멈췄다. 이제 연속 3번까지 재시도하고 4번째에 멈춘다(프로토콜·인증 불변 조건은 그대로). 기기에서 실제로 재시도 후 복구하는지 미확인. 원인(`GATT_BUSY_RETRY` 직후 실패)은 미조사|
 |SmartThings/루틴|[AUTOMATION_REVIEW.md](AUTOMATION_REVIEW.md) 참고. **가장 먼저**: 삼성 루틴의 ‘알림을 받으면’ 조건으로 앱 이벤트 알림이 루틴을 실행하는지 사용자 폰에서 시험(알림 접근 허용 필요, 루틴 생성은 사용자 동의 후). 그다음 가상 스위치 수동 REST 호출 시험|
 |배터리·장기 안정성|비충전·기본 최적화·깊은 절전·수 시간 시험. 15분 충전 중 결과와 구분|

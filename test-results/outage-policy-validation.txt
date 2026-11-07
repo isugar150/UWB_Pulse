@@ -43,3 +43,20 @@ Scope: only the short transient case (A) was exercised. NOT yet verified: TAG_DI
 - Windows with fewer than 21 callbacks per 5 s: 13:58:32 (20), 13:58:37 (20), 13:58:42 (19), 13:58:47 (16) - a few dropped ranging rounds shortly after the screen turned off, no stall.
 - This confirms every callback is still processed with the 1 s hidden UI refresh. The UI state itself is not visible in the journal.
 
+## Movement test (14:02-14:11), user carried the phone away from a stationary tag and back; threshold lowered by the user to 1.5 m for the test
+Events as published (event IDs removed):
+14:02:29 TAG_DISTANCE_EXCEEDED distanceMeters=2.35; thresholdMeters=1.5
+14:02:31 TAG_RETURNED          distanceMeters=0.97
+14:03:29 TAG_DISTANCE_EXCEEDED distanceMeters=2.31   (no second exceed while it stayed away)
+14:05:02 MONITOR_CONNECTION_ERROR UWB_STOPPED_0       -> OUTAGE_NOT_PUBLISHED (outage starts, tag out of range)
+14:05:22 OWNER_TAG_NOT_FOUND -> OUTAGE_NOT_PUBLISHED
+14:05:42 OWNER_TAG_NOT_FOUND -> OUTAGE_NOT_PUBLISHED
+14:06:12 OWNER_TAG_NOT_FOUND -> OUTAGE_NOT_PUBLISHED
+14:07:27 OWNER_TAG_NOT_FOUND -> TAG_DISCONNECTED distanceMeters=unknown   (145 s after the first failure, once)
+14:08:42 OWNER_TAG_NOT_FOUND -> OUTAGE_NOT_PUBLISHED                      (no second TAG_DISCONNECTED)
+14:09:52 TAG_AUTHENTICATED, UWB_STARTED (automatic reconnect after the user came back)
+14:09:53 TAG_RETURNED distanceMeters=0.15   (away state was kept through the outage)
+Totals: TAG_DISTANCE_EXCEEDED 2, TAG_RETURNED 2, TAG_DISCONNECTED 1, UWB_MONITORING_ERROR 0, suppressed failures 5. No further events until the watch was stopped at 14:11:24 (distance 0.19 m).
+- Verified: exceed/return are published once per transition; an out-of-range outage publishes TAG_DISCONNECTED once after 120 s and never UWB_MONITORING_ERROR; reconnect is automatic and the away state survives the outage.
+- NOT verified: a tag that was never connected in the run and stays out of range for the whole run; the owner-proof retry path; delivery of these notifications to a Samsung routine.
+

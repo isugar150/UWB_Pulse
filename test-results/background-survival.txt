@@ -1,0 +1,23 @@
+UWB Pulse background survival (single device, tag stationary at about 0.2 m, build with the code of commit 61a5bc9)
+Date: 2026-11-07 (Asia/Seoul). Device: Samsung SM-F971N, Android 17 / API 37. Source: on-device journal and dumpsys, reviewed; no identifiers.
+
+## 1. App removed from the recents list (14:13)
+- Before: pid 3431, foreground service type connectedDevice (0x10), stopIfKilled=false (START_STICKY), MainActivity visible.
+- The card was swiped away in the recents screen: the activity task was gone (0 tasks of the app).
+- After 3 s and after another 40 s: same pid 3431, foreground service still present, UWB_REPORT every 5 s with activityVisible=false.
+- Callbacks: total 2901 -> 3111 in 45 s (4.2/s at 240 ms). No error, no event, no journal gap.
+
+## 2. Process killed with SIGKILL (14:14:18, run-as kill -9 3431; simulates the system killing the process)
++  0.0 s  new process pid 27569 within about 1 s (START_STICKY restart), foreground service present
++  0.0 s  APP_START, MONITOR_RESTORE manual=false (saved ON state and policy restored), MONITOR_START
++ 16.3 s  tag found, mutual owner proof verified, UWB started, OOB acknowledged
++ 26.6 s  UWB_STOPPED_0 (no report yet; the killed process had left the tag session running) -> OUTAGE_NOT_PUBLISHED
++ 27.4 s  encrypted stop acknowledged, new scan
++ 44.4 s  authenticated again, UWB started
++ 45.4 s  first UWB_REPORT of the new process
+Published TAG_DISCONNECTED / UWB_MONITORING_ERROR since the restart: 0.
+- Result: the service comes back by itself; tracking resumes after about 45 s because the tag first has to drop the session of the killed process.
+
+## Not tested
+- Force stop from Settings (by design the app does not resume until it is opened) and the Samsung battery features that put apps to sleep.
+- Long background runs on battery.
