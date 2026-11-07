@@ -127,6 +127,7 @@ class MainActivity : ComponentActivity() {
                 Text("이탈 임계거리  ${"%.1f".format(prefs.policy.threshold)} m",style=MaterialTheme.typography.titleMedium)
                 Slider(value=prefs.policy.threshold.toFloat(),onValueChange=vm::threshold,valueRange=1f..10f,steps=17)
                 Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text("1 m");Text("10 m") }
+                ReturnDistanceSlider(prefs.policy,vm::returnDistance)
                 Text("${prefs.policy.dwellMillis / 1000.0}초 이상 초과하면 이탈 · ${"%.1f".format(prefs.policy.returnDistance)} m 이내에서 복귀",style=MaterialTheme.typography.bodySmall)
                 Button(onClick={if (state.running) stopMonitoring() else request("start")},enabled=state.running || owned.any { it.id == selected && it.supportsUwb && it.hasOwnerKey },modifier=Modifier.fillMaxWidth().height(56.dp)) {
                     Text(if (state.running) "모니터링 중지" else "모니터링 시작")
@@ -151,8 +152,7 @@ class MainActivity : ComponentActivity() {
                     TextButton(onClick={vm.refreshAccount()},enabled=!state.running && !accountBusy) { Text("내 태그 새로고침") }
                     TextButton(onClick={vm.logout()},enabled=!state.running && !accountBusy) { Text("연결 해제") }
                 }
-                Text("복귀 거리  ${"%.1f".format(prefs.policy.returnDistance)} m")
-                Slider(value=prefs.policy.returnDistance.toFloat(),onValueChange=vm::returnDistance,valueRange=0f..(prefs.policy.threshold.toFloat()-0.5f),steps=((prefs.policy.threshold-0.5)*2).toInt().minus(1).coerceAtLeast(0))
+                ReturnDistanceSlider(prefs.policy,vm::returnDistance)
                 Text("이탈 지속 시간  ${prefs.policy.dwellMillis / 1000.0}초")
                 Slider(value=(prefs.policy.dwellMillis / 1000f),onValueChange=vm::dwell,valueRange=1f..10f,steps=17)
                 HorizontalDivider()
@@ -191,6 +191,16 @@ class MainActivity : ComponentActivity() {
                 events.takeLast(8).reversed().forEach { event -> Text("${event.timestamp.substringAfter('T').take(8)} · ${label(event.type)}",style=MaterialTheme.typography.bodySmall) }
             }
         }
+    }
+    /** The return distance may be set anywhere from MIN_RETURN up to half a metre below the exit threshold. */
+    @Composable private fun ReturnDistanceSlider(policy: DistancePolicy,change: (Float)->Unit) {
+        val min = DistancePolicy.MIN_RETURN.toFloat()
+        val max = policy.threshold.toFloat() - 0.5f
+        Text("복귀 거리  ${"%.1f".format(policy.returnDistance)} m",style=MaterialTheme.typography.titleMedium)
+        if (max > min) {
+            Slider(value=policy.returnDistance.toFloat().coerceIn(min,max),onValueChange=change,valueRange=min..max,steps=((max-min)*2).toInt().minus(1).coerceAtLeast(0))
+            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text("%.1f m".format(min));Text("%.1f m".format(max)) }
+        } else Text("임계거리가 1 m일 때 복귀 거리는 0.5 m로 고정됩니다.",style=MaterialTheme.typography.bodySmall)
     }
     @Composable private fun Toggle(title: String,value: Boolean,change: (Boolean)->Unit) {
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text(title,Modifier.weight(1f).padding(top=12.dp));Switch(value,change) }

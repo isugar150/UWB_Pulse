@@ -2,6 +2,10 @@ package dev.uwbpulse.monitor.domain
 
 enum class MonitorEventType { TAG_DISTANCE_EXCEEDED, TAG_RETURNED, TAG_DISCONNECTED, UWB_MONITORING_ERROR }
 data class DistancePolicy(val threshold: Double = 5.0, val returnDistance: Double = 4.0, val dwellMillis: Long = 3_000) {
+    companion object {
+        /** Smallest return distance the UI offers; 0 m would need an exact 0.00 reading and never return. */
+        const val MIN_RETURN = 0.5
+    }
     init {
         require(threshold.isFinite() && threshold in 1.0..10.0 && threshold * 2 % 1 == 0.0)
         require(returnDistance.isFinite() && returnDistance >= 0 && returnDistance < threshold)

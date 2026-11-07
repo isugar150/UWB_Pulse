@@ -68,7 +68,7 @@ class MonitorSettings(private val context: Context) {
         it[threshold] = rounded
         it[returned] = (rounded - hysteresis).coerceIn(0.5,rounded - 0.5)
     }
-    suspend fun setReturnDistance(value: Double) = context.monitorPreferences.edit { it[returned] = value.coerceIn(0.0,(it[threshold] ?: 5.0) - 0.5) }
+    suspend fun setReturnDistance(value: Double) = context.monitorPreferences.edit { it[returned] = value.coerceIn(DistancePolicy.MIN_RETURN,(it[threshold] ?: 5.0) - 0.5) }
     suspend fun setDwell(value: Long) = context.monitorPreferences.edit { it[dwell] = value.coerceIn(500,30_000) }
     suspend fun notify(type: MonitorEventType, enabled: Boolean) = context.monitorPreferences.edit { it[booleanPreferencesKey("notify_${type.name}")] = enabled }
     suspend fun tasker(enabled: Boolean) = context.monitorPreferences.edit { it[tasker] = enabled }
